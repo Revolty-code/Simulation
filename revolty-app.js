@@ -1512,6 +1512,14 @@
             // Source : données internes Revolty — 1 tCO₂eq pour 10 kWh de batterie neuve
             const CO2_BATT_NEUVE = 100; // kgCO₂eq / kWh de capacité nominale
 
+            // SoH LFP reconditionnée — modèle linéaire calendaire + cyclique
+            // SoH initial 95% (seuil tri reconditionnement — Martinez-Laserna 2018)
+            // Calendaire 0,8%/an (Naumann 2018, Keil 2016, LFP 25°C / SoC moy 50%)
+            // Cyclique 0,0035%/EFC (≈5 700 cycles à 80% — Preger 2020, Naumann 2020)
+            const SOH_INIT = 0.95;
+            const SOH_CAL_LOSS = 0.008;
+            const SOH_CYC_LOSS = 0.000035;
+
             // Heures creuses standard Enedis : 22h–6h (8 heures)
             // Source : plage la plus courante sur le parc Enedis résidentiel
             const HEURES_CREUSES = [22, 23, 0, 1, 2, 3, 4, 5];
@@ -1558,7 +1566,7 @@
             // Source : Open DPE ADEME, logements existants post-juillet 2021
             // Colonne besoin_chauffage / surface_habitable — médiane sur 3 301 maisons
             // Besoin thermique bâtiment (kWh_th/m²/an), système-indépendant, méthode 3CL
-            const BESOIN_CHAUFFE = { A: 48, B: 77, C: 75, D: 112, E: 166, F: 228, G: 302 };
+            const BESOIN_CHAUFFE = { A: 48, B: 62, C: 75, D: 112, E: 166, F: 228, G: 302 };
 
             // Source : même dataset — ratio conso_chauffage_EF / besoin_chauffage
             // gaz : 0 (chauffage non électrique)
@@ -1950,10 +1958,12 @@
             // ═══════════════════════════════════════════════════════════════════════════
             // PROJECTION 20 ANS — histogramme empilé
             // ═══════════════════════════════════════════════════════════════════════════
-            function renderProjection(ecoDirecte, ecoBatterie, ecoRevente) {
+            function renderProjection(ecoDirecte, ecoBatterie, ecoRevente, battKwh, efcAn) {
                 const sec = document.getElementById('projSection');
                 if (ecoDirecte + ecoBatterie + ecoRevente <= 0) { sec.style.display = 'none'; return; }
                 sec.style.display = '';
+
+                const showSoh = battKwh > 0;
 
                 // Build yearly data — autoconso grows with elec price, surplus stays fixed
                 const years = [];
@@ -1964,13 +1974,15 @@
                     const b = Math.round(ecoBatterie * mult);
                     const s = Math.round(ecoRevente); // tarif fixe 20 ans
                     cumul += d + b + s;
-                    years.push({ y: y + 1, d, b, s, total: d + b + s, cumul });
+                    const yr1 = y + 1;
+                    const soh = showSoh ? Math.max(0, SOH_INIT - SOH_CAL_LOSS * yr1 - SOH_CYC_LOSS * efcAn * yr1) : null;
+                    years.push({ y: yr1, d, b, s, total: d + b + s, cumul, soh });
                 }
 
                 document.getElementById('projTotal').textContent = cumul.toLocaleString('fr-FR') + ' €';
 
                 // SVG dimensions
-                const W = 520, H = 200, PAD_L = 40, PAD_R = 10, PAD_T = 10, PAD_B = 24;
+                const W = 520, H = 200, PAD_L = 40, PAD_R = showSoh ? 36 : 10, PAD_T = 10, PAD_B = 24;
                 const chartW = W - PAD_L - PAD_R, chartH = H - PAD_T - PAD_B;
                 const maxVal = Math.max(...years.map(y => y.total)) * 1.08;
                 const barW = Math.floor(chartW / HORIZON) - 2;
@@ -1979,7 +1991,7 @@
                 const scY = v => PAD_T + chartH - (v / maxVal) * chartH;
                 let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">`;
 
-                // Y axis labels
+                // Y axis labels (gauche, €)
                 const nTicks = 4;
                 for (let i = 0; i <= nTicks; i++) {
                     const val = Math.round(maxVal * i / nTicks);
@@ -2005,6 +2017,23 @@
                     if (yr.y === 1 || yr.y % 5 === 0) {
                         svg += `<text x="${x + barW / 2}" y="${H - 4}" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.3)" font-family="DM Sans,sans-serif">${yr.y}</text>`;
                     }
+                }
+
+                // Courbe SoH (axe droit 0–100%)
+                if (showSoh) {
+                    const sohScY = v => PAD_T + chartH - v * chartH;
+                    for (let i = 0; i <= nTicks; i++) {
+                        const frac = i / nTicks;
+                        const yy = sohScY(frac);
+                        svg += `<text x="${W - PAD_R + 4}" y="${yy + 3}" text-anchor="start" font-size="8" fill="rgba(255,255,255,0.25)" font-family="DM Sans,sans-serif">${Math.round(frac * 100)}%</text>`;
+                    }
+                    svg += `<text x="${W - PAD_R + 4}" y="${PAD_T - 2}" text-anchor="start" font-size="7" fill="rgba(255,255,255,0.45)" font-family="DM Sans,sans-serif">SoH</text>`;
+                    const pts = years.map((yr, i) => {
+                        const x = PAD_L + i * barGap + 1 + barW / 2;
+                        const yy = sohScY(yr.soh);
+                        return `${x.toFixed(1)},${yy.toFixed(1)}`;
+                    }).join(' ');
+                    svg += `<polyline points="${pts}" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>`;
                 }
 
                 svg += '</svg>';
@@ -2133,7 +2162,8 @@
                     co2BattEviteKg: state.batt > 0 ? Math.round(state.batt * CO2_BATT_NEUVE) : 0
                 };
                 _dbgCtx = { kwhs, prodAnnuelle, battKwh: state.batt };
-                renderProjection(resBatt.ecoDirecte, resBatt.ecoBatterie, resBatt.ecoRevente);
+                const efcAn = state.batt > 0 ? kwhRest / state.batt : 0;
+                renderProjection(resBatt.ecoDirecte, resBatt.ecoBatterie, resBatt.ecoRevente, state.batt, efcAn);
                 renderDebug(_dbgState.m, _dbgState.we);
             }
 
