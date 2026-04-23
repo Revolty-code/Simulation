@@ -194,36 +194,6 @@
             margin-bottom: 9px;
         }
 
-        .pills {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 7px;
-        }
-
-        .pill-btn {
-            padding: 8px 16px;
-            border: 1.5px solid var(--border);
-            border-radius: 50px;
-            font-family: 'Instrument Sans', sans-serif;
-            font-size: 0.86rem;
-            font-weight: 500;
-            color: var(--mid);
-            background: #fff;
-            cursor: pointer;
-            transition: all 0.16s;
-        }
-
-        .pill-btn:hover {
-            border-color: var(--respire);
-            color: var(--respire);
-        }
-
-        .pill-btn.active {
-            background: var(--respire);
-            border-color: var(--respire);
-            color: #fff;
-        }
-
         /* ── DPE SELECTOR ─────────────────────────────────────────────────────── */
         .dpe-selector {
             display: flex;
@@ -456,6 +426,64 @@
             color: var(--muted);
             display: block;
             margin-top: 2px;
+        }
+
+        /* ── TILES (appareils spécifiques + options solaires) ──────────────── */
+        .tile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 8px;
+            margin-top: 2px;
+        }
+
+        .tile-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .tile-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+        .tile-grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
+
+        .tile-btn {
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 4px;
+            background: #fff;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.18s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            min-height: 72px;
+        }
+
+        .tile-btn:hover { border-color: var(--green-mid); }
+
+        .tile-btn.active {
+            border-color: var(--respire);
+            background: var(--respire);
+        }
+
+        .tile-btn.active .tile-label,
+        .tile-btn.active .tile-sub,
+        .tile-btn.active .tile-icon { color: #fff; }
+
+        .tile-icon {
+            font-size: 1.4rem;
+            line-height: 1;
+        }
+
+        .tile-label {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1.15;
+        }
+
+        .tile-sub {
+            font-size: 0.62rem;
+            color: var(--muted);
+            line-height: 1;
         }
 
         /* ── RESULT ───────────────────────────────────────────────────────────── */

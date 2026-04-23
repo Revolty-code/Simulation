@@ -1735,22 +1735,38 @@
                 ecs: null, ve: false, piscine: false, clim: false,
                 nbPanels: 6, panelwc: 400,
                 dept: '75', orient: 'sud', incl: 35, ombrage: 0, batt: 10,
-                contrat: 'base', consoManuelle: null
+                contrat: 'base', consoManuelle: null, consoMode: 'estim'
             };
 
             // ═══════════════════════════════════════════════════════════════════════════
             // CALCUL kWhs — retourne l'objet des kWh annuels par composante
             // ═══════════════════════════════════════════════════════════════════════════
             function computeKwhs() {
-                const kwh1 = USAGES_COURANTS[Math.min(state.persons, 5)];
-                const kwh2 = state.surface * BESOIN_CHAUFFE[state.dpe] * COEFF_ELEC[state.heat];
                 const kwh_ecs = state.ecs ? KWH_ECS[state.ecs] : 0;
                 const kwh_ve = state.ve ? KWH_VE : 0;
                 const kwh_pisci = state.piscine ? KWH_PISCI : 0;
                 const kwh_clim = state.clim ? KWH_CLIM : 0;
-                const total = state.consoManuelle > 0
-                    ? state.consoManuelle
-                    : Math.round((kwh1 + kwh2 + kwh_ecs + kwh_ve + kwh_pisci + kwh_clim) / 100) * 100;
+
+                // Mode manuel : conso totale saisie, ventilation selon type de chauffage
+                // Parts chauffage issues des moyennes ADEME pour foyers électriques
+                //   résistance : ~60% du total (hors appareils spécifiques)
+                //   PAC        : ~45% (COP ≈ 3 → besoin élec plus faible)
+                //   gaz/bois   : 0% (chauffage non électrique)
+                if (state.consoMode === 'manuel') {
+                    if (!state.consoManuelle || state.consoManuelle <= 0) {
+                        return { kwh1: 0, kwh2: 0, kwh_ecs: 0, kwh_ve: 0, kwh_pisci: 0, kwh_clim: 0, total: 0 };
+                    }
+                    const kwh_specific = kwh_ecs + kwh_ve + kwh_pisci + kwh_clim;
+                    const available = Math.max(0, state.consoManuelle - kwh_specific);
+                    const heatShare = state.heat === 'elec' ? 0.60 : state.heat === 'pompe' ? 0.45 : 0;
+                    const kwh2 = Math.round(available * heatShare);
+                    const kwh1 = available - kwh2;
+                    return { kwh1, kwh2, kwh_ecs, kwh_ve, kwh_pisci, kwh_clim, total: state.consoManuelle };
+                }
+
+                const kwh1 = USAGES_COURANTS[Math.min(state.persons, 5)];
+                const kwh2 = state.surface * BESOIN_CHAUFFE[state.dpe] * COEFF_ELEC[state.heat];
+                const total = Math.round((kwh1 + kwh2 + kwh_ecs + kwh_ve + kwh_pisci + kwh_clim) / 100) * 100;
                 return { kwh1, kwh2, kwh_ecs, kwh_ve, kwh_pisci, kwh_clim, total };
             }
 
@@ -2161,7 +2177,7 @@
                     reventeAnnuelle: resBatt.ecoRevente, prodAnnuelle,
                     co2BattEviteKg: state.batt > 0 ? Math.round(state.batt * CO2_BATT_NEUVE) : 0
                 };
-                _dbgCtx = { kwhs, prodAnnuelle, battKwh: state.batt };
+                _dbgCtx = { kwhs, prodAnnuelle, battKwh: state.batt, consoAnnuelle: resBatt.consoAnnuelle };
                 const efcAn = state.batt > 0 ? kwhRest / state.batt : 0;
                 renderProjection(resBatt.ecoDirecte, resBatt.ecoBatterie, resBatt.ecoRevente, state.batt, efcAn);
                 renderDebug(_dbgState.m, _dbgState.we);
@@ -2218,7 +2234,9 @@
                 const totSurp = H.surplus.reduce((a, b) => a + b, 0);
                 const totAchat = H.achat.reduce((a, b) => a + b, 0);
                 const autoRate = totConso > 0 ? Math.round((totDir + totRest) / totConso * 100) : 0;
+                const consoAn = Math.round(ctx.consoAnnuelle || 0);
                 document.getElementById('dbgMetrics').innerHTML = `
+    <div class="dbg-metric hl"><div class="dm-val">${consoAn.toLocaleString('fr-FR')} kWh</div><div class="dm-lbl">Conso annuelle simulée</div></div>
     <div class="dbg-metric"><div class="dm-val">${f(totConso)}</div><div class="dm-lbl">Conso journée</div></div>
     <div class="dbg-metric hl"><div class="dm-val">${f(totProd)}</div><div class="dm-lbl">Production PV</div></div>
     <div class="dbg-metric"><div class="dm-val">${f(totDir)}</div><div class="dm-lbl">Autoconso directe</div></div>
@@ -2332,30 +2350,78 @@
                 });
             });
 
-            // Pills génériques
-            document.querySelectorAll('.pill-btn').forEach(btn => {
+            // Tiles à choix unique (tous les groupes single-select)
+            document.querySelectorAll('.tile-btn[data-group]').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const g = btn.dataset.group, v = btn.dataset.val;
-                    document.querySelectorAll('.pill-btn[data-group="' + g + '"]').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tile-btn[data-group="' + g + '"]').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     if (g === 'persons') state.persons = parseInt(v);
                     else if (g === 'heat') state.heat = v;
-                    else if (g === 'ecs') state.ecs = v === 'non' ? null : v;
-                    else if (g === 've') state.ve = v === 'oui';
-                    else if (g === 'piscine') state.piscine = v === 'oui';
-                    else if (g === 'clim') state.clim = v === 'oui';
                     else if (g === 'panelwc') state.panelwc = parseInt(v);
                     else if (g === 'contrat') state.contrat = v;
+                    else if (g === 'journee') state.journee = v;
+                    else if (g === 'consoMode') { state.consoMode = v; applyConsoMode(); }
                     else if (g === 'orient') state.orient = v;
                     else if (g === 'incl') state.incl = parseInt(v);
                     else if (g === 'ombrage') state.ombrage = parseFloat(v);
-                    else if (g === 'journee') state.journee = v;
                     compute();
                 });
             });
 
+            // Tiles appareils spécifiques (toggle individuel)
+            // ECS résistance / ECS thermo mutuellement exclusifs
+            document.querySelectorAll('.tile-btn[data-appliance]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const a = btn.dataset.appliance;
+                    const wasActive = btn.classList.contains('active');
+                    if (a === 'ecs-joule' || a === 'ecs-thermo') {
+                        document.querySelectorAll('.tile-btn[data-appliance="ecs-joule"],.tile-btn[data-appliance="ecs-thermo"]').forEach(b => b.classList.remove('active'));
+                        if (wasActive) {
+                            state.ecs = null;
+                        } else {
+                            btn.classList.add('active');
+                            state.ecs = a === 'ecs-joule' ? 'joule' : 'thermo';
+                        }
+                    } else {
+                        btn.classList.toggle('active');
+                        const isOn = btn.classList.contains('active');
+                        if (a === 've') state.ve = isOn;
+                        else if (a === 'piscine') state.piscine = isOn;
+                        else if (a === 'clim') state.clim = isOn;
+                    }
+                    compute();
+                });
+            });
+
+            // Bascule estimation ↔ saisie manuelle
+            // Reset les champs de l'autre mode pour éviter toute fuite de valeur
+            function applyConsoMode() {
+                const mode = state.consoMode;
+                document.getElementById('estimFields').style.display = mode === 'estim' ? '' : 'none';
+                document.getElementById('manualField').style.display = mode === 'manuel' ? '' : 'none';
+
+                // Chauffage : partagé entre les deux modes, toujours remis à "gaz" au switch
+                state.heat = 'gaz';
+                document.querySelectorAll('.tile-btn[data-group="heat"]').forEach(b => b.classList.toggle('active', b.dataset.val === 'gaz'));
+
+                if (mode === 'manuel') {
+                    state.persons = 2; state.dpe = 'D'; state.surface = 100; state.journee = 'maison';
+                    document.querySelectorAll('.tile-btn[data-group="persons"]').forEach(b => b.classList.toggle('active', b.dataset.val === '2'));
+                    document.querySelectorAll('.dpe-btn').forEach(b => b.classList.toggle('active', b.dataset.dpe === 'D'));
+                    document.getElementById('surface').value = 100;
+                    document.getElementById('surfaceVal').textContent = '100';
+                    document.querySelectorAll('.tile-btn[data-group="journee"]').forEach(b => b.classList.toggle('active', b.dataset.val === 'maison'));
+                } else {
+                    state.consoManuelle = null;
+                    const input = document.getElementById('consoManuelle');
+                    input.value = '';
+                    input.classList.remove('has-value');
+                }
+            }
+
             // Afficher tarifs HP/HC
-            document.querySelectorAll('.pill-btn[data-group="contrat"]').forEach(btn => {
+            document.querySelectorAll('.tile-btn[data-group="contrat"]').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.getElementById('block-tarifs-custom').classList.toggle('hidden', btn.dataset.val !== 'hphc');
                 });
