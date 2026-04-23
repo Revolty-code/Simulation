@@ -2139,12 +2139,16 @@
                 const kWhStockedIn = state.batt > 0 ? kwhRest / BATT_EFF : 0;
                 const surplusJourMoy = (kWhStockedIn + resBatt.kWhSurplus) / 365;
                 const ratio = surplusJourMoy > 0.1 ? state.batt / surplusJourMoy : 999;
+                const MAX_BATT_KWH = 15;
                 let dim, dimLabel, dimClass, msgText, msgClass;
                 if (state.batt === 0) {
                     dim = 'base'; dimLabel = ''; dimClass = 'dim-badge'; msgText = ''; msgClass = 'surplus-msg hidden';
+                } else if (state.batt >= MAX_BATT_KWH && ratio < DIM_SOUS_RATIO) {
+                    dim = 'max'; dimLabel = 'Capacité maximum'; dimClass = 'dim-badge dim-max';
+                    msgText = '💎 Vous avez atteint le max avec une seule batterie ! Votre surplus dépasse cette capacité — contactez-nous pour étudier une installation multi-batteries.'; msgClass = 'surplus-msg max';
                 } else if (ratio < DIM_SOUS_RATIO) {
                     dim = 'sous'; dimLabel = 'Sous-dimensionnée'; dimClass = 'dim-badge dim-sous';
-                    msgText = '📈 Une partie du surplus repart sur le réseau à 0,04 €/kWh. Le modèle supérieur récupérerait davantage.'; msgClass = 'surplus-msg sous';
+                    msgText = '📈 Une partie du surplus repart sur le réseau pour presque rien. Le modèle supérieur récupérerait davantage.'; msgClass = 'surplus-msg sous';
                 } else if (ratio <= DIM_OK_RATIO) {
                     dim = 'ok'; dimLabel = 'Bien dimensionnée'; dimClass = 'dim-badge dim-ok';
                     msgText = '✅ La batterie est bien calibrée pour absorber votre surplus solaire.'; msgClass = 'surplus-msg ok';
@@ -2153,6 +2157,7 @@
                     msgText = '🚀 La batterie a plus de capacité que votre production ne génère de surplus. Ajoutez des panneaux pour en exploiter tout le potentiel.'; msgClass = 'surplus-msg sur';
                 }
                 document.getElementById('resSurplusBar').style.width = (state.batt === 0 ? 0 : Math.min(100, Math.round(Math.min(ratio, 1) * 100))) + '%';
+                document.getElementById('resDimBarTrack').style.display = dim === 'max' ? 'none' : '';
                 document.getElementById('resDimBadge').textContent = dimLabel;
                 document.getElementById('resDimBadge').className = dimClass;
                 document.getElementById('resSurplusMsg').textContent = msgText;

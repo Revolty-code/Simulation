@@ -783,6 +783,11 @@
             color: #5BC4E8;
         }
 
+        .dim-max {
+            background: rgba(139, 92, 246, 0.22);
+            color: #B794F6;
+        }
+
         .bar-track {
             height: 7px;
             background: rgba(255, 255, 255, 0.1);
@@ -820,6 +825,11 @@
         .surplus-msg.sur {
             color: #5BC4E8;
             background: rgba(26, 107, 138, 0.12);
+        }
+
+        .surplus-msg.max {
+            color: #B794F6;
+            background: rgba(139, 92, 246, 0.14);
         }
 
         .cta-btn {
