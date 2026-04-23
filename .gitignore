@@ -1,0 +1,14 @@
+# Dossier de dev / staging local — non servi par jsDelivr
+dist/
+
+# Monolithique tout-inline utilisé pour itérer localement
+Simulation_Revolty.html
+
+# Tooling local (Claude Code, skills, etc.)
+.claude/
+.agents/
+skills-lock.json
+
+# Divers
+.DS_Store
+Thumbs.db

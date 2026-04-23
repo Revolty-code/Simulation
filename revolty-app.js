@@ -1499,7 +1499,12 @@
 
             // TRV EDF, grille au 01/03/2026 — source CRE (https://www.cre.fr/documents/Publications/Rapports-thematiques/Comparaison-des-offres-de-marche-et-du-TRV)
             const TARIFS = { base: { kwh: 0.1940 }, hphc: { hp: 0.2065, hc: 0.1579 } };
-            const RACHAT = 0.04; // EDF OA S06 T1 2026, < 9 kWc
+            // Tarifs de rachat du surplus — contrat au choix, stocké dynamiquement dans state.rachat
+            //   sans   : 0 €/kWh (pas de contrat OA — 17% du parc Enedis Q3 2024)
+            //   oa     : 0,04 €/kWh (EDF OA T2 2026, < 9 kWc, arrêté S21)
+            //   projet : 0,011 €/kWh (projet d'arrêté CSE 16 avril 2026, prix spot positif)
+            //   custom : valeur saisie par l'utilisateur
+            const RACHAT_PRESETS = { sans: 0, oa: 0.04, projet: 0.011 };
             const ELEC_ESCALATION = 0.04; // +4% / an — hypothèse EDF long terme
             const HORIZON = 20; // durée contrat OA en années
             const BATT_EFF = 0.92;   // round-trip LFP (0.96 × 0.96)
@@ -1735,7 +1740,8 @@
                 ecs: null, ve: false, piscine: false, clim: false,
                 nbPanels: 6, panelwc: 400,
                 dept: '75', orient: 'sud', incl: 35, ombrage: 0, batt: 10,
-                contrat: 'base', consoManuelle: null, consoMode: 'estim'
+                contrat: 'base', consoManuelle: null, consoMode: 'estim',
+                rachatMode: 'sans', rachat: 0, rachatCustom: 0.04
             };
 
             // ═══════════════════════════════════════════════════════════════════════════
@@ -1835,7 +1841,7 @@
                         soc = Math.min(battKwh, soc + chargeIn * 0.96);
                         const surp = Math.max(0, delta - chargeIn);
                         dSurplus += surp;
-                        eSurplus += surp * RACHAT;
+                        eSurplus += surp * state.rachat;
                     } else {
                         dDirect += prod_h;
                         eDirect += prod_h * prix;
@@ -2118,11 +2124,15 @@
                 const battRow = document.getElementById('ecoBatterieRow');
                 if (battRow) battRow.style.display = state.batt > 0 ? 'flex' : 'none';
                 document.getElementById('ecoDirecte').textContent = fmt(resBatt.ecoDirecte);
-                document.getElementById('ecoBatterie').textContent = state.batt > 0 ? fmt(resBatt.ecoBatterie) : '—';
+                document.getElementById('ecoBatterie').textContent = state.batt > 0 ? fmt(deltaBattEur) : '—';
                 document.getElementById('ecoRevente').textContent = fmt(resBatt.ecoRevente);
+                const rachatLbl = state.rachatMode === 'sans' ? 'Surplus non valorisé'
+                    : state.rachatMode === 'oa' ? 'Rachat EDF OA : 0,04 €/kWh'
+                    : state.rachatMode === 'projet' ? 'Rachat projet avril 2026 : 0,011 €/kWh (prix spot +)'
+                    : `Rachat perso : ${state.rachat.toFixed(3).replace('.', ',')} €/kWh`;
                 document.getElementById('tarifNote').textContent = state.contrat === 'hphc'
-                    ? `HP : ${userTarifs.hp.toFixed(4)} € · HC : ${userTarifs.hc.toFixed(4)} € · Rachat : ${RACHAT} €/kWh`
-                    : `TRV Base mars 2026 : ${TARIFS.base.kwh} €/kWh · Rachat EDF OA : ${RACHAT} €/kWh`;
+                    ? `HP : ${userTarifs.hp.toFixed(4)} € · HC : ${userTarifs.hc.toFixed(4)} € · ${rachatLbl}`
+                    : `TRV Base mars 2026 : ${TARIFS.base.kwh} €/kWh · ${rachatLbl}`;
 
                 // ── Diagnostic : dimensionnement ───────────────────────────────────────
                 const kwhRest = resBatt.kWhRestitue;
@@ -2179,7 +2189,9 @@
                 };
                 _dbgCtx = { kwhs, prodAnnuelle, battKwh: state.batt, consoAnnuelle: resBatt.consoAnnuelle };
                 const efcAn = state.batt > 0 ? kwhRest / state.batt : 0;
-                renderProjection(resBatt.ecoDirecte, resBatt.ecoBatterie, resBatt.ecoRevente, state.batt, efcAn);
+                // Projection : bonus batterie net (vs sans batt) pour cohérence avec le breakdown éco
+                const ecoBatterieProj = state.batt > 0 ? Math.max(0, deltaBattEur) : 0;
+                renderProjection(resBatt.ecoDirecte, ecoBatterieProj, resBatt.ecoRevente, state.batt, efcAn);
                 renderDebug(_dbgState.m, _dbgState.we);
             }
 
@@ -2365,6 +2377,11 @@
                     else if (g === 'orient') state.orient = v;
                     else if (g === 'incl') state.incl = parseInt(v);
                     else if (g === 'ombrage') state.ombrage = parseFloat(v);
+                    else if (g === 'rachatMode') {
+                        state.rachatMode = v;
+                        state.rachat = v === 'custom' ? (state.rachatCustom || 0) : (RACHAT_PRESETS[v] ?? 0);
+                        document.getElementById('rachatCustomField').style.display = v === 'custom' ? 'flex' : 'none';
+                    }
                     compute();
                 });
             });
@@ -2465,6 +2482,15 @@
             document.getElementById('tarifHP').addEventListener('input', debouncedCompute);
             document.getElementById('tarifHC').addEventListener('input', debouncedCompute);
 
+            // Rachat personnalisé
+            document.getElementById('rachatCustom').addEventListener('input', function () {
+                state.rachatCustom = parseFloat(this.value) || 0;
+                if (state.rachatMode === 'custom') {
+                    state.rachat = state.rachatCustom;
+                    debouncedCompute();
+                }
+            });
+
             // Méthodologie
             document.getElementById('infoBtn').addEventListener('click', function () {
                 const p = document.getElementById('methodPanel');
@@ -2490,6 +2516,41 @@
                     renderDebug(_dbgState.m, _dbgState.we);
                 });
             });
+
+            // ═══════════════════════════════════════════════════════════════════════════
+            // LEAD GATE — proto visuel (aucune logique backend, juste UX)
+            // ═══════════════════════════════════════════════════════════════════════════
+            const _resultCard = document.querySelector('.result-card');
+            const _leadGate = document.getElementById('leadGate');
+            const _leadForm = document.getElementById('leadGateForm');
+
+            function _unlockResults() {
+                _resultCard.classList.remove('locked');
+                _leadGate.style.opacity = '0';
+                setTimeout(() => { _leadGate.style.display = 'none'; }, 350);
+            }
+
+            _leadForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const payload = {
+                    email: document.getElementById('leadEmail').value.trim(),
+                    firstname: document.getElementById('leadFirstname').value.trim(),
+                    zip: document.getElementById('leadZip').value.trim(),
+                    phone: document.getElementById('leadPhone').value.trim(),
+                };
+                console.log('[proto lead gate] données fictives soumises', payload);
+                _unlockResults();
+            });
+
+            // DEBUG — bypass du lead gate (à retirer en prod)
+            const _debugBypass = document.getElementById('debugBypass');
+            if (_debugBypass) {
+                _debugBypass.addEventListener('click', () => {
+                    console.log('[debug] bypass du lead gate');
+                    _unlockResults();
+                    _debugBypass.style.display = 'none';
+                });
+            }
 
             // ── INIT
             compute();

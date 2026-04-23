@@ -1216,3 +1216,106 @@
             text-align: center;
             flex-shrink: 0;
         }
+
+        /* ═══ LEAD GATE (proto) ═══ */
+        .result-card.locked > *:not(.lead-gate) {
+            filter: blur(7px);
+            pointer-events: none;
+            user-select: none;
+            transition: filter .35s ease;
+        }
+        .lead-gate {
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(13,26,20,0.55) 0%, rgba(1,114,103,0.45) 100%);
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 20; border-radius: var(--radius);
+            transition: opacity .35s ease;
+            padding: 20px;
+        }
+        .lead-gate-card {
+            background: var(--surface);
+            padding: 28px 26px 22px;
+            border-radius: 18px;
+            box-shadow: 0 24px 60px -10px rgba(0,0,0,0.35);
+            max-width: 360px; width: 100%;
+            text-align: center;
+            color: var(--dark);
+        }
+        .lead-gate-icon {
+            font-size: 2rem;
+            margin-bottom: 4px;
+            display: inline-block;
+        }
+        .lead-gate-card h3 {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 1.22rem; font-weight: 700; color: var(--dark);
+            margin-bottom: 6px; letter-spacing: -0.01em;
+        }
+        .lead-gate-card > p {
+            font-size: 0.86rem; color: var(--mid); margin-bottom: 18px;
+            line-height: 1.4;
+        }
+        .lead-gate-card form { display: flex; flex-direction: column; gap: 9px; }
+        .lead-gate-card input[type="email"],
+        .lead-gate-card input[type="text"],
+        .lead-gate-card input[type="tel"] {
+            width: 100%; padding: 11px 13px;
+            border: 1px solid var(--border); border-radius: 10px;
+            font-family: inherit; font-size: 0.9rem;
+            background: var(--bg); color: var(--dark);
+            transition: border-color .2s, background .2s;
+        }
+        .lead-gate-card input:focus {
+            outline: none; border-color: var(--respire); background: var(--surface);
+        }
+        .lead-gate-card input::placeholder { color: var(--muted); }
+        .lead-gate-consent {
+            display: flex; align-items: flex-start; gap: 8px;
+            font-size: 0.72rem; color: var(--mid); text-align: left;
+            margin: 4px 2px 0;
+            line-height: 1.35;
+        }
+        .lead-gate-consent input[type="checkbox"] {
+            width: auto; margin: 2px 0 0 0; flex-shrink: 0;
+            accent-color: var(--respire);
+        }
+        .lead-gate-card button {
+            margin-top: 8px; padding: 13px 18px;
+            background: var(--respire); color: #fff;
+            border: none; border-radius: 10px;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700; font-size: 0.95rem; cursor: pointer;
+            transition: background .2s, transform .1s;
+            letter-spacing: 0.01em;
+        }
+        .lead-gate-card button:hover:not(:disabled) { background: var(--green-mid); }
+        .lead-gate-card button:active:not(:disabled) { transform: scale(0.98); }
+        .lead-gate-card button:disabled { opacity: 0.55; cursor: wait; }
+        .lead-gate-legal {
+            font-size: 0.68rem; color: var(--muted);
+            margin-top: 10px; line-height: 1.35;
+        }
+
+        /* DEBUG — bouton magique pour bypasser le lead gate (à retirer en prod) */
+        #debugBypass {
+            position: fixed;
+            bottom: 16px; right: 16px;
+            z-index: 9999;
+            padding: 10px 16px;
+            background: #8b5cf6;
+            color: #fff;
+            border: 2px dashed #fff;
+            border-radius: 999px;
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 0.8rem; font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.45);
+            transition: transform .15s, box-shadow .15s;
+            letter-spacing: 0.02em;
+        }
+        #debugBypass:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(139, 92, 246, 0.55);
+        }
+        #debugBypass:active { transform: translateY(0); }
