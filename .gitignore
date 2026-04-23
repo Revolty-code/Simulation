@@ -1,8 +1,6 @@
-# Dossier de dev / staging local — non servi par jsDelivr
-dist/
-
-# Monolithique tout-inline utilisé pour itérer localement
-Simulation_Revolty.html
+# Monolithique tout-inline à la racine — dev local uniquement, non déployé
+# (le slash initial force la correspondance à la racine, pas dans dist/)
+/Simulation_Revolty.html
 
 # Tooling local (Claude Code, skills, etc.)
 .claude/
