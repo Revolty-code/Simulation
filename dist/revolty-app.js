@@ -1499,12 +1499,7 @@
 
             // TRV EDF, grille au 01/03/2026 — source CRE (https://www.cre.fr/documents/Publications/Rapports-thematiques/Comparaison-des-offres-de-marche-et-du-TRV)
             const TARIFS = { base: { kwh: 0.1940 }, hphc: { hp: 0.2065, hc: 0.1579 } };
-            // Tarifs de rachat du surplus — contrat au choix, stocké dynamiquement dans state.rachat
-            //   sans   : 0 €/kWh (pas de contrat OA — 17% du parc Enedis Q3 2024)
-            //   oa     : 0,04 €/kWh (EDF OA T2 2026, < 9 kWc, arrêté S21)
-            //   projet : 0,011 €/kWh (projet d'arrêté CSE 16 avril 2026, prix spot positif)
-            //   custom : valeur saisie par l'utilisateur
-            const RACHAT_PRESETS = { sans: 0, oa: 0.04, projet: 0.011 };
+            // Tarif de rachat du surplus — saisi librement par l'utilisateur (0 par défaut)
             const ELEC_ESCALATION = 0.04; // +4% / an — hypothèse EDF long terme
             const HORIZON = 20; // durée contrat OA en années
             const BATT_EFF = 0.92;   // round-trip LFP (0.96 × 0.96)
@@ -1528,9 +1523,367 @@
             // Heures creuses standard Enedis : 22h–6h (8 heures)
             // Source : plage la plus courante sur le parc Enedis résidentiel
             const HEURES_CREUSES = [22, 23, 0, 1, 2, 3, 4, 5];
+            const HEURES_CREUSES_SET = new Set(HEURES_CREUSES);
 
-            // Retourne un tableau de 24 prix €/kWh selon le contrat
-            function buildTarifHoraire(contrat, tarifs) {
+            // ─── TARIF FLEX (spot Day-ahead ENTSO-E FR, calé via TVA + TURPE) ──────
+            // Vecteurs p10/p50/p90 generes par scripts/build_vectors.py + injectes par
+            // scripts/inject_vectors.py. 24 valeurs par segment (saison × type-jour).
+            // FLEX_VECTORS_BEGIN
+            const FLEX_VECTORS = {
+                "ete": {
+                    "sem": {
+                        "p10": [
+                            0.11554,
+                            0.111,
+                            0.11065,
+                            0.10581,
+                            0.10365,
+                            0.10684,
+                            0.1163,
+                            0.12754,
+                            0.13191,
+                            0.11723,
+                            0.10207,
+                            0.10199,
+                            0.10197,
+                            0.10062,
+                            0.09948,
+                            0.10188,
+                            0.10199,
+                            0.102,
+                            0.11399,
+                            0.13725,
+                            0.14154,
+                            0.14099,
+                            0.14256,
+                            0.13476
+                        ],
+                        "p50": [
+                            0.17195,
+                            0.15374,
+                            0.15144,
+                            0.1404,
+                            0.13586,
+                            0.14419,
+                            0.16126,
+                            0.18782,
+                            0.19193,
+                            0.16642,
+                            0.1386,
+                            0.1204,
+                            0.1163,
+                            0.10813,
+                            0.10668,
+                            0.10796,
+                            0.1132,
+                            0.13374,
+                            0.16062,
+                            0.19327,
+                            0.20665,
+                            0.20915,
+                            0.20962,
+                            0.1962
+                        ],
+                        "p90": [
+                            0.22063,
+                            0.21101,
+                            0.20594,
+                            0.19675,
+                            0.19503,
+                            0.19918,
+                            0.21453,
+                            0.24022,
+                            0.24618,
+                            0.21861,
+                            0.19939,
+                            0.18737,
+                            0.17892,
+                            0.16452,
+                            0.16394,
+                            0.17005,
+                            0.17879,
+                            0.19702,
+                            0.21771,
+                            0.24507,
+                            0.25338,
+                            0.25342,
+                            0.24487,
+                            0.22664
+                        ]
+                    },
+                    "we": {
+                        "p10": [
+                            0.11334,
+                            0.10968,
+                            0.10965,
+                            0.10608,
+                            0.10604,
+                            0.107,
+                            0.10757,
+                            0.10742,
+                            0.10229,
+                            0.10189,
+                            0.09382,
+                            0.07662,
+                            0.06778,
+                            0.05,
+                            0.05,
+                            0.05,
+                            0.08126,
+                            0.10194,
+                            0.10361,
+                            0.1162,
+                            0.12802,
+                            0.13457,
+                            0.13991,
+                            0.13162
+                        ],
+                        "p50": [
+                            0.17091,
+                            0.15172,
+                            0.1466,
+                            0.13504,
+                            0.12883,
+                            0.13042,
+                            0.13296,
+                            0.1325,
+                            0.13304,
+                            0.1145,
+                            0.10201,
+                            0.10199,
+                            0.10198,
+                            0.10067,
+                            0.09938,
+                            0.10188,
+                            0.10199,
+                            0.10627,
+                            0.13139,
+                            0.15793,
+                            0.17403,
+                            0.17788,
+                            0.18695,
+                            0.1791
+                        ],
+                        "p90": [
+                            0.21667,
+                            0.20625,
+                            0.19132,
+                            0.17902,
+                            0.16803,
+                            0.16637,
+                            0.17634,
+                            0.17903,
+                            0.17729,
+                            0.16369,
+                            0.1336,
+                            0.11893,
+                            0.11507,
+                            0.10742,
+                            0.10523,
+                            0.11255,
+                            0.11995,
+                            0.14035,
+                            0.18115,
+                            0.21431,
+                            0.23128,
+                            0.23304,
+                            0.22992,
+                            0.22078
+                        ]
+                    }
+                },
+                "hiver": {
+                    "sem": {
+                        "p10": [
+                            0.12253,
+                            0.11731,
+                            0.11492,
+                            0.10925,
+                            0.10679,
+                            0.11513,
+                            0.13173,
+                            0.16443,
+                            0.17401,
+                            0.1601,
+                            0.1315,
+                            0.11772,
+                            0.11743,
+                            0.10813,
+                            0.10921,
+                            0.11941,
+                            0.13118,
+                            0.1467,
+                            0.17114,
+                            0.19498,
+                            0.17145,
+                            0.15137,
+                            0.1506,
+                            0.13904
+                        ],
+                        "p50": [
+                            0.1887,
+                            0.18348,
+                            0.17562,
+                            0.16922,
+                            0.16566,
+                            0.17795,
+                            0.19607,
+                            0.22158,
+                            0.23153,
+                            0.21942,
+                            0.20403,
+                            0.19561,
+                            0.19099,
+                            0.18388,
+                            0.1824,
+                            0.18738,
+                            0.19274,
+                            0.2113,
+                            0.23386,
+                            0.24512,
+                            0.22477,
+                            0.20878,
+                            0.20696,
+                            0.19972
+                        ],
+                        "p90": [
+                            0.23604,
+                            0.22887,
+                            0.22623,
+                            0.22239,
+                            0.2228,
+                            0.22862,
+                            0.24791,
+                            0.28265,
+                            0.2991,
+                            0.28059,
+                            0.26059,
+                            0.24963,
+                            0.24336,
+                            0.23997,
+                            0.24123,
+                            0.24682,
+                            0.25784,
+                            0.27943,
+                            0.30295,
+                            0.30931,
+                            0.2808,
+                            0.25636,
+                            0.25151,
+                            0.2417
+                        ]
+                    },
+                    "we": {
+                        "p10": [
+                            0.12546,
+                            0.12097,
+                            0.11706,
+                            0.10952,
+                            0.10793,
+                            0.10926,
+                            0.11222,
+                            0.11432,
+                            0.11916,
+                            0.11482,
+                            0.10962,
+                            0.10556,
+                            0.10794,
+                            0.10209,
+                            0.10208,
+                            0.10285,
+                            0.10774,
+                            0.12261,
+                            0.14808,
+                            0.16919,
+                            0.14673,
+                            0.1364,
+                            0.14078,
+                            0.13219
+                        ],
+                        "p50": [
+                            0.1959,
+                            0.18682,
+                            0.18026,
+                            0.16969,
+                            0.16835,
+                            0.16927,
+                            0.1751,
+                            0.18334,
+                            0.18748,
+                            0.18079,
+                            0.1696,
+                            0.15968,
+                            0.16276,
+                            0.15271,
+                            0.149,
+                            0.15599,
+                            0.16966,
+                            0.18701,
+                            0.2115,
+                            0.21809,
+                            0.20384,
+                            0.1933,
+                            0.19587,
+                            0.18913
+                        ],
+                        "p90": [
+                            0.24166,
+                            0.23329,
+                            0.23016,
+                            0.21818,
+                            0.21935,
+                            0.22086,
+                            0.22718,
+                            0.23446,
+                            0.24007,
+                            0.24412,
+                            0.24335,
+                            0.23419,
+                            0.23374,
+                            0.22971,
+                            0.22727,
+                            0.23277,
+                            0.23891,
+                            0.25818,
+                            0.27173,
+                            0.27225,
+                            0.25838,
+                            0.24832,
+                            0.24494,
+                            0.23991
+                        ]
+                    }
+                }
+            };
+            // FLEX_VECTORS_END
+
+            const FLEX_MOIS_ETE = new Set([4, 5, 6, 7, 8, 9]); // avr-sept = ete
+            const FLEX_SCENARIOS = ['p10', 'p50', 'p90'];
+            const FLEX_DEFAULT_SCENARIO = 'p50';
+            // Heuristique smart_flex
+            const FLEX_N_PIC = 3;       // top-N heures cheres -> decharge prio
+            const FLEX_N_CREUX = 5;     // bottom-N heures bon marche -> charge reseau
+            const FLEX_SOC_TARGET = 0.80; // ne charge plus du reseau au-dela
+
+            function flexSegment(month, dow) {
+                const season = FLEX_MOIS_ETE.has(month) ? 'ete' : 'hiver';
+                const wkey = (dow >= 5) ? 'we' : 'sem';
+                return [season, wkey];
+            }
+            function buildTarifFlexJour(month, dow, scenario) {
+                if (!FLEX_VECTORS) return new Array(24).fill(TARIFS.base.kwh);
+                const [s, w] = flexSegment(month, dow);
+                const sc = FLEX_SCENARIOS.includes(scenario) ? scenario : FLEX_DEFAULT_SCENARIO;
+                return FLEX_VECTORS[s][w][sc].slice();
+            }
+
+            // Retourne soit un Array(24) (base/hphc) soit un provider {flex:true, scenario}
+            // pour signaler a simMensuelle/simJourneeFlex qu'il doit reconstruire un tarif
+            // jour-type-dependant.
+            function buildTarifHoraire(contrat, tarifs, scenario) {
+                if (contrat === 'flex') {
+                    return { flex: true, scenario: scenario || FLEX_DEFAULT_SCENARIO };
+                }
                 if (contrat === 'hphc') {
                     const hcSet = new Set(HEURES_CREUSES);
                     return Array.from({ length: 24 }, (_, h) => hcSet.has(h) ? tarifs.hc : tarifs.hp);
@@ -1554,7 +1907,7 @@
             // Source : Panel Elecdom ADEME/Enertech/RTE, année 1 (2019-2020)
             // Électricité spécifique (hors chauffage, ECS) + cuisson — 101 logements
             // Médiane par taille de ménage — Figure 2-3, page 35
-            const USAGES_COURANTS = { 1: 1400, 2: 2300, 3: 2700, 4: 3200, 5: 3700 }; // kWh/an
+            const USAGES_COURANTS = { 1: 1500, 2: 2300, 3: 3100, 4: 3900, 5: 4700 }; // kWh/an
 
             // Saisonnalité seau 1 : quasi-plate, légère hausse hiver (éclairage)
             // Source : forme usages spécifiques RES1 (froid, audiovisuel anti-corrélés avec éclairage)
@@ -1578,6 +1931,21 @@
             // pompe : PAC air/eau ≥2017, COP réel terrain = 3.0 → coeff = 1/3
             // elec : résistance, rendement distribution 3CL = 0.87 (pas 1.0)
             const COEFF_ELEC = { gaz: 0, pompe: 0.33, elec: 0.87 };
+
+            // Coefficient comportemental par DPE — capture l'effet "prebound" :
+            // la conso mesurée est inférieure au besoin théorique 3CL, écart
+            // croissant avec la dégradation de l'enveloppe (chauffage partiel,
+            // consigne réduite, pièces fermées sur les passoires).
+            // Sources : Sunikka-Blank & Galvin (Building Research & Information
+            // 40(3), 2012), Allibe (thèse EDF R&D / Mines ParisTech, 2012),
+            // ENL/SDES 2020.
+            const COEFF_BEHAV = { A: 1.0, B: 1.0, C: 1.0, D: 0.95, E: 0.80, F: 0.65, G: 0.55 };
+
+            // Multiplicateur d'usage du chauffage choisi par l'utilisateur :
+            //  - fond    : conso conforme au besoin théorique 3CL (consigne + temps complet)
+            //  - normal  : usage intermédiaire ~70% du besoin (Panel Elecdom moyen)
+            //  - econome : usage économe ~45% du besoin (sous-chauffage / pièces fermées / absences)
+            const USAGE_FACTOR = { econome: 0.45, normal: 0.70, fond: 1.00 };
 
             // Saisonnalité chauffage — fort hiver, quasi-nul été
             // Source : CONSO_MONTHLY v3 recalibré sur la composante chauffage seule
@@ -1603,12 +1971,58 @@
             // kWh annuels — Source : Panel Elecdom ADEME 2021
             const KWH_ECS = { joule: 1670, thermo: 752 }; // kWh/an, foyer moyen (2,24p)
             const KWH_VE = 2500;   // kWh/an — ADEME, usage moyen VE France
-            const KWH_PISCI = 1000;   // kWh/an — ADEME, médiane fourchette pompe filtration 400–1500 + accessoires ~5%
-            const KWH_CLIM = 304;    // kWh/an — Panel Elecdom ADEME 2021, split fixe national
+            const KWH_PISCI = 1690;   // kWh/an — Panel Elecdom ADEME 2021, fig 13-3 (moyenne 5 piscines, plage 250–4 100)
+            const KWH_CLIM = 304;    // kWh/an — Panel Elecdom ADEME 2021, split fixe national (fallback)
+
+            // Zones climatiques RT2012 par département — arrêté du 26 octobre 2010
+            // H1 (~55% pop) : climat tempéré (Nord, Est, IdF, Centre, montagne)
+            // H2 (~30% pop) : climat océanique (Atlantique, Sud-Ouest, Centre-Ouest)
+            // H3 (~15% pop) : climat méditerranéen (Sud-Est + Corse)
+            const ZONE_CLIM = {
+                // H1a — Nord oceanique frais, IdF, Picardie, Normandie
+                '02': 'H1a', '14': 'H1a', '27': 'H1a', '28': 'H1a', '50': 'H1a', '59': 'H1a',
+                '60': 'H1a', '61': 'H1a', '62': 'H1a', '75': 'H1a', '76': 'H1a', '77': 'H1a',
+                '78': 'H1a', '80': 'H1a', '91': 'H1a', '92': 'H1a', '93': 'H1a', '94': 'H1a', '95': 'H1a',
+                // H1b — Champagne-Ardenne, Lorraine, Alsace, Bourgogne nord
+                '08': 'H1b', '10': 'H1b', '21': 'H1b', '25': 'H1b', '39': 'H1b', '51': 'H1b',
+                '52': 'H1b', '54': 'H1b', '55': 'H1b', '57': 'H1b', '67': 'H1b', '68': 'H1b',
+                '70': 'H1b', '88': 'H1b', '89': 'H1b', '90': 'H1b',
+                // H1c — Massif Central, Alpes nord, Jura, Bourgogne-FC sud, Auvergne, Rhône-Alpes
+                '01': 'H1c', '03': 'H1c', '05': 'H1c', '15': 'H1c', '19': 'H1c', '23': 'H1c',
+                '38': 'H1c', '42': 'H1c', '43': 'H1c', '58': 'H1c', '63': 'H1c', '69': 'H1c',
+                '71': 'H1c', '73': 'H1c', '74': 'H1c', '87': 'H1c',
+                // H2a — Bretagne, Pays de la Loire ouest
+                '22': 'H2a', '29': 'H2a', '35': 'H2a', '44': 'H2a', '49': 'H2a', '53': 'H2a',
+                '56': 'H2a', '85': 'H2a',
+                // H2b — Centre-Val de Loire, Poitou
+                '16': 'H2b', '17': 'H2b', '18': 'H2b', '36': 'H2b', '37': 'H2b', '41': 'H2b',
+                '45': 'H2b', '79': 'H2b', '86': 'H2b',
+                // H2c — Aquitaine littoral
+                '24': 'H2c', '33': 'H2c', '40': 'H2c', '47': 'H2c', '64': 'H2c', '72': 'H2c',
+                // H2d — Sud-Ouest intérieur, Pyrénées
+                '09': 'H2d', '12': 'H2d', '31': 'H2d', '32': 'H2d', '46': 'H2d', '65': 'H2d',
+                '81': 'H2d', '82': 'H2d',
+                // H3 — Méditerranée + Corse
+                '04': 'H3', '06': 'H3', '07': 'H3', '11': 'H3', '13': 'H3', '26': 'H3',
+                '30': 'H3', '34': 'H3', '48': 'H3', '66': 'H3', '83': 'H3', '84': 'H3',
+                '2A': 'H3', '2B': 'H3'
+            };
+
+            // Conso clim annuelle par zone (kWh/an, foyer équipé) — calibré pour
+            // préserver l'ancrage Panel Elecdom 304 kWh national pondéré par taux
+            // d'équipement régional (~20% H1, ~30% H2, ~50% H3).
+            // Sources : EDF Solutions Solaires (482 kWh moyenne Sud-Est),
+            //           ADEME État de l'art climatisation 2018 (DJU clim base 26°C),
+            //           Panel Elecdom ADEME 2021 (ancrage national).
+            const KWH_CLIM_ZONE = {
+                H1a: 120, H1b: 140, H1c: 130,
+                H2a: 200, H2b: 250, H2c: 280, H2d: 280,
+                H3: 580
+            };
 
             // Saisonnalité ECS — Source : CSV ADEME elecdom-courbes-horaires
             // Ratios mesurés : hiver(déc-fév)/moy = 1.201, été(jun-août)/moy = 0.730
-            const SAISON_ECS = [1.20, 1.17, 1.10, 1.00, 0.90, 0.80, 0.73, 0.73, 0.80, 0.95, 1.10, 1.20];
+            const SAISON_ECS = [1.31, 1.30, 1.15, 0.95, 0.80, 0.70, 0.65, 0.61, 0.75, 0.95, 1.15, 1.28];
             const SAISON_VE = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]; // recharge nocturne, plate annuellement
             const SAISON_PISCI = [0, 0, 0, 0, 0.5, 1.8, 3.2, 3.0, 1.5, 0, 0, 0]; // mai–sept uniquement
             const SAISON_CLIM = [0, 0, 0, 0, 0.4, 2.1, 3.8, 3.6, 1.7, 0.4, 0, 0]; // juin–sept
@@ -1735,14 +2149,19 @@
             // ═══════════════════════════════════════════════════════════════════════════
             // ÉTAT
             // ═══════════════════════════════════════════════════════════════════════════
+            // Profil par defaut : 4 pers / 140 m2 Gironde / DPE D / gaz /
+            // VE + clim + ECS resistance / 6 kWc S 35deg / 10 kWh / Base sans rachat.
             const state = {
-                persons: 2, dpe: 'D', surface: 100, heat: 'gaz', journee: 'maison',
-                ecs: null, ve: false, piscine: false, clim: false,
-                nbPanels: 6, panelwc: 400,
-                dept: '75', orient: 'sud', incl: 35, ombrage: 0, batt: 10,
+                persons: 4, dpe: 'D', surface: 140, heat: 'gaz', usage: 'normal', journee: 'maison',
+                ecs: 'joule', ve: true, piscine: false, clim: true,
+                kwc: 6, hasPv: true,
+                dept: '33', orient: 'sud', incl: 35, ombrage: 0, batt: 10,
                 contrat: 'base', consoManuelle: null, consoMode: 'estim',
-                rachatMode: 'sans', rachat: 0, rachatCustom: 0.04
+                rachat: 0,
+                flexScenario: 'p50'
             };
+            // CAPEX batterie Revolty TTC (marge installateur incluse) — €/kWh utile
+            const CAPEX_BATT_PAR_KWH = 576;
 
             // ═══════════════════════════════════════════════════════════════════════════
             // CALCUL kWhs — retourne l'objet des kWh annuels par composante
@@ -1751,7 +2170,8 @@
                 const kwh_ecs = state.ecs ? KWH_ECS[state.ecs] : 0;
                 const kwh_ve = state.ve ? KWH_VE : 0;
                 const kwh_pisci = state.piscine ? KWH_PISCI : 0;
-                const kwh_clim = state.clim ? KWH_CLIM : 0;
+                const climZone = ZONE_CLIM[state.dept];
+                const kwh_clim = state.clim ? (climZone ? KWH_CLIM_ZONE[climZone] : KWH_CLIM) : 0;
 
                 // Mode manuel : conso totale saisie, ventilation selon type de chauffage
                 // Parts chauffage issues des moyennes ADEME pour foyers électriques
@@ -1771,7 +2191,7 @@
                 }
 
                 const kwh1 = USAGES_COURANTS[Math.min(state.persons, 5)];
-                const kwh2 = state.surface * BESOIN_CHAUFFE[state.dpe] * COEFF_ELEC[state.heat];
+                const kwh2 = state.surface * BESOIN_CHAUFFE[state.dpe] * COEFF_ELEC[state.heat] * COEFF_BEHAV[state.dpe] * USAGE_FACTOR[state.usage];
                 const total = Math.round((kwh1 + kwh2 + kwh_ecs + kwh_ve + kwh_pisci + kwh_clim) / 100) * 100;
                 return { kwh1, kwh2, kwh_ecs, kwh_ve, kwh_pisci, kwh_clim, total };
             }
@@ -1823,43 +2243,187 @@
             // ═══════════════════════════════════════════════════════════════════════════
             // SIMULATION JOURNÉE TYPE — batterie heure par heure
             // ═══════════════════════════════════════════════════════════════════════════
-            function simJourneeType(profilHoraire, prodJour, solarProfile, battKwh, socInit, pLimits, tarifH) {
+            // pilot = { enabled: bool, target: kWh } — recharge batterie au réseau en HC
+            // jusqu'à `target` (= déficit HP attendu) pour arbitrage tarifaire
+            function simJourneeType(profilHoraire, prodJour, solarProfile, battKwh, socInit, socPvInit, pLimits, tarifH, pilot) {
                 let soc = socInit;
-                let dDirect = 0, dRestitue = 0, dSurplus = 0, dAchat = 0;
-                let eDirect = 0, eRestitue = 0, eSurplus = 0;
+                // socPv : sous-ensemble du SOC dont l'origine est le PV (par opposition aux kWh chargés au réseau en HC).
+                // Permet de distinguer la décharge "vraie autoconso" de la décharge issue d'arbitrage tarifaire.
+                let socPv = Math.min(socPvInit, soc);
+                let dDirect = 0, dRestitue = 0, dRestituePV = 0, dSurplus = 0, dAchat = 0, dAchatHC = 0, dAchatHP = 0;
+                let eDirect = 0, eRestitue = 0, eSurplus = 0, eCoutHC = 0;
                 const { pCharge, pDischarge } = pLimits;
+                const pilotOn = !!(pilot && pilot.enabled && battKwh > 0);
                 for (let h = 0; h < 24; h++) {
                     const conso_h = profilHoraire[h];
                     const prod_h = prodJour * solarProfile[h];
                     const delta = prod_h - conso_h;
                     const prix = tarifH[h];
+                    const isHC = HEURES_CREUSES_SET.has(h);
                     if (delta >= 0) {
                         dDirect += conso_h;
                         eDirect += conso_h * prix;
                         const canCharge = (battKwh - soc) / 0.96;
                         const chargeIn = Math.min(canCharge, delta, pCharge);
                         soc = Math.min(battKwh, soc + chargeIn * 0.96);
+                        socPv = Math.min(soc, socPv + chargeIn * 0.96);
+                        const surp = Math.max(0, delta - chargeIn);
+                        dSurplus += surp;
+                        eSurplus += surp * state.rachat;
+                        // Recharge additionnelle réseau en HC si SoC sous target et puissance dispo
+                        if (pilotOn && isHC && soc < pilot.target - 1e-6) {
+                            const pLeft = pCharge - chargeIn;
+                            if (pLeft > 1e-6) {
+                                const toTarget = (pilot.target - soc) / 0.96;
+                                const capLeft = (battKwh - soc) / 0.96;
+                                const gc = Math.min(pLeft, toTarget, capLeft);
+                                if (gc > 0) {
+                                    soc = Math.min(battKwh, soc + gc * 0.96);
+                                    // socPv inchangé : énergie d'origine réseau
+                                    dAchatHC += gc;
+                                    eCoutHC += gc * prix;
+                                }
+                            }
+                        }
+                    } else {
+                        dDirect += prod_h;
+                        eDirect += prod_h * prix;
+                        const need = -delta;
+                        if (pilotOn && isHC) {
+                            // Décharger uniquement l'excédent au-dessus du target
+                            // (le target reste préservé pour la restitution en HP)
+                            const dischargeable = Math.max(0, soc - pilot.target) * 0.96;
+                            const dischargeOut = Math.min(dischargeable, need, pDischarge);
+                            if (dischargeOut > 0) {
+                                const pvShare = soc > 0 ? socPv / soc : 0;
+                                soc -= dischargeOut / 0.96;
+                                socPv = Math.max(0, socPv - (dischargeOut / 0.96) * pvShare);
+                                dRestitue += dischargeOut;
+                                dRestituePV += dischargeOut * pvShare;
+                                eRestitue += dischargeOut * prix;
+                            }
+                            dAchat += need - dischargeOut;
+                            // Recharger depuis le réseau si sous le target
+                            if (soc < pilot.target - 1e-6) {
+                                const toTarget = (pilot.target - soc) / 0.96;
+                                const capLeft = (battKwh - soc) / 0.96;
+                                const gc = Math.min(pCharge, toTarget, capLeft);
+                                if (gc > 0) {
+                                    soc = Math.min(battKwh, soc + gc * 0.96);
+                                    // socPv inchangé : énergie d'origine réseau
+                                    dAchatHC += gc;
+                                    eCoutHC += gc * prix;
+                                }
+                            }
+                        } else {
+                            const dischargeOut = Math.min(soc * 0.96, need, pDischarge);
+                            const pvShare = soc > 0 ? socPv / soc : 0;
+                            soc = Math.max(0, soc - dischargeOut / 0.96);
+                            socPv = Math.max(0, socPv - (dischargeOut / 0.96) * pvShare);
+                            dRestitue += dischargeOut;
+                            dRestituePV += dischargeOut * pvShare;
+                            eRestitue += dischargeOut * prix;
+                            const achatH = Math.max(0, need - dischargeOut);
+                            dAchat += achatH;
+                            if (!isHC) dAchatHP += achatH;
+                        }
+                    }
+                }
+                return { dDirect, dRestitue, dRestituePV, dSurplus, dAchat, dAchatHC, dAchatHP, eDirect, eRestitue, eSurplus, eCoutHC, socEnd: soc, socPvEnd: socPv };
+            }
+
+            // ─── SIMULATION JOURNEE TYPE — TARIF FLEX (smart_flex) ─────────────────
+            // Strategie heuristique (PAS de MILP) :
+            //  - Surplus PV -> charge batterie (priorite absolue, autoconso normale).
+            //  - Top FLEX_N_PIC heures cheres du jour : decharge prio si soc > 0.
+            //  - Bottom FLEX_N_CREUX heures bon marche : charge reseau si SoC < TARGET.
+            //  - Hors fenetres : autoconso classique (decharge si deficit, sinon achat).
+            // Note : on raisonne sur le tarif TTC du jour (vecteur 24h) ; le tri est figé
+            // a chaque jour-type, ce qui suffit pour une heuristique day-ahead.
+            function simJourneeFlex(profilHoraire, prodJour, solarProfile, battKwh, socInit, socPvInit, pLimits, tarifH) {
+                let soc = socInit;
+                let socPv = Math.min(socPvInit, soc);
+                let dDirect = 0, dRestitue = 0, dRestituePV = 0, dSurplus = 0, dAchat = 0, dAchatHC = 0, dAchatHP = 0;
+                let eDirect = 0, eRestitue = 0, eSurplus = 0, eCoutHC = 0;
+                const { pCharge, pDischarge } = pLimits;
+                const battActive = battKwh > 0;
+
+                // Identifie heures pic (decharge) / creux (charge reseau) sur le tarif du jour
+                const order = Array.from({ length: 24 }, (_, h) => h);
+                const sortedDesc = [...order].sort((a, b) => tarifH[b] - tarifH[a]);
+                const sortedAsc = [...order].sort((a, b) => tarifH[a] - tarifH[b]);
+                const picSet = new Set(battActive ? sortedDesc.slice(0, FLEX_N_PIC) : []);
+                const creuxSet = new Set(battActive ? sortedAsc.slice(0, FLEX_N_CREUX) : []);
+                const targetKwh = battKwh * FLEX_SOC_TARGET;
+
+                for (let h = 0; h < 24; h++) {
+                    const conso_h = profilHoraire[h];
+                    const prod_h = prodJour * solarProfile[h];
+                    const delta = prod_h - conso_h;
+                    const prix = tarifH[h];
+                    if (delta >= 0) {
+                        // Surplus PV : autoconso directe + charge batt prio
+                        dDirect += conso_h;
+                        eDirect += conso_h * prix;
+                        const canCharge = (battKwh - soc) / 0.96;
+                        const chargeIn = Math.min(canCharge, delta, pCharge);
+                        soc = Math.min(battKwh, soc + chargeIn * 0.96);
+                        socPv = Math.min(soc, socPv + chargeIn * 0.96);
                         const surp = Math.max(0, delta - chargeIn);
                         dSurplus += surp;
                         eSurplus += surp * state.rachat;
                     } else {
                         dDirect += prod_h;
                         eDirect += prod_h * prix;
-                        const need = -delta;
-                        const dischargeOut = Math.min(soc * 0.96, need, pDischarge);
-                        soc = Math.max(0, soc - dischargeOut / 0.96);
-                        dRestitue += dischargeOut;
-                        eRestitue += dischargeOut * prix;
-                        dAchat += Math.max(0, need - dischargeOut);
+                        let need = -delta;
+                        const inCreux = battActive && creuxSet.has(h);
+                        // Decharge :
+                        //  - heure pic    : prio absolue (toute l'energie dispo) -- inclus dans !inCreux.
+                        //  - heure creuse : pas de decharge (on charge plutot).
+                        //  - hors fenetre : autoconso classique (decharge sur deficit).
+                        if (battActive && !inCreux && soc > 0) {
+                            const dischargeOut = Math.min(soc * 0.96, need, pDischarge);
+                            if (dischargeOut > 0) {
+                                const pvShare = soc > 0 ? socPv / soc : 0;
+                                soc = Math.max(0, soc - dischargeOut / 0.96);
+                                socPv = Math.max(0, socPv - (dischargeOut / 0.96) * pvShare);
+                                dRestitue += dischargeOut;
+                                dRestituePV += dischargeOut * pvShare;
+                                eRestitue += dischargeOut * prix;
+                                need -= dischargeOut;
+                            }
+                        }
+                        if (need > 0) {
+                            dAchat += need;
+                            dAchatHP += need; // reporting : achat residuel
+                        }
+                        // Charge reseau en heure creuse si SoC < TARGET
+                        if (inCreux && soc < targetKwh - 1e-6) {
+                            const toTarget = (targetKwh - soc) / 0.96;
+                            const capLeft = (battKwh - soc) / 0.96;
+                            const gc = Math.min(pCharge, toTarget, capLeft);
+                            if (gc > 0) {
+                                soc = Math.min(battKwh, soc + gc * 0.96);
+                                // socPv inchange : energie d'origine reseau
+                                dAchatHC += gc;
+                                eCoutHC += gc * prix;
+                            }
+                        }
                     }
                 }
-                return { dDirect, dRestitue, dSurplus, dAchat, eDirect, eRestitue, eSurplus, socEnd: soc };
+                return { dDirect, dRestitue, dRestituePV, dSurplus, dAchat, dAchatHC, dAchatHP, eDirect, eRestitue, eSurplus, eCoutHC, socEnd: soc, socPvEnd: socPv };
             }
 
             // ═══════════════════════════════════════════════════════════════════════════
             // SIMULATION MENSUELLE — 12 mois × semaine/weekend
             // ═══════════════════════════════════════════════════════════════════════════
-            function simMensuelle(prodAnnuelle, kwhs, battKwh, tarifH) {
+            function simMensuelle(prodAnnuelle, kwhs, battKwh, tarifH, pilotEnabled) {
+                // tarifH peut etre :
+                //  - Array(24) : tarif fixe (base/hphc), pilotage HP/HC eventuel
+                //  - {flex:true, scenario:'p10'|'p50'|'p90'} : reconstruit un Array(24)
+                //    par jour-type et utilise simJourneeFlex (smart_flex), pas de pilotage HP/HC.
+                const isFlex = !!(tarifH && tarifH.flex);
+                if (isFlex) pilotEnabled = false; // smart_flex remplace le pilote HP/HC
                 // Répartition mensuelle via PROFIL_PV (somme des 24h d'un mois = poids du mois)
                 const profPV = PROFIL_PV[state.dept];
                 const monthWeights = profPV
@@ -1867,9 +2431,10 @@
                     : [0.038, 0.054, 0.090, 0.110, 0.126, 0.135, 0.136, 0.116, 0.092, 0.063, 0.038, 0.024]; // fallback
                 const pfacSum = monthWeights.reduce((a, b) => a + b, 0);
                 const pLimits = battPowerLimits(battKwh);
-                let sumDirect = 0, sumRestitue = 0, sumSurplus = 0, sumAchat = 0;
-                let sumEDirect = 0, sumERestitue = 0, sumESurplus = 0;
+                let sumDirect = 0, sumRestitue = 0, sumRestituePV = 0, sumSurplus = 0, sumAchat = 0, sumAchatHC = 0;
+                let sumEDirect = 0, sumERestitue = 0, sumESurplus = 0, sumECoutHC = 0;
                 const monthly = [];
+                const debugMonthly = [];
 
                 for (let m = 0; m < 12; m++) {
                     const d = DAYS_PER_MONTH[m];
@@ -1887,19 +2452,61 @@
                     for (const [tj, nDays] of [[0, nSem], [1, nWe]]) {
                         const prof = buildProfilJour(m, tj, kwhs);
                         profs[tj] = prof;
+                        // def/surplusPV : info debug (V2, conservée pour monitoring)
+                        let def = 0, surplusPV = 0;
+                        for (let h = 0; h < 24; h++) {
+                            const d2 = prof[h] - prodJour * solar[h];
+                            if (d2 < 0) surplusPV += -d2;
+                            else if (!HEURES_CREUSES_SET.has(h)) def += d2;
+                        }
+                        // Tarif horaire effectif du jour-type
+                        // tj : 0=semaine (dow=2 par convention), 1=weekend (dow=6)
+                        const tarifJour = isFlex
+                            ? buildTarifFlexJour(m + 1, tj === 0 ? 2 : 6, tarifH.scenario)
+                            : tarifH;
+                        // V3 : target = achats HP réels mesurés via pré-passe sans pilotage
+                        let pilot = null;
+                        let target = 0;
+                        if (pilotEnabled && battKwh > 0) {
+                            let socNP = battKwh * SOC_INIT;
+                            let socPvNP = battKwh * SOC_INIT;
+                            let resNP;
+                            for (let p = 0; p < 3; p++) {
+                                resNP = simJourneeType(prof, prodJour, solar, battKwh, socNP, socPvNP, pLimits, tarifJour, null);
+                                socNP = resNP.socEnd;
+                                socPvNP = resNP.socPvEnd;
+                            }
+                            target = Math.min(battKwh, resNP.dAchatHP);
+                            pilot = { enabled: true, target };
+                        }
                         let soc = battKwh * SOC_INIT;
+                        let socPv = battKwh * SOC_INIT;
                         let res;
                         for (let pass = 0; pass < 3; pass++) {
-                            res = simJourneeType(prof, prodJour, solar, battKwh, soc, pLimits, tarifH);
+                            res = isFlex
+                                ? simJourneeFlex(prof, prodJour, solar, battKwh, soc, socPv, pLimits, tarifJour)
+                                : simJourneeType(prof, prodJour, solar, battKwh, soc, socPv, pLimits, tarifJour, pilot);
                             soc = res.socEnd;
+                            socPv = res.socPvEnd;
                         }
+                        debugMonthly.push({
+                            m, tj, nDays, def, surplusPV, target,
+                            dDirect: res.dDirect, dRestitue: res.dRestitue, dSurplus: res.dSurplus,
+                            dAchat: res.dAchat, dAchatHC: res.dAchatHC,
+                            eDirect: res.eDirect, eRestitue: res.eRestitue,
+                            eSurplus: res.eSurplus, eCoutHC: res.eCoutHC,
+                            socEnd: res.socEnd
+                        });
                         mDirect += res.dDirect * nDays;
                         mRestitue += res.dRestitue * nDays;
+                        sumRestituePV += res.dRestituePV * nDays;
                         mSurplus += res.dSurplus * nDays;
                         mAchat += res.dAchat * nDays;
+                        sumAchatHC += res.dAchatHC * nDays;
                         mEDirect += res.eDirect * nDays;
                         mERestitue += res.eRestitue * nDays;
                         mESurplus += res.eSurplus * nDays;
+                        sumECoutHC += res.eCoutHC * nDays;
                     }
 
                     sumDirect += mDirect;
@@ -1925,10 +2532,13 @@
                     });
                 }
 
-                const kWhAuto = sumDirect + sumRestitue;
+                // Auto-conso et auto-prod : ne comptent QUE l'énergie d'origine PV.
+                // sumRestitue inclut les kWh chargés au réseau en HC (pilotage tarifaire) qui
+                // ne sont pas de l'autoconsommation — on utilise sumRestituePV pour l'isoler.
+                const kWhAutoPV = sumDirect + sumRestituePV;
                 const consoAnnuelle = monthly.reduce((a, m) => a + m.conso, 0);
-                const autoProdRate = consoAnnuelle > 0 ? Math.min(AUTOPROD_CAP, Math.round(kWhAuto / consoAnnuelle * 100)) : 0;
-                const autoConsoRate = prodAnnuelle > 0 ? Math.min(100, Math.round(kWhAuto / prodAnnuelle * 100)) : 0;
+                const autoProdRate = consoAnnuelle > 0 ? Math.min(AUTOPROD_CAP, Math.round(kWhAutoPV / consoAnnuelle * 100)) : 0;
+                const autoConsoRate = prodAnnuelle > 0 ? Math.min(100, Math.round(kWhAutoPV / prodAnnuelle * 100)) : 0;
 
                 return {
                     autoRate: autoProdRate,
@@ -1936,13 +2546,17 @@
                     autoConsoRate,
                     kWhDirect: Math.round(sumDirect),
                     kWhRestitue: Math.round(sumRestitue),
+                    kWhRestituePV: Math.round(sumRestituePV),
                     kWhSurplus: Math.round(sumSurplus),
                     kWhAchat: Math.round(sumAchat),
+                    kWhAchatHC: Math.round(sumAchatHC),
                     consoAnnuelle: Math.round(consoAnnuelle),
                     ecoDirecte: Math.round(sumEDirect),
                     ecoBatterie: Math.round(sumERestitue),
                     ecoRevente: Math.round(sumESurplus),
-                    monthly
+                    ecoCoutHC: Math.round(sumECoutHC),
+                    monthly,
+                    debugMonthly
                 };
             }
 
@@ -1980,25 +2594,29 @@
             // ═══════════════════════════════════════════════════════════════════════════
             // PROJECTION 20 ANS — histogramme empilé
             // ═══════════════════════════════════════════════════════════════════════════
-            function renderProjection(ecoDirecte, ecoBatterie, ecoRevente, battKwh, efcAn) {
+            function renderProjection(ecoDirecte, ecoBatterie, ecoPilot, ecoRevente, battKwh, efcAn) {
                 const sec = document.getElementById('projSection');
-                if (ecoDirecte + ecoBatterie + ecoRevente <= 0) { sec.style.display = 'none'; return; }
+                if (ecoDirecte + ecoBatterie + ecoPilot + ecoRevente <= 0) { sec.style.display = 'none'; return; }
                 sec.style.display = '';
 
                 const showSoh = battKwh > 0;
+                const showPilot = ecoPilot > 0;
+                const legPilot = document.getElementById('projLegendPilot');
+                if (legPilot) legPilot.style.display = showPilot ? '' : 'none';
 
-                // Build yearly data — autoconso grows with elec price, surplus stays fixed
+                // Build yearly data — autoconso & pilotage HP/HC grow with elec price, surplus stays fixed
                 const years = [];
                 let cumul = 0;
                 for (let y = 0; y < HORIZON; y++) {
                     const mult = Math.pow(1 + ELEC_ESCALATION, y);
                     const d = Math.round(ecoDirecte * mult);
                     const b = Math.round(ecoBatterie * mult);
+                    const p = Math.round(ecoPilot * mult);
                     const s = Math.round(ecoRevente); // tarif fixe 20 ans
-                    cumul += d + b + s;
+                    cumul += d + b + p + s;
                     const yr1 = y + 1;
                     const soh = showSoh ? Math.max(0, SOH_INIT - SOH_CAL_LOSS * yr1 - SOH_CYC_LOSS * efcAn * yr1) : null;
-                    years.push({ y: yr1, d, b, s, total: d + b + s, cumul, soh });
+                    years.push({ y: yr1, d, b, p, s, total: d + b + p + s, cumul, soh });
                 }
 
                 document.getElementById('projTotal').textContent = cumul.toLocaleString('fr-FR') + ' €';
@@ -2030,6 +2648,8 @@
 
                     // Surplus (bottom)
                     if (yr.s > 0) { const bh = Math.max(1, Math.round((yr.s / maxVal) * chartH)); top -= bh; svg += `<rect x="${x}" y="${top}" width="${barW}" height="${bh}" fill="rgba(255,209,69,0.6)" rx="1"/>`; }
+                    // Pilotage HP/HC (violet)
+                    if (yr.p > 0) { const bh = Math.max(1, Math.round((yr.p / maxVal) * chartH)); top -= bh; svg += `<rect x="${x}" y="${top}" width="${barW}" height="${bh}" fill="#9B6DFF" rx="1"/>`; }
                     // Batterie
                     if (yr.b > 0) { const bh = Math.max(1, Math.round((yr.b / maxVal) * chartH)); top -= bh; svg += `<rect x="${x}" y="${top}" width="${barW}" height="${bh}" fill="#017267" rx="1"/>`; }
                     // Directe (top)
@@ -2062,9 +2682,137 @@
                 document.getElementById('projChartWrap').innerHTML = svg;
             }
 
+            // ─── Sweep dimensionnement : trouve le kWc dont la PV brute couvre ~28% de la conso annuelle ──
+            // Couverture = PV_autoconsommée / conso_annuelle, calculée SANS batterie ni pilotage : la batterie
+            // augmenterait artificiellement la couverture (surplus stocké → autoconsommé), ce qui fausserait
+            // le dimensionnement. On veut le kWc qui satisfait la cible PV brute, indépendamment du kWh de batt.
+            const COVERAGE_TARGET = 0.28;
+            function sweepOptimalKwc() {
+                const kwhs = computeKwhs();
+                if (!kwhs.total) return 6;
+                const deptProd = PROD_ANNUEL[state.dept];
+                const productible = deptProd ? (deptProd[state.incl]?.[state.orient] || 1100) : 1100;
+                // Sweep dimensionnement : independant du tarif (autoProdRate ne depend que des kWh).
+                // En mode flex on utilise le TRV Base pour eviter de cumuler 12*2 sims flex inutiles.
+                const sweepContrat = state.contrat === 'flex' ? 'base' : state.contrat;
+                const userTarifs = sweepContrat === 'hphc'
+                    ? {
+                        hp: parseFloat(document.getElementById('tarifHP').value) || TARIFS.hphc.hp,
+                        hc: parseFloat(document.getElementById('tarifHC').value) || TARIFS.hphc.hc
+                    }
+                    : { kwh: parseFloat(document.getElementById('tarifBase').value) || TARIFS.base.kwh };
+                const tarifH = buildTarifHoraire(sweepContrat, userTarifs);
+                let best = 1, bestDiff = Infinity;
+                for (let k = 1; k <= 12; k += 0.5) {
+                    const prod = k * productible * (1 - state.ombrage);
+                    // battKwh=0 + pilot=false : couverture brute, indépendante du choix de batterie
+                    const r = simMensuelle(prod, kwhs, 0, tarifH, false);
+                    const coverage = r.autoProdRate / 100;
+                    const diff = Math.abs(coverage - COVERAGE_TARGET);
+                    if (diff < bestDiff) { bestDiff = diff; best = k; }
+                }
+                return Math.round(best * 2) / 2;
+            }
+
+            // ─── Payback batterie (économies totales = compute(batt) − compute(0)) ─────
+            // deltaBattAn = bonusBattSolarEur + bonusPilotEur — donc pilotage HP/HC inclus
+            function renderPayback(deltaBattAn, battKwh, bonusBattSolarEur, bonusPilotEur) {
+                const sec = document.getElementById('paybackSection');
+                if (!sec) return;
+                if (battKwh <= 0) { sec.style.display = 'none'; return; }
+                sec.style.display = '';
+                const capex = battKwh * CAPEX_BATT_PAR_KWH;
+                document.getElementById('paybackCapex').textContent = capex.toLocaleString('fr-FR') + ' €';
+                const ecoTxt = deltaBattAn > 0
+                    ? '+' + Math.round(deltaBattAn).toLocaleString('fr-FR') + ' €/an'
+                    : Math.round(deltaBattAn).toLocaleString('fr-FR') + ' €/an';
+                document.getElementById('paybackEco').textContent = ecoTxt;
+                // Décomposition explicite : sans cela on doute que le pilotage soit pris en compte.
+                const breakdownEl = document.getElementById('paybackBreakdown');
+                if (breakdownEl) {
+                    const parts = [];
+                    if (bonusBattSolarEur > 0) parts.push(`autoconso solaire : +${Math.round(bonusBattSolarEur).toLocaleString('fr-FR')} €/an`);
+                    else if (bonusBattSolarEur < 0) parts.push(`autoconso solaire : ${Math.round(bonusBattSolarEur).toLocaleString('fr-FR')} €/an (surplus revendu plus rentable)`);
+                    if (bonusPilotEur > 0) parts.push(`<span style="color:#9B6DFF">pilotage HP/HC : +${Math.round(bonusPilotEur).toLocaleString('fr-FR')} €/an</span>`);
+                    breakdownEl.innerHTML = parts.length ? 'dont ' + parts.join(' · ') : '';
+                }
+                if (deltaBattAn <= 0) {
+                    document.getElementById('paybackYears').textContent = 'Non rentable';
+                    document.getElementById('paybackChartWrap').innerHTML = '<div style="padding:30px;text-align:center;color:var(--muted);font-size:0.85rem">Avec ce tarif de rachat, vendre le surplus rapporte plus que de le stocker. La batterie ne s’amortit pas sur 20 ans dans ce scénario.</div>';
+                    return;
+                }
+
+                // Cumul année par année avec inflation élec (l'éco batterie suit le prix élec)
+                const years = [];
+                let cum = -capex;
+                let breakeven = null;
+                for (let y = 1; y <= HORIZON; y++) {
+                    const eco = deltaBattAn * Math.pow(1 + ELEC_ESCALATION, y - 1);
+                    const prev = cum;
+                    cum += eco;
+                    if (breakeven === null && cum >= 0) {
+                        // interpolation linéaire pour le point exact
+                        breakeven = (y - 1) + (-prev) / eco;
+                    }
+                    years.push({ y, cum });
+                }
+                document.getElementById('paybackYears').textContent = breakeven
+                    ? breakeven.toFixed(1).replace('.', ',') + ' ans'
+                    : '> 20 ans';
+
+                // SVG (même style visuel que renderProjection)
+                const W = 520, H = 200, PAD_L = 44, PAD_R = 10, PAD_T = 10, PAD_B = 24;
+                const chartW = W - PAD_L - PAD_R, chartH = H - PAD_T - PAD_B;
+                const minV = Math.min(-capex, ...years.map(y => y.cum));
+                const maxV = Math.max(0, ...years.map(y => y.cum));
+                const range = maxV - minV || 1;
+                const scX = i => PAD_L + (i / HORIZON) * chartW;
+                const scY = v => PAD_T + chartH - ((v - minV) / range) * chartH;
+                let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">`;
+                // grid + zero line
+                const y0 = scY(0);
+                svg += `<line x1="${PAD_L}" y1="${y0}" x2="${W - PAD_R}" y2="${y0}" stroke="rgba(255,255,255,0.25)" stroke-width="1" stroke-dasharray="3,3"/>`;
+                svg += `<text x="${PAD_L - 4}" y="${y0 + 3}" text-anchor="end" font-size="8" fill="rgba(255,255,255,0.4)" font-family="DM Sans,sans-serif">0 €</text>`;
+                svg += `<text x="${PAD_L - 4}" y="${scY(minV) + 3}" text-anchor="end" font-size="8" fill="rgba(255,255,255,0.25)" font-family="DM Sans,sans-serif">${Math.round(minV).toLocaleString('fr-FR')} €</text>`;
+                svg += `<text x="${PAD_L - 4}" y="${scY(maxV) + 3}" text-anchor="end" font-size="8" fill="rgba(255,255,255,0.25)" font-family="DM Sans,sans-serif">${Math.round(maxV).toLocaleString('fr-FR')} €</text>`;
+
+                // surface area
+                const pts = [`${scX(0).toFixed(1)},${scY(-capex).toFixed(1)}`]
+                    .concat(years.map((yr, i) => `${scX(i + 1).toFixed(1)},${scY(yr.cum).toFixed(1)}`));
+                const areaPts = pts.join(' ') + ` ${scX(HORIZON).toFixed(1)},${y0.toFixed(1)} ${PAD_L},${y0.toFixed(1)}`;
+                svg += `<polygon points="${areaPts}" fill="rgba(17,228,122,0.15)"/>`;
+                svg += `<polyline points="${pts.join(' ')}" fill="none" stroke="#11E47A" stroke-width="2" stroke-linejoin="round"/>`;
+
+                // breakeven marker
+                if (breakeven && breakeven <= HORIZON) {
+                    const bx = scX(breakeven);
+                    svg += `<line x1="${bx}" y1="${PAD_T}" x2="${bx}" y2="${PAD_T + chartH}" stroke="#9B6DFF" stroke-width="1.5" stroke-dasharray="2,2"/>`;
+                    svg += `<circle cx="${bx}" cy="${y0}" r="4" fill="#9B6DFF"/>`;
+                    svg += `<text x="${bx}" y="${PAD_T + 10}" text-anchor="middle" font-size="9" fill="#9B6DFF" font-family="DM Sans,sans-serif" font-weight="600">${breakeven.toFixed(1).replace('.', ',')} ans</text>`;
+                }
+
+                // X labels
+                for (let i = 0; i <= HORIZON; i += 5) {
+                    svg += `<text x="${scX(i)}" y="${H - 4}" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.3)" font-family="DM Sans,sans-serif">${i === 0 ? 'J0' : i + ' ans'}</text>`;
+                }
+
+                svg += '</svg>';
+                document.getElementById('paybackChartWrap').innerHTML = svg;
+            }
+
             function compute() {
                 const kwhs = computeKwhs();
-                const kwc = Math.round((state.nbPanels * state.panelwc / 1000) * 10) / 10;
+                // Mode "Pas de PV" : on re-dimensionne à chaque calcul pour suivre les évolutions
+                // de conso (foyer, appareils, dept…). Le sweep ignore la batterie volontairement.
+                if (!state.hasPv) {
+                    const opt = sweepOptimalKwc();
+                    state.kwc = opt;
+                    const inp = document.getElementById('kwcInput');
+                    if (inp && parseFloat(inp.value) !== opt) inp.value = opt.toFixed(1);
+                    document.getElementById('kwcHelper').textContent = `Dimensionnement proposé pour ~28 % de couverture : ${opt.toFixed(1).replace('.', ',')} kWc`;
+                    if (typeof updateKwcWarn === 'function') updateKwcWarn();
+                }
+                const kwc = state.kwc || 0;
 
                 // Productible PVGIS par département × inclinaison × orientation, avec ombrage
                 const deptProd = PROD_ANNUEL[state.dept];
@@ -2072,16 +2820,53 @@
                 const prodAnnuelle = Math.round(kwc * productible * (1 - state.ombrage));
 
                 // Tarif horaire selon contrat
+                const isFlex = state.contrat === 'flex';
                 const userTarifs = state.contrat === 'hphc'
                     ? {
                         hp: parseFloat(document.getElementById('tarifHP').value) || TARIFS.hphc.hp,
                         hc: parseFloat(document.getElementById('tarifHC').value) || TARIFS.hphc.hc
                     }
-                    : TARIFS.base;
-                const tarifH = buildTarifHoraire(state.contrat, userTarifs);
+                    : (isFlex ? null : { kwh: parseFloat(document.getElementById('tarifBase').value) || TARIFS.base.kwh });
+                const tarifH = isFlex
+                    ? { flex: true, scenario: state.flexScenario || 'p50' }
+                    : buildTarifHoraire(state.contrat, userTarifs);
 
-                const resBatt = simMensuelle(prodAnnuelle, kwhs, state.batt, tarifH);
-                const resBase = simMensuelle(prodAnnuelle, kwhs, 0, tarifH);
+                const pilotActive = state.contrat === 'hphc' && state.batt > 0;
+                const resBatt = simMensuelle(prodAnnuelle, kwhs, state.batt, tarifH, pilotActive);
+                const resBattNoPilot = pilotActive
+                    ? simMensuelle(prodAnnuelle, kwhs, state.batt, tarifH, false)
+                    : resBatt;
+                // resBase : sans batterie. En mode flex, on calcule aussi un resBase au tarif Base
+                // pour le banner "tarif flex non adapte".
+                const resBase = simMensuelle(prodAnnuelle, kwhs, 0, tarifH, false);
+                // Fourchette p10-p90 (mode flex uniquement) — economies extremes
+                let resBattLow = null, resBattHigh = null;
+                let ecoBaseRefAnnuelle = null; // facture nette au TRV Base, avec PV+batt+pilote HP/HC pour comparaison
+                if (isFlex) {
+                    resBattLow = simMensuelle(prodAnnuelle, kwhs, state.batt, { flex: true, scenario: 'p10' }, false);
+                    resBattHigh = simMensuelle(prodAnnuelle, kwhs, state.batt, { flex: true, scenario: 'p90' }, false);
+                    // Reference Base TRV (avec batt mais sans pilotage) pour la comparaison
+                    const tarifBaseRef = buildTarifHoraire('base', { kwh: TARIFS.base.kwh });
+                    const refBatt = simMensuelle(prodAnnuelle, kwhs, state.batt, tarifBaseRef, false);
+                    ecoBaseRefAnnuelle = refBatt.ecoDirecte + refBatt.ecoBatterie + refBatt.ecoRevente;
+                }
+
+                // ── Highlight batterie « OPTIMALE » ─────────────────────────────────────
+                // Optimale = celle dont |ratio − 1| est minimal parmi les trois tailles.
+                // Indépendant du choix utilisateur — pas de boucle de rétroaction.
+                const surplusJourBrut = resBase.kWhSurplus / 365;
+                let optimalBatt = null;
+                if (surplusJourBrut > 0.1) {
+                    let bestDiff = Infinity;
+                    [5, 10, 15].forEach(k => {
+                        const diff = Math.abs(k / surplusJourBrut - 1);
+                        if (diff < bestDiff) { bestDiff = diff; optimalBatt = k; }
+                    });
+                }
+                document.querySelectorAll('.objectif-btn').forEach(btn => {
+                    const b = parseInt(btn.dataset.batt);
+                    btn.classList.toggle('optimal-batt', optimalBatt !== null && b === optimalBatt);
+                });
 
                 const auto = resBatt.autoRate;
                 const autoBase = resBase.autoRate;
@@ -2089,13 +2874,35 @@
                 const conso = resBatt.consoAnnuelle;
 
                 // ── Bloc 1 — L'essentiel ──────────────────────────────────────────────
-                const ecoTotal = resBatt.ecoDirecte + resBatt.ecoBatterie + resBatt.ecoRevente;
+                const ecoCoutHC = resBatt.ecoCoutHC || 0;
+                const ecoTotal = resBatt.ecoDirecte + resBatt.ecoBatterie + resBatt.ecoRevente - ecoCoutHC;
+                const ecoTotalNoPilot = resBattNoPilot.ecoDirecte + resBattNoPilot.ecoBatterie + resBattNoPilot.ecoRevente;
                 const ecoTotalBase = resBase.ecoDirecte + resBase.ecoBatterie + resBase.ecoRevente;
                 const fmt = v => v > 0 ? '+\u00a0' + v.toLocaleString('fr-FR') + '\u00a0€' : '—';
 
-                document.getElementById('outEcoTotal').textContent = ecoTotal > 0 ? ecoTotal.toLocaleString('fr-FR') + ' €' : '—';
+                // Affichage : fourchette p10-p90 si flex, sinon valeur unique
+                if (isFlex && resBattLow && resBattHigh) {
+                    const ecoLow = resBattLow.ecoDirecte + resBattLow.ecoBatterie + resBattLow.ecoRevente - (resBattLow.ecoCoutHC || 0);
+                    const ecoHigh = resBattHigh.ecoDirecte + resBattHigh.ecoBatterie + resBattHigh.ecoRevente - (resBattHigh.ecoCoutHC || 0);
+                    const lo = Math.round(Math.min(ecoLow, ecoHigh, ecoTotal));
+                    const hi = Math.round(Math.max(ecoLow, ecoHigh, ecoTotal));
+                    document.getElementById('outEcoTotal').textContent =
+                        lo === hi ? lo.toLocaleString('fr-FR') + ' €' :
+                            `${lo.toLocaleString('fr-FR')} – ${hi.toLocaleString('fr-FR')} €`;
+                } else {
+                    document.getElementById('outEcoTotal').textContent = ecoTotal > 0 ? ecoTotal.toLocaleString('fr-FR') + ' €' : '—';
+                }
 
-                const tarifMoyen = tarifH.reduce((a, b) => a + b, 0) / 24;
+                // tarif moyen : moyenne 24h pour Array, moyenne du vecteur p50 hiver-semaine pour flex
+                let tarifMoyen;
+                if (isFlex) {
+                    const ref = (FLEX_VECTORS && FLEX_VECTORS.hiver && FLEX_VECTORS.hiver.sem)
+                        ? FLEX_VECTORS.hiver.sem[state.flexScenario || 'p50']
+                        : null;
+                    tarifMoyen = ref ? ref.reduce((a, b) => a + b, 0) / 24 : TARIFS.base.kwh;
+                } else {
+                    tarifMoyen = tarifH.reduce((a, b) => a + b, 0) / 24;
+                }
                 const factureSansPV = conso * tarifMoyen;
                 const pctReduc = factureSansPV > 0 ? Math.round(ecoTotal / factureSansPV * 100) : 0;
                 document.getElementById('outPctReduc').textContent = pctReduc > 0 ? '-' + pctReduc + '% sur la facture' : '—';
@@ -2104,6 +2911,13 @@
                 document.getElementById('outAutoProd').textContent = resBatt.autoProdRate + '%';
 
                 const deltaBattEur = ecoTotal - ecoTotalBase;
+                const bonusPilotEur = pilotActive ? (ecoTotal - ecoTotalNoPilot) : 0;
+                // Invariant : deltaBatt = bonusBattSolar + bonusPilot.
+                // L'ancienne formule (ecoTotalNoPilot - ecoTotalBase) ignorait ecoCoutHC en
+                // mode flex (smart_flex achete en HC, ce cout n'est dans aucune simu noPilot)
+                // -> bonusBattSolar gonflait artificiellement. Cette ecriture est equivalente
+                //    en Base/HP-HC et correcte en flex.
+                const bonusBattSolarEur = deltaBattEur - bonusPilotEur;
                 const deltaBattRow = document.getElementById('outDeltaBattRow');
                 const battMetrics = document.getElementById('outBattMetrics');
                 if (state.batt > 0) {
@@ -2112,8 +2926,6 @@
                     document.getElementById('outProduct').textContent = 'Revolty ' + state.batt;
                     document.getElementById('outDeltaBatt').textContent = deltaBattEur > 0 ? '+' + deltaBattEur.toLocaleString('fr-FR') + ' €/an' : '—';
                     const kwhRest = resBatt.kWhRestitue;
-                    const cycles = state.batt > 0 ? Math.round(kwhRest / state.batt * 10) / 10 : 0;
-                    document.getElementById('outCyclesBatt').textContent = Math.round(cycles) + ' cycles';
                     document.getElementById('outKwhRestitue').textContent = kwhRest.toLocaleString('fr-FR') + ' kWh';
                 } else {
                     deltaBattRow.style.display = 'none';
@@ -2123,16 +2935,32 @@
                 // Eco breakdown rows
                 const battRow = document.getElementById('ecoBatterieRow');
                 if (battRow) battRow.style.display = state.batt > 0 ? 'flex' : 'none';
+                const pilotRow = document.getElementById('ecoPilotRow');
+                if (pilotRow) pilotRow.style.display = pilotActive ? 'flex' : 'none';
                 document.getElementById('ecoDirecte').textContent = fmt(resBatt.ecoDirecte);
-                document.getElementById('ecoBatterie').textContent = state.batt > 0 ? fmt(deltaBattEur) : '—';
+                document.getElementById('ecoBatterie').textContent = state.batt > 0 ? fmt(bonusBattSolarEur) : '—';
+                document.getElementById('ecoPilot').textContent = fmt(bonusPilotEur);
                 document.getElementById('ecoRevente').textContent = fmt(resBatt.ecoRevente);
-                const rachatLbl = state.rachatMode === 'sans' ? 'Surplus non valorisé'
-                    : state.rachatMode === 'oa' ? 'Rachat EDF OA : 0,04 €/kWh'
-                    : state.rachatMode === 'projet' ? 'Rachat projet avril 2026 : 0,011 €/kWh (prix spot +)'
-                    : `Rachat perso : ${state.rachat.toFixed(3).replace('.', ',')} €/kWh`;
-                document.getElementById('tarifNote').textContent = state.contrat === 'hphc'
-                    ? `HP : ${userTarifs.hp.toFixed(4)} € · HC : ${userTarifs.hc.toFixed(4)} € · ${rachatLbl}`
-                    : `TRV Base mars 2026 : ${TARIFS.base.kwh} €/kWh · ${rachatLbl}`;
+                const rachatLbl = state.rachat > 0
+                    ? `Rachat : ${state.rachat.toFixed(3).replace('.', ',')} €/kWh`
+                    : 'Surplus non valorisé';
+                if (isFlex) {
+                    const sc = state.flexScenario || 'p50';
+                    const lbl = sc === 'p10' ? 'bas' : sc === 'p90' ? 'haut' : 'médian';
+                    document.getElementById('tarifNote').textContent =
+                        `Flex horaire · scénario ${sc} (${lbl}) · ø ${tarifMoyen.toFixed(4)} €/kWh · smart_flex actif · ${rachatLbl}`;
+                } else if (state.contrat === 'hphc') {
+                    document.getElementById('tarifNote').textContent =
+                        `HP : ${userTarifs.hp.toFixed(4)} € · HC : ${userTarifs.hc.toFixed(4)} € · ${rachatLbl}`;
+                } else {
+                    document.getElementById('tarifNote').textContent =
+                        `Base : ${userTarifs.kwh.toFixed(4)} €/kWh · ${rachatLbl}`;
+                }
+                // Banner "tarif flex non adapté" si l'eco flex p50 est inferieure au TRV Base
+                const noteEl = document.getElementById('tarifNote');
+                if (isFlex && ecoBaseRefAnnuelle != null && ecoTotal < ecoBaseRefAnnuelle - 1) {
+                    noteEl.innerHTML += `<div style="color:#FFD145;font-weight:600;margin-top:4px">⚠ Tarif flex non adapté à votre profil — éco TRV Base ≈ ${Math.round(ecoBaseRefAnnuelle).toLocaleString('fr-FR')} €/an</div>`;
+                }
 
                 // ── Diagnostic : dimensionnement ───────────────────────────────────────
                 const kwhRest = resBatt.kWhRestitue;
@@ -2192,39 +3020,251 @@
                     reventeAnnuelle: resBatt.ecoRevente, prodAnnuelle,
                     co2BattEviteKg: state.batt > 0 ? Math.round(state.batt * CO2_BATT_NEUVE) : 0
                 };
-                _dbgCtx = { kwhs, prodAnnuelle, battKwh: state.batt, consoAnnuelle: resBatt.consoAnnuelle };
+                _dbgCtx = { kwhs, prodAnnuelle, battKwh: state.batt, consoAnnuelle: resBatt.consoAnnuelle, tarifH: isFlex ? buildTarifFlexJour(1, 2, state.flexScenario || 'p50') : tarifH };
                 const efcAn = state.batt > 0 ? kwhRest / state.batt : 0;
-                // Projection : bonus batterie net (vs sans batt) pour cohérence avec le breakdown éco
-                const ecoBatterieProj = state.batt > 0 ? Math.max(0, deltaBattEur) : 0;
-                renderProjection(resBatt.ecoDirecte, ecoBatterieProj, resBatt.ecoRevente, state.batt, efcAn);
+                // Projection : bonus batterie solaire + bonus pilotage HC séparés (violet)
+                renderProjection(resBatt.ecoDirecte, bonusBattSolarEur, bonusPilotEur, resBatt.ecoRevente, state.batt, efcAn);
+                // Payback batterie : économies totales batterie (avec − sans), CAPEX = 576 €/kWh × kWh
+                renderPayback(deltaBattEur, state.batt, bonusBattSolarEur, bonusPilotEur);
+                // Debug window-level pour inspection console
+                window._rev = {
+                    pilotActive,
+                    ecoDir_A: resBatt.ecoDirecte, ecoBatt_A: resBatt.ecoBatterie, ecoRev_A: resBatt.ecoRevente, ecoCoutHC_A: resBatt.ecoCoutHC,
+                    ecoDir_B: resBattNoPilot.ecoDirecte, ecoBatt_B: resBattNoPilot.ecoBatterie, ecoRev_B: resBattNoPilot.ecoRevente,
+                    ecoDir_Base: resBase.ecoDirecte, ecoRev_Base: resBase.ecoRevente,
+                    ecoTotal, ecoTotalNoPilot, ecoTotalBase,
+                    deltaBattEur, bonusBattSolarEur, bonusPilotEur,
+                    kWhAchatHC: resBatt.kWhAchatHC, kWhRestitue_A: resBatt.kWhRestitue, kWhRestitue_B: resBattNoPilot.kWhRestitue,
+                    state: { ...state },
+                    inputs: {
+                        prodAnnuelle, kwc, productible,
+                        kwhs: { ...kwhs },
+                        battKwh: state.batt,
+                        tarifH: Array.isArray(tarifH) ? [...tarifH] : { ...tarifH },
+                        rachat: state.rachat,
+                        HEURES_CREUSES: [...HEURES_CREUSES_SET]
+                    },
+                    monthly_A: resBatt.debugMonthly,
+                    monthly_B: resBattNoPilot.debugMonthly,
+                    monthly_Base: resBase.debugMonthly
+                };
+                window._revDay = function (m, we = 0) {
+                    const I = window._rev && window._rev.inputs;
+                    if (!I) { console.warn('[Revolty] Lance une simulation d\'abord'); return null; }
+                    const profPVd = PROFIL_PV[state.dept];
+                    const mw = profPVd
+                        ? Array.from({ length: 12 }, (_, mi) => profPVd[mi].reduce((a, b) => a + b, 0))
+                        : [0.038, 0.054, 0.090, 0.110, 0.126, 0.135, 0.136, 0.116, 0.092, 0.063, 0.038, 0.024];
+                    const mwSum = mw.reduce((a, b) => a + b, 0);
+                    const d = DAYS_PER_MONTH[m];
+                    const prodJour = I.prodAnnuelle * mw[m] / mwSum / d;
+                    const solar = solarHourlyProfile(m);
+                    const prof = buildProfilJour(m, we, I.kwhs);
+                    let def = 0, surplusPV = 0;
+                    for (let h = 0; h < 24; h++) {
+                        const d2 = prof[h] - prodJour * solar[h];
+                        if (d2 < 0) surplusPV += -d2;
+                        else if (!HEURES_CREUSES_SET.has(h)) def += d2;
+                    }
+                    const Hp = simJourneeDebug(prof, prodJour, solar, I.battKwh, window._rev.pilotActive);
+                    const Hn = simJourneeDebug(prof, prodJour, solar, I.battKwh, false);
+                    const target = Hp.target;
+                    let ecoPilot = 0, ecoNoPilot = 0;
+                    for (let h = 0; h < 24; h++) {
+                        const p = I.tarifH[h] || 0;
+                        ecoPilot += (Hp.direct[h] + Hp.restitue[h]) * p + Hp.surplus[h] * I.rachat - (Hp.achatPilot ? Hp.achatPilot[h] : 0) * p;
+                        ecoNoPilot += (Hn.direct[h] + Hn.restitue[h]) * p + Hn.surplus[h] * I.rachat;
+                    }
+                    return { m, we, prodJour, def, surplusPV, target, prof, solar, pilot: Hp, noPilot: Hn, ecoPilot, ecoNoPilot, gainJour: ecoPilot - ecoNoPilot };
+                };
+                window._revDumpJSON = function () {
+                    if (!window._rev) { console.warn('[Revolty] Lance une simulation d\'abord'); return; }
+                    const dump = JSON.parse(JSON.stringify(window._rev));
+                    dump.days = {};
+                    for (let mi = 0; mi < 12; mi++) {
+                        for (const w of [0, 1]) {
+                            dump.days[`m${mi}_${w === 0 ? 'sem' : 'we'}`] = window._revDay(mi, w);
+                        }
+                    }
+                    const s = JSON.stringify(dump, null, 2);
+                    console.log(s);
+                    return s;
+                };
                 renderDebug(_dbgState.m, _dbgState.we);
             }
 
             // ═══════════════════════════════════════════════════════════════════════════
             // DEBUG — journée type heure par heure
             // ═══════════════════════════════════════════════════════════════════════════
-            function simJourneeDebug(profil, prodJour, solar, battKwh) {
+            function simJourneeDebug(profil, prodJour, solar, battKwh, pilotActive) {
                 const { pCharge, pDischarge } = battPowerLimits(battKwh);
+                // V3 : target = achats HP réels mesurés via pré-passe sans pilotage
+                let target = 0;
+                if (pilotActive && battKwh > 0) {
+                    let sNP = battKwh * SOC_INIT, achatHP = 0;
+                    for (let pass = 0; pass < 2; pass++) {
+                        achatHP = 0;
+                        let s = sNP;
+                        for (let h = 0; h < 24; h++) {
+                            const prod_h = prodJour * solar[h], conso_h = profil[h], delta = prod_h - conso_h;
+                            const isHC = HEURES_CREUSES_SET.has(h);
+                            if (delta >= 0) {
+                                const ci = Math.min((battKwh - s) / 0.96, delta, pCharge);
+                                s = Math.min(battKwh, s + ci * 0.96);
+                            } else {
+                                const need = -delta;
+                                const out = Math.min(s * 0.96, need, pDischarge);
+                                s = Math.max(0, s - out / 0.96);
+                                const ach = Math.max(0, need - out);
+                                if (!isHC) achatHP += ach;
+                            }
+                        }
+                        sNP = s;
+                    }
+                    target = Math.min(battKwh, achatHP);
+                }
+                const pilotOn = pilotActive && battKwh > 0;
+                // Convergence SOC régime permanent
                 let soc = battKwh * SOC_INIT;
                 for (let pass = 0; pass < 2; pass++) {
                     let s = soc;
                     for (let h = 0; h < 24; h++) {
-                        const delta = prodJour * solar[h] - profil[h];
-                        if (delta >= 0) { s = Math.min(battKwh, s + Math.min((battKwh - s) / 0.96, delta, pCharge) * 0.96); }
-                        else { const out = Math.min(s * 0.96, -delta, pDischarge); s = Math.max(0, s - out / 0.96); }
+                        const prod_h = prodJour * solar[h], conso_h = profil[h], delta = prod_h - conso_h;
+                        const isHC = HEURES_CREUSES_SET.has(h);
+                        if (delta >= 0) {
+                            const ci = Math.min((battKwh - s) / 0.96, delta, pCharge);
+                            s = Math.min(battKwh, s + ci * 0.96);
+                            if (pilotOn && isHC && s < target - 1e-6) {
+                                const pLeft = pCharge - ci;
+                                if (pLeft > 1e-6) {
+                                    const gc = Math.min(pLeft, (target - s) / 0.96, (battKwh - s) / 0.96);
+                                    if (gc > 0) s = Math.min(battKwh, s + gc * 0.96);
+                                }
+                            }
+                        } else {
+                            const need = -delta;
+                            if (pilotOn && isHC) {
+                                const dischargeable = Math.max(0, s - target) * 0.96;
+                                const out = Math.min(dischargeable, need, pDischarge);
+                                if (out > 0) s -= out / 0.96;
+                                if (s < target - 1e-6) {
+                                    const gc = Math.min(pCharge, (target - s) / 0.96, (battKwh - s) / 0.96);
+                                    if (gc > 0) s = Math.min(battKwh, s + gc * 0.96);
+                                }
+                            } else {
+                                const out = Math.min(s * 0.96, need, pDischarge);
+                                s = Math.max(0, s - out / 0.96);
+                            }
+                        }
                     }
                     soc = s;
                 }
-                const H = { prod: [], conso: [], direct: [], restitue: [], surplus: [], achat: [], soc: [] };
+                const H = { prod: [], conso: [], direct: [], restitue: [], surplus: [], achat: [], achatPilot: [], soc: [], target };
                 for (let h = 0; h < 24; h++) {
                     const prod_h = prodJour * solar[h], conso_h = profil[h], delta = prod_h - conso_h;
-                    let dir, rest, surp, ach;
+                    const isHC = HEURES_CREUSES_SET.has(h);
+                    let dir = 0, rest = 0, surp = 0, ach = 0, achPilot = 0;
                     if (delta >= 0) {
-                        dir = conso_h; const ci = Math.min((battKwh - soc) / 0.96, delta, pCharge); soc = Math.min(battKwh, soc + ci * 0.96); surp = Math.max(0, delta - ci); rest = 0; ach = 0;
+                        dir = conso_h;
+                        const ci = Math.min((battKwh - soc) / 0.96, delta, pCharge);
+                        soc = Math.min(battKwh, soc + ci * 0.96);
+                        surp = Math.max(0, delta - ci);
+                        if (pilotOn && isHC && soc < target - 1e-6) {
+                            const pLeft = pCharge - ci;
+                            if (pLeft > 1e-6) {
+                                const gc = Math.min(pLeft, (target - soc) / 0.96, (battKwh - soc) / 0.96);
+                                if (gc > 0) { soc = Math.min(battKwh, soc + gc * 0.96); achPilot = gc; }
+                            }
+                        }
                     } else {
-                        dir = prod_h; const need = -delta, out = Math.min(soc * 0.96, need, pDischarge); soc = Math.max(0, soc - out / 0.96); rest = out; ach = Math.max(0, need - out); surp = 0;
+                        dir = prod_h;
+                        const need = -delta;
+                        if (pilotOn && isHC) {
+                            const dischargeable = Math.max(0, soc - target) * 0.96;
+                            const out = Math.min(dischargeable, need, pDischarge);
+                            if (out > 0) { soc -= out / 0.96; rest = out; }
+                            ach = need - out;
+                            if (soc < target - 1e-6) {
+                                const gc = Math.min(pCharge, (target - soc) / 0.96, (battKwh - soc) / 0.96);
+                                if (gc > 0) { soc = Math.min(battKwh, soc + gc * 0.96); achPilot = gc; }
+                            }
+                        } else {
+                            const out = Math.min(soc * 0.96, need, pDischarge);
+                            soc = Math.max(0, soc - out / 0.96);
+                            rest = out;
+                            ach = Math.max(0, need - out);
+                        }
                     }
-                    H.prod.push(prod_h); H.conso.push(conso_h); H.direct.push(dir); H.restitue.push(rest); H.surplus.push(surp); H.achat.push(ach); H.soc.push(soc);
+                    H.prod.push(prod_h); H.conso.push(conso_h); H.direct.push(dir); H.restitue.push(rest); H.surplus.push(surp); H.achat.push(ach); H.achatPilot.push(achPilot); H.soc.push(soc);
+                }
+                return H;
+            }
+
+            // Variante debug du smart_flex : memes arrays {prod, conso, direct, restitue,
+            // surplus, achat, achatPilot, soc} que simJourneeDebug pour rester compatible
+            // avec le renderer. La logique doit etre alignee sur simJourneeFlex.
+            function simJourneeFlexDebug(profil, prodJour, solar, battKwh, tarifJour) {
+                const { pCharge, pDischarge } = battPowerLimits(battKwh);
+                const battActive = battKwh > 0;
+                const ord = Array.from({ length: 24 }, (_, h) => h);
+                const picSet = new Set(battActive ? [...ord].sort((a, b) => tarifJour[b] - tarifJour[a]).slice(0, FLEX_N_PIC) : []);
+                const creuxSet = new Set(battActive ? [...ord].sort((a, b) => tarifJour[a] - tarifJour[b]).slice(0, FLEX_N_CREUX) : []);
+                const targetKwh = battKwh * FLEX_SOC_TARGET;
+
+                // Convergence SOC en regime permanent (3 passes comme simMensuelle)
+                let soc = battKwh * SOC_INIT;
+                for (let pass = 0; pass < 3; pass++) {
+                    let s = soc;
+                    for (let h = 0; h < 24; h++) {
+                        const prod_h = prodJour * solar[h], conso_h = profil[h], delta = prod_h - conso_h;
+                        const inCreux = battActive && creuxSet.has(h);
+                        if (delta >= 0) {
+                            const ci = Math.min((battKwh - s) / 0.96, delta, pCharge);
+                            s = Math.min(battKwh, s + ci * 0.96);
+                        } else {
+                            const need = -delta;
+                            if (battActive && !inCreux && s > 0) {
+                                const out = Math.min(s * 0.96, need, pDischarge);
+                                s = Math.max(0, s - out / 0.96);
+                            }
+                            if (inCreux && s < targetKwh - 1e-6) {
+                                const gc = Math.min(pCharge, (targetKwh - s) / 0.96, (battKwh - s) / 0.96);
+                                if (gc > 0) s = Math.min(battKwh, s + gc * 0.96);
+                            }
+                        }
+                    }
+                    soc = s;
+                }
+
+                const H = { prod: [], conso: [], direct: [], restitue: [], surplus: [], achat: [], achatPilot: [], soc: [] };
+                for (let h = 0; h < 24; h++) {
+                    const prod_h = prodJour * solar[h], conso_h = profil[h], delta = prod_h - conso_h;
+                    const inCreux = battActive && creuxSet.has(h);
+                    let dir = 0, rest = 0, surp = 0, ach = 0, achPilot = 0;
+                    if (delta >= 0) {
+                        dir = conso_h;
+                        const ci = Math.min((battKwh - soc) / 0.96, delta, pCharge);
+                        soc = Math.min(battKwh, soc + ci * 0.96);
+                        surp = Math.max(0, delta - ci);
+                    } else {
+                        dir = prod_h;
+                        const need = -delta;
+                        if (battActive && !inCreux && soc > 0) {
+                            const out = Math.min(soc * 0.96, need, pDischarge);
+                            soc = Math.max(0, soc - out / 0.96);
+                            rest = out;
+                            ach = Math.max(0, need - out);
+                        } else {
+                            ach = need;
+                        }
+                        if (inCreux && soc < targetKwh - 1e-6) {
+                            const gc = Math.min(pCharge, (targetKwh - soc) / 0.96, (battKwh - soc) / 0.96);
+                            if (gc > 0) { soc = Math.min(battKwh, soc + gc * 0.96); achPilot = gc; }
+                        }
+                    }
+                    H.prod.push(prod_h); H.conso.push(conso_h); H.direct.push(dir);
+                    H.restitue.push(rest); H.surplus.push(surp); H.achat.push(ach);
+                    H.achatPilot.push(achPilot); H.soc.push(soc);
                 }
                 return H;
             }
@@ -2241,39 +3281,116 @@
                 const prodJour = prodAnnuelle * monthWeights[m] / monthWeights.reduce((a, b) => a + b, 0) / d;
                 const solar = solarHourlyProfile(m);
                 const profil = buildProfilJour(m, we, kwhs);
-                const H = simJourneeDebug(profil, prodJour, solar, battKwh);
+                const pilotActive = state.contrat === 'hphc' && battKwh > 0;
+                // En mode flex, on calcule d'abord le tarif du jour puis on lance le sim flex.
+                // Sinon, sim "classique" (Base / HP-HC).
+                const isFlexDbg0 = state.contrat === 'flex';
+                let __tarifJourEarly = null;
+                if (isFlexDbg0) __tarifJourEarly = buildTarifFlexJour(m + 1, we ? 6 : 2, state.flexScenario || 'p50');
+                const H = isFlexDbg0
+                    ? simJourneeFlexDebug(profil, prodJour, solar, battKwh, __tarifJourEarly)
+                    : simJourneeDebug(profil, prodJour, solar, battKwh, pilotActive);
+                const dlegPilot = document.getElementById('dlegPilot');
+                if (dlegPilot) dlegPilot.style.display = (pilotActive || isFlexDbg0) ? '' : 'none';
+
+                // ── Tarif horaire effectif du jour-type affiche ─────────────────────
+                // Recalcule explicitement (au lieu d'utiliser _dbgCtx.tarifH fige a janv).
+                const isFlexDbg = state.contrat === 'flex';
+                let tarifJour;
+                if (isFlexDbg) {
+                    tarifJour = buildTarifFlexJour(m + 1, we ? 6 : 2, state.flexScenario || 'p50');
+                } else if (state.contrat === 'hphc') {
+                    const userT = {
+                        hp: parseFloat(document.getElementById('tarifHP').value) || TARIFS.hphc.hp,
+                        hc: parseFloat(document.getElementById('tarifHC').value) || TARIFS.hphc.hc
+                    };
+                    tarifJour = buildTarifHoraire('hphc', userT);
+                } else {
+                    const userT = { kwh: parseFloat(document.getElementById('tarifBase').value) || TARIFS.base.kwh };
+                    tarifJour = buildTarifHoraire('base', userT);
+                }
+                // Heures pic/creux selectionnees par smart_flex (uniquement en mode flex)
+                const ord = Array.from({ length: 24 }, (_, h) => h);
+                const picSetDbg = isFlexDbg ? new Set([...ord].sort((a, b) => tarifJour[b] - tarifJour[a]).slice(0, FLEX_N_PIC)) : new Set();
+                const creuxSetDbg = isFlexDbg ? new Set([...ord].sort((a, b) => tarifJour[a] - tarifJour[b]).slice(0, FLEX_N_CREUX)) : new Set();
+                const prixMin = Math.min(...tarifJour);
+                const prixMax = Math.max(...tarifJour);
+                const prixMoy = tarifJour.reduce((a, b) => a + b, 0) / 24;
 
                 const f = v => (v * 1000).toFixed(0) + ' Wh';
                 const totConso = H.conso.reduce((a, b) => a + b, 0);
+                // Conso du mois sélectionné = profil semaine × nSem + profil we × nWe
+                const _nWeM = Math.round(d * 2 / 7);
+                const _nSemM = d - _nWeM;
+                const _profSemM = buildProfilJour(m, 0, kwhs);
+                const _profWeM = buildProfilJour(m, 1, kwhs);
+                const consoMois = _profSemM.reduce((a, b) => a + b, 0) * _nSemM
+                    + _profWeM.reduce((a, b) => a + b, 0) * _nWeM;
                 const totProd = H.prod.reduce((a, b) => a + b, 0);
                 const totDir = H.direct.reduce((a, b) => a + b, 0);
                 const totRest = H.restitue.reduce((a, b) => a + b, 0);
                 const totSurp = H.surplus.reduce((a, b) => a + b, 0);
                 const totAchat = H.achat.reduce((a, b) => a + b, 0);
+                const totPilot = (H.achatPilot || []).reduce((a, b) => a + b, 0);
                 const autoRate = totConso > 0 ? Math.round((totDir + totRest) / totConso * 100) : 0;
                 const consoAn = Math.round(ctx.consoAnnuelle || 0);
+                // Bénéfice pilotage = delta éco du jour type (avec vs sans pilotage)
+                // direct identique dans les 2 cas → annulé. On diff restitue, surplus et soustrait achatPilot.
+                const tarifH = ctx.tarifH || [];
+                let gainJour = 0;
+                if (pilotActive) {
+                    const H0 = simJourneeDebug(profil, prodJour, solar, battKwh, false);
+                    const rachat = state.rachat || 0;
+                    for (let h = 0; h < 24; h++) {
+                        const p = tarifH[h] || 0;
+                        gainJour += (H.restitue[h] - H0.restitue[h]) * p
+                            + (H.surplus[h] - H0.surplus[h]) * rachat
+                            - (H.achatPilot ? H.achatPilot[h] : 0) * p;
+                    }
+                }
+                const fE = v => (v >= 0 ? '+' : '') + v.toFixed(2).replace('.', ',') + ' €';
                 document.getElementById('dbgMetrics').innerHTML = `
     <div class="dbg-metric hl"><div class="dm-val">${consoAn.toLocaleString('fr-FR')} kWh</div><div class="dm-lbl">Conso annuelle simulée</div></div>
     <div class="dbg-metric"><div class="dm-val">${f(totConso)}</div><div class="dm-lbl">Conso journée</div></div>
+    <div class="dbg-metric hl"><div class="dm-val">${Math.round(consoMois).toLocaleString('fr-FR')} kWh</div><div class="dm-lbl">Conso mois</div></div>
+    <div class="dbg-metric hl"><div class="dm-val">${Math.round(prodAnnuelle).toLocaleString('fr-FR')} kWh</div><div class="dm-lbl">Prod PV annuelle</div></div>
     <div class="dbg-metric hl"><div class="dm-val">${f(totProd)}</div><div class="dm-lbl">Production PV</div></div>
     <div class="dbg-metric"><div class="dm-val">${f(totDir)}</div><div class="dm-lbl">Autoconso directe</div></div>
     <div class="dbg-metric"><div class="dm-val">${f(totRest)}</div><div class="dm-lbl">Restitution batt.</div></div>
     <div class="dbg-metric red"><div class="dm-val">${f(totAchat)}</div><div class="dm-lbl">Achat réseau</div></div>
+    ${pilotActive ? `<div class="dbg-metric" style="color:#9B6DFF"><div class="dm-val" style="color:#9B6DFF">${f(totPilot)}</div><div class="dm-lbl">Recharge HC pilotée</div></div>` : ''}
+    ${pilotActive ? `<div class="dbg-metric" style="color:#9B6DFF"><div class="dm-val" style="color:#9B6DFF">${fE(gainJour)}</div><div class="dm-lbl">Bénéfice pilotage ce jour</div></div>` : ''}
     <div class="dbg-metric"><div class="dm-val">${autoRate}%</div><div class="dm-lbl">Autoconso journée</div></div>
     ${battKwh > 0 ? `<div class="dbg-metric"><div class="dm-val">${(H.soc[23] * 1000).toFixed(0)} Wh</div><div class="dm-lbl">SOC fin journée</div></div>` : ''}
+    <div class="dbg-metric" style="color:#FF9F45"><div class="dm-val" style="color:#FF9F45">${prixMin.toFixed(3).replace('.', ',')} – ${prixMax.toFixed(3).replace('.', ',')}</div><div class="dm-lbl">Prix min – max (€/kWh)</div></div>
+    <div class="dbg-metric" style="color:#FF9F45"><div class="dm-val" style="color:#FF9F45">${prixMoy.toFixed(4).replace('.', ',')}</div><div class="dm-lbl">Prix moyen jour</div></div>
+    ${isFlexDbg ? `<div class="dbg-metric" style="color:#FF9F45"><div class="dm-val" style="color:#FF9F45">${(prixMax / prixMin).toFixed(2)}×</div><div class="dm-lbl">Ratio pic/creux</div></div>` : ''}
   `;
 
                 // ── Layout ──
-                const ML = 38, MR = battKwh > 0 ? 38 : 8, MT = 4, MB = 18;
+                const ML = 38, MR = battKwh > 0 ? 38 : 8, MT = 4, MB = 28;
                 const W = 900, CHART_H = 170;
                 const TOTAL_W = W, TOTAL_H = MT + CHART_H + MB;
                 const plotW = W - ML - MR;
                 const BAR_W = Math.floor(plotW / 24);
-                const maxY = Math.max(...H.conso, ...H.prod) * 1.12 || 0.001;
+                const stackHi = H.conso.map((c, h) => c + (H.achatPilot ? H.achatPilot[h] : 0));
+                const maxY = Math.max(...stackHi, ...H.prod) * 1.12 || 0.001;
                 const scY = v => MT + CHART_H - (v / maxY) * (CHART_H - 4);
                 const barX = h => ML + h * BAR_W;
 
                 let svg = '';
+
+                // ── Bandes pic / creux (mode flex uniquement) — en arriere-plan ──
+                if (isFlexDbg) {
+                    for (let h = 0; h < 24; h++) {
+                        const x = barX(h);
+                        if (picSetDbg.has(h)) {
+                            svg += `<rect x="${x}" y="${MT}" width="${BAR_W}" height="${CHART_H}" fill="rgba(255,80,80,0.10)"/>`;
+                        } else if (creuxSetDbg.has(h)) {
+                            svg += `<rect x="${x}" y="${MT}" width="${BAR_W}" height="${CHART_H}" fill="rgba(120,200,255,0.10)"/>`;
+                        }
+                    }
+                }
 
                 // ── Grille horizontale + labels axe gauche (kWh) ──
                 const nTicks = 4;
@@ -2288,9 +3405,10 @@
 
                 // ── Barres empilées ──
                 for (let h = 0; h < 24; h++) {
-                    const x = barX(h), dir = H.direct[h], rest = H.restitue[h], ach = H.achat[h];
+                    const x = barX(h), dir = H.direct[h], rest = H.restitue[h], ach = H.achat[h], achPilot = H.achatPilot ? H.achatPilot[h] : 0;
                     let top = MT + CHART_H;
                     if (ach > 0) { const bh = Math.max(1, Math.round((ach / maxY) * (CHART_H - 4))); top -= bh; svg += `<rect x="${x}" y="${top}" width="${BAR_W - 1}" height="${bh}" fill="rgba(255,255,255,0.13)" rx="1"/>`; }
+                    if (achPilot > 0) { const bh = Math.max(1, Math.round((achPilot / maxY) * (CHART_H - 4))); top -= bh; svg += `<rect x="${x}" y="${top}" width="${BAR_W - 1}" height="${bh}" fill="#9B6DFF" rx="1"/>`; }
                     if (rest > 0) { const bh = Math.max(1, Math.round((rest / maxY) * (CHART_H - 4))); top -= bh; svg += `<rect x="${x}" y="${top}" width="${BAR_W - 1}" height="${bh}" fill="#017267" rx="1"/>`; }
                     if (dir > 0) { const bh = Math.max(1, Math.round((dir / maxY) * (CHART_H - 4))); top -= bh; svg += `<rect x="${x}" y="${top}" width="${BAR_W - 1}" height="${bh}" fill="#11E47A" rx="1"/>`; }
                     if (H.surplus[h] > 0) { const bh = Math.max(1, Math.round((H.surplus[h] / maxY) * (CHART_H - 4))); svg += `<rect x="${x}" y="${top - bh}" width="${BAR_W - 1}" height="${bh}" fill="rgba(255,209,69,0.55)" rx="1"/>`; }
@@ -2316,6 +3434,21 @@
                     }
                     // Label axe droit
                     svg += `<text x="${W - 4}" y="${(MT + CHART_H / 2)}" text-anchor="middle" font-size="7" fill="rgba(116,198,157,0.3)" font-family="DM Sans,sans-serif" transform="rotate(90 ${W - 4} ${MT + CHART_H / 2})">SOC</text>`;
+                }
+
+                // ── Courbe prix horaire (overlay orange, axe vertical implicite [0, prixMax*1.05]) ──
+                {
+                    const prixScale = Math.max(prixMax * 1.05, 0.01);
+                    const scP = v => MT + CHART_H - (v / prixScale) * (CHART_H - 4);
+                    const ptsP = tarifJour.map((v, h) => `${(barX(h) + BAR_W / 2).toFixed(1)},${scP(v).toFixed(1)}`).join(' ');
+                    svg += `<polyline points="${ptsP}" fill="none" stroke="#FF9F45" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3,2" opacity="0.85"/>`;
+                    // Labels prix (en orange) sous les ticks pairs de l'axe X
+                    for (let h = 0; h < 24; h += 2) {
+                        const x = barX(h) + BAR_W / 2;
+                        svg += `<text x="${x.toFixed(1)}" y="${MT + CHART_H + 22}" text-anchor="middle" font-size="6.5" fill="rgba(255,159,69,0.7)" font-family="DM Sans,sans-serif">${tarifJour[h].toFixed(2).replace('.', ',')}</text>`;
+                    }
+                    // Petite legende prix en haut a gauche du chart
+                    svg += `<text x="${ML + 4}" y="${MT + 9}" font-size="7" fill="#FF9F45" font-family="DM Sans,sans-serif">— prix € / kWh${isFlexDbg ? ' · pic (rouge) / creux (bleu)' : ''}</text>`;
                 }
 
                 // ── Axe des abscisses ──
@@ -2375,18 +3508,21 @@
                     btn.classList.add('active');
                     if (g === 'persons') state.persons = parseInt(v);
                     else if (g === 'heat') state.heat = v;
-                    else if (g === 'panelwc') state.panelwc = parseInt(v);
+                    else if (g === 'usage') state.usage = v;
+                    else if (g === 'hasPv') {
+                        state.hasPv = (v === 'oui');
+                        if (state.hasPv) {
+                            document.getElementById('kwcHelper').textContent = 'ex : 6 kWc ≈ 15 panneaux 400 Wc';
+                        }
+                        // Sinon : compute() recalcule le dimensionnement et met à jour le helper
+                    }
                     else if (g === 'contrat') state.contrat = v;
+                    else if (g === 'flexScenario') state.flexScenario = v;
                     else if (g === 'journee') state.journee = v;
                     else if (g === 'consoMode') { state.consoMode = v; applyConsoMode(); }
                     else if (g === 'orient') state.orient = v;
                     else if (g === 'incl') state.incl = parseInt(v);
                     else if (g === 'ombrage') state.ombrage = parseFloat(v);
-                    else if (g === 'rachatMode') {
-                        state.rachatMode = v;
-                        state.rachat = v === 'custom' ? (state.rachatCustom || 0) : (RACHAT_PRESETS[v] ?? 0);
-                        document.getElementById('rachatCustomField').style.display = v === 'custom' ? 'flex' : 'none';
-                    }
                     compute();
                 });
             });
@@ -2442,10 +3578,13 @@
                 }
             }
 
-            // Afficher tarifs HP/HC
+            // Afficher tarifs HP/HC, Base ou Flex selon contrat
             document.querySelectorAll('.tile-btn[data-group="contrat"]').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    document.getElementById('block-tarifs-custom').classList.toggle('hidden', btn.dataset.val !== 'hphc');
+                    const v = btn.dataset.val;
+                    document.getElementById('block-tarifs-custom').classList.toggle('hidden', v !== 'hphc');
+                    document.getElementById('block-tarif-base').classList.toggle('hidden', v !== 'base');
+                    document.getElementById('block-tarif-flex').classList.toggle('hidden', v !== 'flex');
                 });
             });
 
@@ -2455,11 +3594,14 @@
                 document.getElementById('surfaceVal').textContent = this.value;
                 debouncedCompute();
             });
-            document.getElementById('nbPanels').addEventListener('input', function () {
-                state.nbPanels = parseInt(this.value);
-                document.getElementById('nbPanelsVal').textContent = this.value;
+            document.getElementById('kwcInput').addEventListener('input', function () {
+                state.kwc = parseFloat(this.value) || 0;
+                updateKwcWarn();
                 debouncedCompute();
             });
+            function updateKwcWarn() {
+                document.getElementById('kwcTriWarn').style.display = state.kwc > 9 ? '' : 'none';
+            }
 
             // Département
             (function populateDeptSelect() {
@@ -2484,16 +3626,14 @@
             });
 
             // Tarifs HP/HC
+            document.getElementById('tarifBase').addEventListener('input', debouncedCompute);
             document.getElementById('tarifHP').addEventListener('input', debouncedCompute);
             document.getElementById('tarifHC').addEventListener('input', debouncedCompute);
 
-            // Rachat personnalisé
-            document.getElementById('rachatCustom').addEventListener('input', function () {
-                state.rachatCustom = parseFloat(this.value) || 0;
-                if (state.rachatMode === 'custom') {
-                    state.rachat = state.rachatCustom;
-                    debouncedCompute();
-                }
+            // Rachat surplus (saisie libre)
+            document.getElementById('rachatInput').addEventListener('input', function () {
+                state.rachat = parseFloat(this.value) || 0;
+                debouncedCompute();
             });
 
             // Méthodologie
@@ -2556,6 +3696,123 @@
                     _debugBypass.style.display = 'none';
                 });
             }
+
+            // ── MODE PUBLIC / PRIVÉ ──────────────────────────────────────────────────
+            // Privé par défaut (usage interne). Pour activer le mode public (champs
+            // sensibles masqués + valeurs figées) : ajouter ?mode=public à l'URL.
+            // Convention : tout élément avec l'attribut [data-private] est masqué en
+            // mode public, et toute clé de PUBLIC_DEFAULTS est forcée à sa valeur.
+            const IS_PUBLIC = new URLSearchParams(location.search).get('mode') === 'public';
+
+            const PUBLIC_DEFAULTS = {
+                groups: { orient: 'sud', incl: '35', ombrage: '0', usage: 'normal' },
+                dpe: 'C',
+            };
+
+            if (IS_PUBLIC) {
+                document.querySelectorAll('[data-private]').forEach(el => el.style.display = 'none');
+                Object.entries(PUBLIC_DEFAULTS.groups).forEach(([group, val]) => {
+                    document.querySelector(`[data-group="${group}"][data-val="${val}"]`)?.click();
+                });
+                document.querySelector(`[data-dpe="${PUBLIC_DEFAULTS.dpe}"]`)?.click();
+            }
+
+            // ── PROFILS DE TEST (interne) ──────────────────────────────────────────
+            const PROFILES = {
+                P1: { // Bordeaux, médian favorable
+                    persons: 4, surface: 140, heat: 'pompe', journee: 'exterieur', dpe: 'D', usage: 'normal',
+                    appliances: { ecs: 'joule', ve: true, piscine: false, clim: false },
+                    batt: 10, dept: '33', kwc: 6, contrat: 'base', tarifBase: 0.2016, rachat: 0,
+                    orient: 'sud', incl: '35', ombrage: '0'
+                },
+                P2: { // Lyon, petit foyer, sans batterie
+                    persons: 2, surface: 75, heat: 'pompe', journee: 'maison', dpe: 'C', usage: 'normal',
+                    appliances: { ecs: 'thermo', ve: false, piscine: false, clim: false },
+                    batt: 0, dept: '69', kwc: 3, contrat: 'hphc', tarifHP: 0.2146, tarifHC: 0.1696, rachat: 0,
+                    orient: 'sud', incl: '20', ombrage: '0'
+                },
+                P3: { // Toulouse, gros consommateur + revente OA
+                    persons: 5, surface: 180, heat: 'elec', journee: 'maison', dpe: 'E', usage: 'normal',
+                    appliances: { ecs: 'thermo', ve: true, piscine: true, clim: true },
+                    batt: 15, dept: '31', kwc: 9, contrat: 'base', tarifBase: 0.2016, rachat: 0.04,
+                    orient: 'sud', incl: '20', ombrage: '0'
+                },
+                P4: { // Nantes, gaz + E/O
+                    persons: 3, surface: 110, heat: 'gaz', journee: 'maison', dpe: 'D', usage: 'normal',
+                    appliances: { ecs: null, ve: false, piscine: false, clim: true },
+                    batt: 0, dept: '44', kwc: 4.5, contrat: 'hphc', tarifHP: 0.2146, tarifHC: 0.1696, rachat: 0,
+                    orient: 'ouest', incl: '35', ombrage: '0'
+                },
+            };
+
+            function _clickGroup(group, val) {
+                const btn = document.querySelector(`.tile-btn[data-group="${group}"][data-val="${val}"]:not([style*="display:none"])`)
+                    || document.querySelector(`.tile-btn[data-group="${group}"][data-val="${val}"]`);
+                if (btn) btn.click();
+            }
+            function _setInput(id, val) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.value = val;
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            function _applBtn(a) { return document.querySelector(`.tile-btn[data-appliance="${a}"]`); }
+
+            function applyProfile(p) {
+                // Mode estim
+                _clickGroup('consoMode', 'estim');
+                // Foyer
+                _clickGroup('persons', p.persons);
+                _setInput('surface', p.surface);
+                _clickGroup('heat', p.heat);
+                _clickGroup('journee', p.journee);
+                document.querySelector(`[data-dpe="${p.dpe}"]`)?.click();
+                _clickGroup('usage', p.usage);
+
+                // Appareils — réconcilier avec l'état courant
+                const a = p.appliances;
+                const curJoule = _applBtn('ecs-joule').classList.contains('active');
+                const curThermo = _applBtn('ecs-thermo').classList.contains('active');
+                const wantJoule = a.ecs === 'joule';
+                const wantThermo = a.ecs === 'thermo';
+                if (curJoule !== wantJoule) _applBtn('ecs-joule').click();
+                // après ce clic, l'autre ECS peut avoir bougé — relire
+                const nowThermo = _applBtn('ecs-thermo').classList.contains('active');
+                if (nowThermo !== wantThermo) _applBtn('ecs-thermo').click();
+                for (const k of ['ve', 'piscine', 'clim']) {
+                    const cur = _applBtn(k).classList.contains('active');
+                    if (cur !== a[k]) _applBtn(k).click();
+                }
+
+                // Batterie
+                document.querySelector(`[data-batt="${p.batt}"]`)?.click();
+
+                // Installation
+                const dept = document.getElementById('dept');
+                dept.value = p.dept;
+                dept.dispatchEvent(new Event('change', { bubbles: true }));
+                _clickGroup('hasPv', 'oui');
+                _setInput('kwcInput', p.kwc);
+                _clickGroup('contrat', p.contrat);
+                if (p.tarifBase != null) _setInput('tarifBase', p.tarifBase);
+                if (p.tarifHP != null) _setInput('tarifHP', p.tarifHP);
+                if (p.tarifHC != null) _setInput('tarifHC', p.tarifHC);
+                _setInput('rachatInput', p.rachat);
+                _clickGroup('orient', p.orient);
+                _clickGroup('incl', p.incl);
+                _clickGroup('ombrage', p.ombrage);
+            }
+
+            document.querySelectorAll('.profile-btn[data-profile]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const name = btn.dataset.profile;
+                    const p = PROFILES[name];
+                    if (!p) return;
+                    applyProfile(p);
+                    document.querySelectorAll('.profile-btn[data-profile]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
 
             // ── INIT
             compute();

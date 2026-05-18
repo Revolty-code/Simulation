@@ -19,11 +19,21 @@
     </header>
 
     <!-- DEBUG — bouton magique pour bypasser le lead gate (à retirer en prod) -->
-    <button type="button" id="debugBypass" title="Bypass le lead gate (debug interne)">🪄 Skip gate (debug)</button>
+    <button type="button" id="debugBypass" data-private title="Bypass le lead gate (debug interne)">🪄 Skip gate
+        (debug)</button>
 
     <div class="hero">
         <h1>Simulateur d'<em>autoconsommation</em><br />et économies</h1>
         <p>Modèle saisonnier heure par heure — DPE, isolation, appareils spécifiques.</p>
+    </div>
+
+    <!-- Profils de test (interne) -->
+    <div class="profile-bar" id="profileBar" data-private>
+        <span class="profile-bar-label">Profils test</span>
+        <button type="button" class="profile-btn" data-profile="P1">P1<span class="profile-btn-sub">Bordeaux · médian</span></button>
+        <button type="button" class="profile-btn" data-profile="P2">P2<span class="profile-btn-sub">Lyon · petit foyer</span></button>
+        <button type="button" class="profile-btn" data-profile="P3">P3<span class="profile-btn-sub">Toulouse · gros + revente</span></button>
+        <button type="button" class="profile-btn" data-profile="P4">P4<span class="profile-btn-sub">Nantes · E/O gaz</span></button>
     </div>
 
     <div class="container">
@@ -36,8 +46,10 @@
                 <div class="field">
                     <span class="field-label">Comment renseigner votre consommation ?</span>
                     <div class="tile-grid cols-2">
-                        <button type="button" class="tile-btn active" data-group="consoMode" data-val="estim"><span class="tile-icon">🧮</span><span class="tile-label">L'estimer</span></button>
-                        <button type="button" class="tile-btn" data-group="consoMode" data-val="manuel"><span class="tile-icon">✏️</span><span class="tile-label">Je la connais</span></button>
+                        <button type="button" class="tile-btn active" data-group="consoMode" data-val="estim"><span
+                                class="tile-icon">🧮</span><span class="tile-label">L'estimer</span></button>
+                        <button type="button" class="tile-btn" data-group="consoMode" data-val="manuel"><span
+                                class="tile-icon">✏️</span><span class="tile-label">Je la connais</span></button>
                     </div>
                 </div>
 
@@ -45,15 +57,50 @@
                     <div class="field">
                         <span class="field-label">Nombre de personnes</span>
                         <div class="tile-grid cols-5">
-                            <button type="button" class="tile-btn" data-group="persons" data-val="1"><span class="tile-icon">1</span><span class="tile-label">personne</span></button>
-                            <button type="button" class="tile-btn active" data-group="persons" data-val="2"><span class="tile-icon">2</span><span class="tile-label">personnes</span></button>
-                            <button type="button" class="tile-btn" data-group="persons" data-val="3"><span class="tile-icon">3</span><span class="tile-label">personnes</span></button>
-                            <button type="button" class="tile-btn" data-group="persons" data-val="4"><span class="tile-icon">4</span><span class="tile-label">personnes</span></button>
-                            <button type="button" class="tile-btn" data-group="persons" data-val="5"><span class="tile-icon">5+</span><span class="tile-label">personnes</span></button>
+                            <button type="button" class="tile-btn" data-group="persons" data-val="1"><span
+                                    class="tile-icon">1</span><span class="tile-label">personne</span></button>
+                            <button type="button" class="tile-btn" data-group="persons" data-val="2"><span
+                                    class="tile-icon">2</span><span class="tile-label">personnes</span></button>
+                            <button type="button" class="tile-btn" data-group="persons" data-val="3"><span
+                                    class="tile-icon">3</span><span class="tile-label">personnes</span></button>
+                            <button type="button" class="tile-btn active" data-group="persons" data-val="4"><span
+                                    class="tile-icon">4</span><span class="tile-label">personnes</span></button>
+                            <button type="button" class="tile-btn" data-group="persons" data-val="5"><span
+                                    class="tile-icon">5+</span><span class="tile-label">personnes</span></button>
                         </div>
                     </div>
 
                     <div class="field">
+                        <span class="field-label">Surface du logement</span>
+                        <div class="slider-row">
+                            <input type="range" id="surface" min="30" max="250" step="10" value="140" />
+                            <span class="slider-val"><span id="surfaceVal">140</span> m²</span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <span class="field-label">Type de chauffage</span>
+                        <div class="tile-grid cols-3">
+                            <button type="button" class="tile-btn active" data-group="heat" data-val="gaz"><span
+                                    class="tile-icon">🔥</span><span class="tile-label">Gaz / Bois</span></button>
+                            <button type="button" class="tile-btn" data-group="heat" data-val="pompe"><span
+                                    class="tile-icon">🌡️</span><span class="tile-label">Pompe à chaleur</span></button>
+                            <button type="button" class="tile-btn" data-group="heat" data-val="elec"><span
+                                    class="tile-icon">🔌</span><span class="tile-label">Résistance élec</span></button>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <span class="field-label">En journée</span>
+                        <div class="tile-grid cols-2">
+                            <button type="button" class="tile-btn active" data-group="journee" data-val="maison"><span
+                                    class="tile-icon">🏠</span><span class="tile-label">À la maison</span></button>
+                            <button type="button" class="tile-btn" data-group="journee" data-val="exterieur"><span
+                                    class="tile-icon">🏢</span><span class="tile-label">À l'extérieur</span></button>
+                        </div>
+                    </div>
+
+                    <div class="field" data-private>
                         <span class="field-label">Isolation / Classe DPE</span>
                         <div class="dpe-selector">
                             <button class="dpe-btn" data-dpe="A" title="A — très performant (BBC, RT2012+)">A</button>
@@ -68,28 +115,18 @@
                             maisons)</p>
                     </div>
 
-                    <div class="field">
-                        <span class="field-label">Surface du logement</span>
-                        <div class="slider-row">
-                            <input type="range" id="surface" min="30" max="250" step="10" value="100" />
-                            <span class="slider-val"><span id="surfaceVal">100</span> m²</span>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <span class="field-label">Type de chauffage</span>
+                    <div class="field" data-private>
+                        <span class="field-label">Usage du chauffage</span>
                         <div class="tile-grid cols-3">
-                            <button type="button" class="tile-btn active" data-group="heat" data-val="gaz"><span class="tile-icon">🔥</span><span class="tile-label">Gaz / Bois</span></button>
-                            <button type="button" class="tile-btn" data-group="heat" data-val="pompe"><span class="tile-icon">🌡️</span><span class="tile-label">Pompe à chaleur</span></button>
-                            <button type="button" class="tile-btn" data-group="heat" data-val="elec"><span class="tile-icon">🔌</span><span class="tile-label">Résistance élec</span></button>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <span class="field-label">En journée</span>
-                        <div class="tile-grid cols-2">
-                            <button type="button" class="tile-btn active" data-group="journee" data-val="maison"><span class="tile-icon">🏠</span><span class="tile-label">À la maison</span></button>
-                            <button type="button" class="tile-btn" data-group="journee" data-val="exterieur"><span class="tile-icon">🏢</span><span class="tile-label">À l'extérieur</span></button>
+                            <button type="button" class="tile-btn" data-group="usage" data-val="econome"><span
+                                    class="tile-icon">🌱</span><span class="tile-label">Économe</span><span
+                                    class="tile-sub">~45 %</span></button>
+                            <button type="button" class="tile-btn active" data-group="usage" data-val="normal"><span
+                                    class="tile-icon">🏠</span><span class="tile-label">Normal</span><span
+                                    class="tile-sub">~70 %</span></button>
+                            <button type="button" class="tile-btn" data-group="usage" data-val="fond"><span
+                                    class="tile-icon">🔥</span><span class="tile-label">À fond</span><span
+                                    class="tile-sub">100 %</span></button>
                         </div>
                     </div>
                 </div>
@@ -108,9 +145,12 @@
                     <div class="field">
                         <span class="field-label">Chauffage principal</span>
                         <div class="tile-grid cols-3">
-                            <button type="button" class="tile-btn active" data-group="heat" data-val="gaz"><span class="tile-icon">🔥</span><span class="tile-label">Gaz / Bois</span></button>
-                            <button type="button" class="tile-btn" data-group="heat" data-val="pompe"><span class="tile-icon">🌡️</span><span class="tile-label">Pompe à chaleur</span></button>
-                            <button type="button" class="tile-btn" data-group="heat" data-val="elec"><span class="tile-icon">🔌</span><span class="tile-label">Résistance élec</span></button>
+                            <button type="button" class="tile-btn active" data-group="heat" data-val="gaz"><span
+                                    class="tile-icon">🔥</span><span class="tile-label">Gaz / Bois</span></button>
+                            <button type="button" class="tile-btn" data-group="heat" data-val="pompe"><span
+                                    class="tile-icon">🌡️</span><span class="tile-label">Pompe à chaleur</span></button>
+                            <button type="button" class="tile-btn" data-group="heat" data-val="elec"><span
+                                    class="tile-icon">🔌</span><span class="tile-label">Résistance élec</span></button>
                         </div>
                         <p class="dpe-hint">Détermine la saisonnalité (pic hiver) appliquée à votre conso.</p>
                     </div>
@@ -120,13 +160,24 @@
             <!-- APPAREILS SPÉCIFIQUES (SEAU 3) -->
             <div class="card">
                 <div class="card-title"><span class="ico">⚡</span> Appareils spécifiques</div>
-                <p class="dpe-hint" style="margin-top:-4px;margin-bottom:10px">Cliquez sur les appareils que vous possédez.</p>
+                <p class="dpe-hint" style="margin-top:-4px;margin-bottom:10px">Cliquez sur les appareils que vous
+                    possédez.</p>
                 <div class="tile-grid cols-5">
-                    <button type="button" class="tile-btn" data-appliance="ecs-joule"><span class="tile-icon">🚿</span><span class="tile-label">Chauffe-eau</span><span class="tile-sub">Résistance</span></button>
-                    <button type="button" class="tile-btn" data-appliance="ecs-thermo"><span class="tile-icon">♨️</span><span class="tile-label">Chauffe-eau</span><span class="tile-sub">Thermo</span></button>
-                    <button type="button" class="tile-btn" data-appliance="ve"><span class="tile-icon">🚗</span><span class="tile-label">Véhicule</span><span class="tile-sub">électrique</span></button>
-                    <button type="button" class="tile-btn" data-appliance="piscine"><span class="tile-icon">🏊</span><span class="tile-label">Piscine</span><span class="tile-sub">&nbsp;</span></button>
-                    <button type="button" class="tile-btn" data-appliance="clim"><span class="tile-icon">❄️</span><span class="tile-label">Climatisation</span><span class="tile-sub">&nbsp;</span></button>
+                    <button type="button" class="tile-btn active" data-appliance="ecs-joule"><span
+                            class="tile-icon">🚿</span><span class="tile-label">Chauffe-eau</span><span
+                            class="tile-sub">Résistance</span></button>
+                    <button type="button" class="tile-btn" data-appliance="ecs-thermo"><span
+                            class="tile-icon">♨️</span><span class="tile-label">Chauffe-eau</span><span
+                            class="tile-sub">Thermo</span></button>
+                    <button type="button" class="tile-btn active" data-appliance="ve"><span
+                            class="tile-icon">🚗</span><span class="tile-label">Véhicule</span><span
+                            class="tile-sub">électrique</span></button>
+                    <button type="button" class="tile-btn" data-appliance="piscine"><span
+                            class="tile-icon">🏊</span><span class="tile-label">Piscine</span><span
+                            class="tile-sub">&nbsp;</span></button>
+                    <button type="button" class="tile-btn active" data-appliance="clim"><span
+                            class="tile-icon">❄️</span><span class="tile-label">Climatisation</span><span
+                            class="tile-sub">&nbsp;</span></button>
                 </div>
             </div>
 
@@ -158,50 +209,23 @@
                 </div>
 
                 <div class="field">
-                    <span class="field-label">Orientation des panneaux</span>
-                    <div class="tile-grid cols-3">
-                        <button type="button" class="tile-btn" data-group="orient" data-val="est"><span class="tile-icon">🌅</span><span class="tile-label">Est</span><span class="tile-sub">matin</span></button>
-                        <button type="button" class="tile-btn active" data-group="orient" data-val="sud"><span class="tile-icon">☀️</span><span class="tile-label">Sud</span><span class="tile-sub">optimal</span></button>
-                        <button type="button" class="tile-btn" data-group="orient" data-val="ouest"><span class="tile-icon">🌇</span><span class="tile-label">Ouest</span><span class="tile-sub">soir</span></button>
+                    <span class="field-label">Puissance installée</span>
+                    <div class="tile-grid cols-2" style="margin-bottom:8px">
+                        <button type="button" class="tile-btn active" data-group="hasPv" data-val="oui"><span
+                                class="tile-icon">☀️</span><span class="tile-label">J'ai des PV</span></button>
+                        <button type="button" class="tile-btn" data-group="hasPv" data-val="non"><span
+                                class="tile-icon">🏠</span><span class="tile-label">Je n'ai pas de PV</span><span
+                                class="tile-sub">dimensionnement auto</span></button>
                     </div>
-                </div>
-
-                <div class="field">
-                    <span class="field-label">Inclinaison toiture</span>
-                    <div class="tile-grid cols-3">
-                        <button type="button" class="tile-btn" data-group="incl" data-val="20"><span class="tile-icon">📐</span><span class="tile-label">20°</span><span class="tile-sub">plat</span></button>
-                        <button type="button" class="tile-btn active" data-group="incl" data-val="35"><span class="tile-icon">📐</span><span class="tile-label">35°</span><span class="tile-sub">standard</span></button>
-                        <button type="button" class="tile-btn" data-group="incl" data-val="45"><span class="tile-icon">📐</span><span class="tile-label">45°</span><span class="tile-sub">pentu</span></button>
+                    <div class="optional-input-row" id="kwcField">
+                        <input type="number" id="kwcInput" min="0" max="20" step="0.1" value="6" />
+                        <span class="unit">kWc</span>
                     </div>
-                </div>
-
-                <div class="field">
-                    <span class="field-label">Ombrage</span>
-                    <div class="tile-grid cols-4">
-                        <button type="button" class="tile-btn active" data-group="ombrage" data-val="0"><span class="tile-icon">☀️</span><span class="tile-label">Aucun</span><span class="tile-sub">&nbsp;</span></button>
-                        <button type="button" class="tile-btn" data-group="ombrage" data-val="0.1"><span class="tile-icon">🌤️</span><span class="tile-label">Léger</span><span class="tile-sub">10 %</span></button>
-                        <button type="button" class="tile-btn" data-group="ombrage" data-val="0.2"><span class="tile-icon">⛅</span><span class="tile-label">Moyen</span><span class="tile-sub">20 %</span></button>
-                        <button type="button" class="tile-btn" data-group="ombrage" data-val="0.3"><span class="tile-icon">☁️</span><span class="tile-label">Fort</span><span class="tile-sub">30 %</span></button>
+                    <div id="kwcHelper" style="font-size:0.68rem;color:var(--muted);margin-top:5px">
+                        ex : 6 kWc ≈ 15 panneaux 400 Wc
                     </div>
-                </div>
-
-                <div class="divider"></div>
-
-                <div class="field">
-                    <span class="field-label">Nombre de panneaux</span>
-                    <div class="slider-row">
-                        <input type="range" id="nbPanels" min="1" max="24" step="1" value="6" />
-                        <span class="slider-val"><span id="nbPanelsVal">6</span> PV</span>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <span class="field-label">Puissance par panneau</span>
-                    <div class="tile-grid cols-4">
-                        <button type="button" class="tile-btn" data-group="panelwc" data-val="300"><span class="tile-icon">300</span><span class="tile-label">Wc</span></button>
-                        <button type="button" class="tile-btn active" data-group="panelwc" data-val="400"><span class="tile-icon">400</span><span class="tile-label">Wc</span></button>
-                        <button type="button" class="tile-btn" data-group="panelwc" data-val="420"><span class="tile-icon">420</span><span class="tile-label">Wc</span></button>
-                        <button type="button" class="tile-btn" data-group="panelwc" data-val="500"><span class="tile-icon">500</span><span class="tile-label">Wc</span></button>
+                    <div id="kwcTriWarn" style="display:none;font-size:0.68rem;color:#ffb454;margin-top:5px">
+                        ⚠️ Au-delà de 9 kWc, installation triphasée requise
                     </div>
                 </div>
 
@@ -209,10 +233,46 @@
 
                 <div class="field">
                     <span class="field-label">Type de contrat électricité</span>
-                    <div class="tile-grid cols-2">
-                        <button type="button" class="tile-btn active" data-group="contrat" data-val="base"><span class="tile-icon">💡</span><span class="tile-label">Tarif Base</span></button>
-                        <button type="button" class="tile-btn" data-group="contrat" data-val="hphc"><span class="tile-icon">⏰</span><span class="tile-label">HP / HC</span></button>
+                    <div class="tile-grid cols-3">
+                        <button type="button" class="tile-btn active" data-group="contrat" data-val="base"><span
+                                class="tile-icon">💡</span><span class="tile-label">Tarif Base</span></button>
+                        <button type="button" class="tile-btn" data-group="contrat" data-val="hphc"><span
+                                class="tile-icon">⏰</span><span class="tile-label">HP / HC</span><span class="tile-sub"
+                                style="color:var(--violet);font-weight:600">+ pilotage intelligent</span></button>
+                        <button type="button" class="tile-btn" data-group="contrat" data-val="flex"><span
+                                class="tile-icon">📈</span><span class="tile-label">Flex horaire</span><span
+                                class="tile-sub" style="color:var(--violet);font-weight:600">+
+                                smart_flex</span></button>
                     </div>
+                </div>
+
+                <div id="block-tarif-flex" class="hidden">
+                    <div class="tarif-custom">
+                        <div class="tarif-custom-field" style="flex:1">
+                            <label>Scénario de prix spot</label>
+                            <div class="tile-grid cols-3" style="margin-top:6px">
+                                <button type="button" class="tile-btn" data-group="flexScenario" data-val="p10"><span
+                                        class="tile-label">Bas (p10)</span></button>
+                                <button type="button" class="tile-btn active" data-group="flexScenario"
+                                    data-val="p50"><span class="tile-label">Médian (p50)</span></button>
+                                <button type="button" class="tile-btn" data-group="flexScenario" data-val="p90"><span
+                                        class="tile-label">Haut (p90)</span></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-size:0.68rem; color:var(--muted); margin-top:5px;">
+                        Tarif indexé sur le spot Day-ahead FR (ENTSO-E 2024-2026), TVA + acheminement inclus. La
+                        fourchette p10–p90 reflète la variabilité historique.
+                    </div>
+                </div>
+
+                <div id="block-tarif-base">
+                    <div class="tarif-custom">
+                        <div class="tarif-custom-field"><label>Prix Base (€/kWh)</label><input type="number"
+                                id="tarifBase" value="0.1940" step="0.001" min="0.05" max="0.5" /></div>
+                    </div>
+                    <div style="font-size:0.68rem; color:var(--muted); margin-top:5px;">Pré-rempli TRV mars 2026.
+                        Modifiable.</div>
                 </div>
 
                 <div id="block-tarifs-custom" class="hidden">
@@ -227,16 +287,62 @@
                 </div>
 
                 <div class="field">
-                    <span class="field-label">Contrat de rachat du surplus</span>
-                    <div class="tile-grid cols-4">
-                        <button type="button" class="tile-btn active" data-group="rachatMode" data-val="sans"><span class="tile-icon">🚫</span><span class="tile-label">Sans rachat</span><span class="tile-sub">0 €/kWh</span></button>
-                        <button type="button" class="tile-btn" data-group="rachatMode" data-val="oa"><span class="tile-icon">💶</span><span class="tile-label">EDF OA</span><span class="tile-sub">0,04 €/kWh</span></button>
-                        <button type="button" class="tile-btn" data-group="rachatMode" data-val="projet"><span class="tile-icon">🔮</span><span class="tile-label">Projet 04/26</span><span class="tile-sub">0,011 €/kWh</span></button>
-                        <button type="button" class="tile-btn" data-group="rachatMode" data-val="custom"><span class="tile-icon">✏️</span><span class="tile-label">Perso</span><span class="tile-sub">&nbsp;</span></button>
-                    </div>
-                    <div id="rachatCustomField" class="optional-input-row" style="display:none;margin-top:8px">
-                        <input type="number" id="rachatCustom" placeholder="ex : 0.04" min="0" max="0.5" step="0.001" value="0.04" />
+                    <span class="field-label">Tarif de rachat du surplus</span>
+                    <div class="optional-input-row">
+                        <input type="number" id="rachatInput" min="0" max="0.5" step="0.001" value="0"
+                            placeholder="0" />
                         <span class="unit">€ / kWh</span>
+                    </div>
+                    <div style="font-size:0.68rem;color:var(--muted);margin-top:5px">
+                        0 si pas de contrat de revente · EDF OA actuel ≈ 0,04 €/kWh
+                    </div>
+                </div>
+
+                <div class="field" data-private>
+                    <span class="field-label">Orientation des panneaux</span>
+                    <div class="tile-grid cols-3">
+                        <button type="button" class="tile-btn" data-group="orient" data-val="est"><span
+                                class="tile-icon">🌅</span><span class="tile-label">Est</span><span
+                                class="tile-sub">matin</span></button>
+                        <button type="button" class="tile-btn active" data-group="orient" data-val="sud"><span
+                                class="tile-icon">☀️</span><span class="tile-label">Sud</span><span
+                                class="tile-sub">optimal</span></button>
+                        <button type="button" class="tile-btn" data-group="orient" data-val="ouest"><span
+                                class="tile-icon">🌇</span><span class="tile-label">Ouest</span><span
+                                class="tile-sub">soir</span></button>
+                    </div>
+                </div>
+
+                <div class="field" data-private>
+                    <span class="field-label">Inclinaison toiture</span>
+                    <div class="tile-grid cols-3">
+                        <button type="button" class="tile-btn" data-group="incl" data-val="20"><span
+                                class="tile-icon">📐</span><span class="tile-label">20°</span><span
+                                class="tile-sub">plat</span></button>
+                        <button type="button" class="tile-btn active" data-group="incl" data-val="35"><span
+                                class="tile-icon">📐</span><span class="tile-label">35°</span><span
+                                class="tile-sub">standard</span></button>
+                        <button type="button" class="tile-btn" data-group="incl" data-val="45"><span
+                                class="tile-icon">📐</span><span class="tile-label">45°</span><span
+                                class="tile-sub">pentu</span></button>
+                    </div>
+                </div>
+
+                <div class="field" data-private>
+                    <span class="field-label">Ombrage</span>
+                    <div class="tile-grid cols-4">
+                        <button type="button" class="tile-btn active" data-group="ombrage" data-val="0"><span
+                                class="tile-icon">☀️</span><span class="tile-label">Aucun</span><span
+                                class="tile-sub">&nbsp;</span></button>
+                        <button type="button" class="tile-btn" data-group="ombrage" data-val="0.1"><span
+                                class="tile-icon">🌤️</span><span class="tile-label">Léger</span><span
+                                class="tile-sub">10 %</span></button>
+                        <button type="button" class="tile-btn" data-group="ombrage" data-val="0.2"><span
+                                class="tile-icon">⛅</span><span class="tile-label">Moyen</span><span class="tile-sub">20
+                                %</span></button>
+                        <button type="button" class="tile-btn" data-group="ombrage" data-val="0.3"><span
+                                class="tile-icon">☁️</span><span class="tile-label">Fort</span><span class="tile-sub">30
+                                %</span></button>
                     </div>
                 </div>
             </div>
@@ -254,14 +360,16 @@
                     <form id="leadGateForm">
                         <input type="email" id="leadEmail" placeholder="Email *" required />
                         <input type="text" id="leadFirstname" placeholder="Prénom *" required />
-                        <input type="text" id="leadZip" placeholder="Code postal *" pattern="[0-9]{5}" maxlength="5" required />
+                        <input type="text" id="leadZip" placeholder="Code postal *" pattern="[0-9]{5}" maxlength="5"
+                            required />
                         <input type="tel" id="leadPhone" placeholder="Téléphone (optionnel — pour être rappelé)" />
                         <label class="lead-gate-consent">
                             <input type="checkbox" id="leadConsent" required />
                             <span>J'accepte d'être recontacté(e) par Revolty au sujet de ma simulation.</span>
                         </label>
                         <button type="submit">Voir mes résultats →</button>
-                        <p class="lead-gate-legal">Données traitées par Revolty à des fins commerciales. Consentement révocable à tout moment.</p>
+                        <p class="lead-gate-legal">Données traitées par Revolty à des fins commerciales. Consentement
+                            révocable à tout moment.</p>
                     </form>
                 </div>
             </div>
@@ -315,10 +423,6 @@
                     <span class="delta-val" id="outDeltaBatt">—</span>
                 </div>
                 <div class="metrics" id="outBattMetrics" style="margin-top:10px">
-                    <div class="metric highlight-metric">
-                        <div class="val" id="outCyclesBatt">—</div>
-                        <div class="lbl">Cycles batterie / an</div>
-                    </div>
                     <div class="metric">
                         <div class="val" id="outKwhRestitue">—</div>
                         <div class="lbl">Restitués par la batterie</div>
@@ -327,8 +431,12 @@
                 <div class="eco-rows" style="margin-top:14px">
                     <div class="eco-row"><span class="eco-lbl">☀️ Autoconso directe</span><span class="eco-val green"
                             id="ecoDirecte">—</span></div>
-                    <div class="eco-row" id="ecoBatterieRow"><span class="eco-lbl">🔋 Bonus batterie <span style="font-weight:400;opacity:0.6;font-size:0.72rem">(vs sans)</span></span><span
+                    <div class="eco-row" id="ecoBatterieRow"><span class="eco-lbl">🔋 Bonus batterie <span
+                                style="font-weight:400;opacity:0.6;font-size:0.72rem">(vs sans)</span></span><span
                             class="eco-val green" id="ecoBatterie">—</span></div>
+                    <div class="eco-row" id="ecoPilotRow" style="display:none"><span class="eco-lbl">⏰ Pilotage HP/HC
+                            <span class="pilot-chip">intelligent</span></span><span class="eco-val violet"
+                            id="ecoPilot">—</span></div>
                     <div class="eco-divider"></div>
                     <div class="eco-row"><span class="eco-lbl">⚡ Revente surplus</span><span class="eco-val"
                             id="ecoRevente">—</span></div>
@@ -343,12 +451,19 @@
                     <br><br><strong>Seau 1 — Usages courants</strong> : électroménager, éclairage, audiovisuel,
                     informatique, cuisson. Driver : nombre de personnes. Source : Panel Elecdom ADEME/Enertech/RTE 2021.
                     Profil horaire : RES1 Enedis corrigé (contribution ECS et clim nationales soustraites).
-                    <br><br><strong>Seau 2 — Chauffage</strong> : <code>surface × Bch[DPE] × coeff[heat]</code>. Bch =
+                    <br><br><strong>Seau 2 — Chauffage</strong> :
+                    <code>surface × Bch[DPE] × coeff[heat] × behav[DPE]</code>. Bch =
                     besoin thermique bâtiment (kWh_th/m²/an), issu de l'Open DPE ADEME sur 3 301 maisons.
                     <code>coeff</code> = 0 (gaz), 0,33 (PAC air/eau ≥2017, COP=3), 0,87 (résistance, pertes distribution
-                    3CL). Saisonnalité fort hiver.
+                    3CL). <code>behav</code> capture l'effet « prebound » : la conso mesurée est inférieure au besoin
+                    théorique 3CL,
+                    écart croissant avec la dégradation DPE (1,0 sur A–C → 0,55 sur G).
+                    Sources : Sunikka-Blank &amp; Galvin (BRI 2012), Allibe (thèse EDF R&amp;D / Mines ParisTech 2012),
+                    ENL/SDES 2020.
+                    Saisonnalité fort hiver.
                     <br><br><strong>Seau 3 — Appareils spécifiques</strong> : ECS (profil 23h mesuré, Panel Elecdom), VE
-                    (même profil nocturne), piscine (8h–18h mai–sept), clim (14h–18h juin–août). Addition pure — pas de
+                    (même profil nocturne), piscine (8h–18h mai–sept), clim (14h–18h juin–août, modulée par
+                    zone climatique RT2012 H1/H2/H3 — 130 kWh nord → 580 kWh Méditerranée). Addition pure — pas de
                     double-comptage avec RES1 corrigé.
                     <h4>Simulation batterie</h4>
                     SOC propagé heure par heure, 3 passes de convergence vers régime permanent. Rendement aller-retour
@@ -370,6 +485,8 @@
                 <div class="proj-legend">
                     <span><span class="pleg-sq" style="background:#11E47A"></span>Autoconso directe</span>
                     <span><span class="pleg-sq" style="background:#017267"></span>Bonus batterie</span>
+                    <span id="projLegendPilot" style="display:none"><span class="pleg-sq"
+                            style="background:#9B6DFF"></span>Pilotage HP/HC</span>
                     <span><span class="pleg-sq" style="background:rgba(255,209,69,0.65)"></span>Surplus revendu</span>
                 </div>
                 <div class="metrics" style="margin-top:14px">
@@ -382,6 +499,30 @@
                         <div class="lbl">Surplus injecté / an</div>
                     </div>
                 </div>
+            </div>
+
+            <!-- ═══ BLOC PAYBACK BATTERIE ═══ -->
+            <div class="bloc" id="paybackSection" style="display:none">
+                <div class="bloc-label">Rentabilité batterie</div>
+                <div class="metrics" style="margin-bottom:10px">
+                    <div class="metric">
+                        <div class="val" id="paybackCapex">—</div>
+                        <div class="lbl">Investissement (576 €/kWh TTC)</div>
+                    </div>
+                    <div class="metric">
+                        <div class="val" id="paybackEco">—</div>
+                        <div class="lbl">Économies totales / an</div>
+                        <div id="paybackBreakdown"
+                            style="font-size:0.65rem;color:var(--muted);margin-top:4px;line-height:1.3"></div>
+                    </div>
+                    <div class="metric">
+                        <div class="val" id="paybackYears">—</div>
+                        <div class="lbl">Retour sur investissement</div>
+                    </div>
+                </div>
+                <div class="proj-chart" id="paybackChartWrap"></div>
+                <div class="proj-sub" style="margin-top:8px">Cumul net (économies − CAPEX). Inflation élec +4 %/an. Le
+                    point violet marque le break-even.</div>
             </div>
 
             <!-- ═══ BLOC 3 — IMPACT ═══ -->
@@ -414,7 +555,7 @@
     </div>
 
     <!-- ── DEBUG ──────────────────────────────────────────────────────────────── -->
-    <div id="debugPanel">
+    <div id="debugPanel" data-private>
         <div class="dbg-header">
             <span class="dbg-title">🔬 Debug — Journée type heure par heure</span>
             <div class="dbg-controls">
@@ -441,6 +582,8 @@
                         batterie</span>
                     <span class="dleg"><span class="dleg-sq" style="background:rgba(255,255,255,0.15)"></span>Achat
                         réseau</span>
+                    <span class="dleg" id="dlegPilot" style="display:none"><span class="dleg-sq"
+                            style="background:#9B6DFF"></span>Recharge HC pilotée</span>
                     <span class="dleg"><span class="dleg-sq" style="background:rgba(245,166,35,0.55)"></span>Surplus
                         revendu</span>
                     <span class="dleg"><span class="dleg-line" style="background:#FFD145"></span>Production PV</span>
@@ -452,7 +595,6 @@
             </div>
         </div>
     </div>
-
 
     <script src="https://cdn.jsdelivr.net/gh/Revolty-code/Simulation@main/dist/revolty-app.js"></script>
 </body>
