@@ -1,3 +1,2530 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Revolty – Simulateur de dimensionnement v4.3</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            /* — Charte Revolty — */
+            --neo: #11E47A;
+            /* Vert Neo — principal */
+            --respire: #017267;
+            /* Vert Respire — secondaire */
+            --soleil: #FFD145;
+            /* Soleil */
+            --corail: #F5817A;
+            /* Corail */
+            --melon: #E8FFF3;
+            /* Melon d'eau */
+            --violet: #9B6DFF;
+            /* Violet — pilotage HP/HC intelligent */
+
+            /* — Alias sémantiques — */
+            --sun: var(--soleil);
+            --green: var(--respire);
+            --green-mid: #019b8a;
+            --green-light: var(--melon);
+            --bg: #F4F7F5;
+            --surface: #FFFFFF;
+            --dark: #0D1A14;
+            --mid: #3A4840;
+            --muted: #8A9E96;
+            --border: #D6E4DE;
+            --radius: 16px;
+            /* marge latérale dynamique : étroite sur mobile, large sur grand écran */
+            --page-x: clamp(16px, 6vw, 150px);
+            /* gris clair des tuiles d'inputs (fond de page blanc) */
+            --tile: #f6f7f9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Instrument Sans', sans-serif;
+            background: var(--bg);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        header {
+            background: var(--dark);
+            padding: 18px 40px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(17, 228, 122, 0.12);
+        }
+
+        .logo {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: 1.45rem;
+            color: #fff;
+            letter-spacing: -0.02em;
+        }
+
+        .logo span {
+            color: var(--neo);
+        }
+
+        header small {
+            margin-left: auto;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.28);
+            letter-spacing: 0.02em;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #0a1f18 0%, var(--respire) 55%, #019b8a 100%);
+            padding: 56px 40px 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 420px;
+            height: 420px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(17, 228, 122, 0.18) 0%, transparent 68%);
+            top: -130px;
+            right: -80px;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 209, 69, 0.14) 0%, transparent 70%);
+            bottom: -60px;
+            left: 30%;
+        }
+
+        .hero h1 {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: clamp(1.9rem, 4vw, 2.8rem);
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.1;
+            letter-spacing: -0.025em;
+            position: relative;
+        }
+
+        .hero h1 em {
+            font-style: normal;
+            color: var(--neo);
+        }
+
+        .hero p {
+            color: rgba(255, 255, 255, 0.65);
+            margin-top: 12px;
+            font-size: 0.95rem;
+            position: relative;
+            letter-spacing: 0.01em;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            align-items: start;
+        }
+
+        @media (max-width: 700px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 16px 20px;
+            }
+
+            .hero {
+                padding: 36px 20px 32px;
+            }
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 28px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(1, 114, 103, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .card:last-child {
+            margin-bottom: 0;
+        }
+
+        .card-title {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 0.97rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title .ico {
+            width: 30px;
+            height: 30px;
+            background: var(--melon);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        .field:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Zones internes (data-private) — visuellement distinctes pour signaler */
+        /* qu'elles n'apparaîtront pas en mode public (?mode=public). */
+        .field[data-private] {
+            position: relative;
+            background: rgba(155, 109, 255, 0.06);
+            border-left: 3px solid rgba(155, 109, 255, 0.45);
+            padding: 10px 12px 10px 14px;
+            border-radius: 4px;
+        }
+
+        .field[data-private]::before {
+            content: "INTERNE";
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            font-size: 0.55rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: rgba(155, 109, 255, 0.85);
+            background: rgba(155, 109, 255, 0.12);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 9px;
+        }
+
+        /* ── DPE SELECTOR ─────────────────────────────────────────────────────── */
+        .dpe-selector {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .dpe-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dpe-btn[data-dpe="A"] {
+            background: #c8e6c9;
+            color: #1b5e20;
+        }
+
+        .dpe-btn[data-dpe="B"] {
+            background: #dcedc8;
+            color: #33691e;
+        }
+
+        .dpe-btn[data-dpe="C"] {
+            background: #f9fbe7;
+            color: #558b2f;
+        }
+
+        .dpe-btn[data-dpe="D"] {
+            background: #fff9c4;
+            color: #f57f17;
+        }
+
+        .dpe-btn[data-dpe="E"] {
+            background: #ffe0b2;
+            color: #e65100;
+        }
+
+        .dpe-btn[data-dpe="F"] {
+            background: #ffccbc;
+            color: #bf360c;
+        }
+
+        .dpe-btn[data-dpe="G"] {
+            background: #ffcdd2;
+            color: #b71c1c;
+        }
+
+        .dpe-btn.active {
+            border-color: var(--dark);
+            box-shadow: 0 0 0 2px var(--dark);
+            transform: scale(1.1);
+        }
+
+        .dpe-hint {
+            font-size: 0.7rem;
+            color: var(--muted);
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .slider-val {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--respire);
+            min-width: 72px;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 5px;
+            border-radius: 3px;
+            background: var(--border);
+            outline: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--respire);
+            border: 3px solid #fff;
+            box-shadow: 0 2px 6px rgba(1, 114, 103, 0.3);
+        }
+
+        select {
+            width: 100%;
+            appearance: none;
+            background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%234A4A42' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 14px center;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 11px 38px 11px 14px;
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 0.93rem;
+            color: var(--dark);
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--green-mid);
+        }
+
+        .optional-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .optional-input-row input[type="number"] {
+            flex: 1;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 0.93rem;
+            color: var(--dark);
+            background: var(--bg);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .optional-input-row input[type="number"]:focus {
+            border-color: var(--green-mid);
+        }
+
+        .optional-input-row input[type="number"].has-value {
+            border-color: var(--green);
+            background: #F0FAF4;
+        }
+
+        .optional-input-row .unit {
+            font-size: 0.82rem;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        .optional-hint {
+            font-size: 0.72rem;
+            color: var(--muted);
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 18px 0;
+        }
+
+        .objectif-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 2px;
+        }
+
+        .objectif-btn {
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 8px;
+            background: #fff;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.18s;
+        }
+
+        .objectif-btn:hover {
+            border-color: var(--green-mid);
+        }
+
+        .objectif-btn.active-sans {
+            border-color: #888;
+            background: #F5F5F5;
+        }
+
+        .objectif-btn.active-essentiel {
+            border-color: var(--soleil);
+            background: #FFFAEE;
+        }
+
+        .objectif-btn.active-confort {
+            border-color: var(--respire);
+            background: #EBF8F4;
+        }
+
+        .objectif-btn.active-autonomie {
+            border-color: #1A6B8A;
+            background: #EFF7FB;
+        }
+
+        /* Capacité la mieux dimensionnée pour l'install PV courante (ratio ≈ 1) */
+        .objectif-btn.optimal-batt {
+            position: relative;
+            box-shadow: 0 0 0 2px var(--violet, #9B6DFF), 0 4px 14px rgba(155, 109, 255, 0.25);
+        }
+
+        .objectif-btn.optimal-batt::after {
+            content: "OPTIMALE";
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.55rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: #fff;
+            background: var(--violet, #9B6DFF);
+            padding: 2px 8px;
+            border-radius: 10px;
+            white-space: nowrap;
+        }
+
+        .obj-icon {
+            font-size: 1.4rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .obj-label {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            display: block;
+            color: var(--dark);
+        }
+
+        .obj-pct {
+            font-size: 0.7rem;
+            color: var(--muted);
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* ── TILES (appareils spécifiques + options solaires) ──────────────── */
+        .tile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 8px;
+            margin-top: 2px;
+        }
+
+        .tile-grid.cols-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .tile-grid.cols-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .tile-grid.cols-5 {
+            grid-template-columns: repeat(5, 1fr);
+        }
+
+        .tile-btn {
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 4px;
+            background: #fff;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.18s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            min-height: 72px;
+        }
+
+        .tile-btn:hover {
+            border-color: var(--green-mid);
+        }
+
+        .tile-btn.active {
+            border-color: var(--respire);
+            background: var(--respire);
+        }
+
+        .tile-btn.active .tile-label,
+        .tile-btn.active .tile-sub,
+        .tile-btn.active .tile-icon {
+            color: #fff;
+        }
+
+        .tile-icon {
+            font-size: 1.4rem;
+            line-height: 1;
+        }
+
+        .tile-label {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1.15;
+        }
+
+        .tile-sub {
+            font-size: 0.62rem;
+            color: var(--muted);
+            line-height: 1;
+        }
+
+        /* ── RESULT ───────────────────────────────────────────────────────────── */
+        .result-card {
+            background: var(--dark);
+            border-radius: var(--radius);
+            padding: 28px;
+            color: #fff;
+            position: sticky;
+            top: 24px;
+            border: 1px solid rgba(17, 228, 122, 0.08);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+        }
+
+        .result-eyebrow {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(17, 228, 122, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .bloc {
+            margin-bottom: 22px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .bloc:last-of-type {
+            border-bottom: none;
+            margin-bottom: 16px;
+            padding-bottom: 0;
+        }
+
+        .bloc-label {
+            font-size: 0.67rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            color: rgba(255, 255, 255, 0.28);
+            margin-bottom: 16px;
+        }
+
+        .hero-wrap {
+            background: linear-gradient(135deg, rgba(17, 228, 122, 0.08) 0%, rgba(1, 114, 103, 0.12) 100%);
+            border-radius: 14px;
+            border: 1px solid rgba(17, 228, 122, 0.14);
+            padding: 24px 16px 20px;
+            margin-bottom: 16px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-wrap::before {
+            content: '';
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(17, 228, 122, 0.08) 0%, transparent 70%);
+            top: -40px;
+            right: -30px;
+            pointer-events: none;
+        }
+
+        .hero-num {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 3.6rem;
+            font-weight: 800;
+            color: var(--neo);
+            line-height: 1;
+            letter-spacing: -0.03em;
+        }
+
+        .hero-sub {
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 4px;
+        }
+
+        .pill-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .pill {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 3px 12px;
+            border-radius: 20px;
+        }
+
+        .pill-green {
+            background: rgba(17, 228, 122, 0.15);
+            color: var(--neo);
+        }
+
+        .delta-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+            font-size: 0.82rem;
+        }
+
+        .delta-lbl {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .delta-val {
+            font-weight: 700;
+            color: var(--soleil);
+            font-family: 'Bricolage Grotesque', sans-serif;
+        }
+
+        .methodo-toggle {
+            text-align: right;
+            margin-top: 8px;
+        }
+
+        .co2-card {
+            background: rgba(17, 228, 122, 0.07);
+            border: 1px solid rgba(17, 228, 122, 0.15);
+            border-radius: 10px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .co2-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(17, 228, 122, 0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .co2-val {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--neo);
+            letter-spacing: -0.015em;
+        }
+
+        .co2-lbl {
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 2px;
+            line-height: 1.3;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .metric {
+            background: rgba(255, 255, 255, 0.055);
+            border-radius: 10px;
+            padding: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .metric .val {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--melon);
+            letter-spacing: -0.02em;
+        }
+
+        .metric .lbl {
+            font-size: 0.71rem;
+            color: rgba(255, 255, 255, 0.38);
+            margin-top: 4px;
+            line-height: 1.3;
+        }
+
+        .highlight-metric {
+            background: rgba(255, 209, 69, 0.1) !important;
+            border: 1px solid rgba(255, 209, 69, 0.2) !important;
+        }
+
+        .highlight-metric .val {
+            color: var(--soleil) !important;
+        }
+
+        .estimated-lbl {
+            font-size: 0.62rem;
+            color: rgba(255, 255, 255, 0.28);
+            font-style: italic;
+            display: block;
+        }
+
+        .chart-wrap {
+            margin-bottom: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 16px;
+        }
+
+        .chart-hdr {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .chart-lbl {
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 10px;
+        }
+
+        .cleg {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.38);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .cleg-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .cleg-dot.auto {
+            background: var(--neo);
+        }
+
+        .cleg-dot.grid {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .cleg-dot.prod {
+            background: rgba(255, 209, 69, 0.7);
+        }
+
+        .auto-section {
+            margin-bottom: 20px;
+        }
+
+        .auto-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.45);
+            margin-bottom: 7px;
+            align-items: center;
+        }
+
+        .dim-badge {
+            display: inline-block;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        .dim-sous {
+            background: rgba(220, 80, 80, 0.2);
+            color: #FF8585;
+        }
+
+        .dim-ok {
+            background: rgba(17, 228, 122, 0.15);
+            color: var(--neo);
+        }
+
+        .dim-sur {
+            background: rgba(26, 107, 138, 0.25);
+            color: #5BC4E8;
+        }
+
+        .dim-max {
+            background: rgba(139, 92, 246, 0.22);
+            color: #B794F6;
+        }
+
+        .bar-track {
+            height: 7px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--respire), var(--neo));
+            border-radius: 4px;
+            transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .surplus-msg {
+            margin-top: 8px;
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 8px 12px;
+            line-height: 1.45;
+        }
+
+        .surplus-msg.sous {
+            color: #FF9E9E;
+            background: rgba(220, 80, 80, 0.1);
+        }
+
+        .surplus-msg.ok {
+            color: var(--neo);
+            background: rgba(17, 228, 122, 0.1);
+        }
+
+        .surplus-msg.sur {
+            color: #5BC4E8;
+            background: rgba(26, 107, 138, 0.12);
+        }
+
+        .surplus-msg.max {
+            color: #B794F6;
+            background: rgba(139, 92, 246, 0.14);
+        }
+
+        .cta-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: var(--neo);
+            color: var(--dark);
+            border: none;
+            border-radius: 12px;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: -0.01em;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            background: #1af585;
+            box-shadow: 0 8px 24px rgba(17, 228, 122, 0.35);
+        }
+
+        .disclaimer {
+            margin-top: 11px;
+            font-size: 0.68rem;
+            color: rgba(255, 255, 255, 0.2);
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .eco-rows {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            margin-bottom: 10px;
+        }
+
+        .eco-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.79rem;
+        }
+
+        .eco-row .eco-lbl {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .eco-row .eco-val {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.85);
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: -0.01em;
+        }
+
+        .eco-row .eco-val.green {
+            color: var(--neo);
+        }
+
+        .eco-row .eco-val.violet {
+            color: var(--violet);
+        }
+
+        .eco-row .eco-lbl .pilot-chip {
+            display: inline-block;
+            background: rgba(155, 109, 255, 0.15);
+            color: var(--violet);
+            border-radius: 4px;
+            padding: 1px 5px;
+            margin-left: 4px;
+            font-size: 0.62rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            vertical-align: middle;
+        }
+
+        .eco-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.06);
+            margin: 8px 0;
+        }
+
+        .tarif-note {
+            font-size: 0.67rem;
+            color: rgba(255, 255, 255, 0.2);
+            text-align: center;
+            font-style: italic;
+            margin-top: 8px;
+        }
+
+        .proj-total {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--neo);
+            letter-spacing: -0.025em;
+            margin-bottom: 4px;
+        }
+
+        .proj-sub {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.35);
+            margin-bottom: 14px;
+        }
+
+        .proj-chart {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .proj-legend {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .proj-legend span {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .proj-legend .pleg-sq {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        .info-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s;
+            flex-shrink: 0;
+        }
+
+        .info-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .methodo-panel {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 8px;
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.55);
+            line-height: 1.6;
+            display: none;
+        }
+
+        .methodo-panel.open {
+            display: block;
+        }
+
+        .methodo-panel h4 {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 10px 0 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .methodo-panel h4:first-child {
+            margin-top: 0;
+        }
+
+        .methodo-panel code {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            padding: 1px 5px;
+            font-size: 0.75rem;
+            color: var(--neo);
+            font-family: monospace;
+        }
+
+        .tarif-custom {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .tarif-custom-field {
+            flex: 1;
+        }
+
+        .tarif-custom-field label {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--muted);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .tarif-custom-field input[type="number"] {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 0.9rem;
+            color: var(--dark);
+            background: var(--bg);
+            outline: none;
+        }
+
+        .tarif-custom-field input[type="number"]:focus {
+            border-color: var(--green-mid);
+        }
+
+        /* ── DEBUG PANEL ─────────────────────────────────────────────────────── */
+        #debugPanel {
+            max-width: 980px;
+            margin: 0 auto 48px;
+            padding: 0 24px;
+        }
+
+        .dbg-header {
+            background: #0F0F0E;
+            border-radius: 14px 14px 0 0;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .dbg-title {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            white-space: nowrap;
+        }
+
+        .dbg-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-left: auto;
+        }
+
+        .dbg-months {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .dbg-m {
+            padding: 4px 9px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 6px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.35);
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+
+        .dbg-m:hover {
+            border-color: rgba(255, 255, 255, 0.35);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .dbg-m.active {
+            background: var(--respire);
+            border-color: var(--respire);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .dbg-daytype {
+            display: flex;
+            gap: 4px;
+        }
+
+        .dbg-dt {
+            padding: 4px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 6px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.35);
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+
+        .dbg-dt.active {
+            background: rgba(255, 209, 69, 0.2);
+            border-color: var(--soleil);
+            color: var(--soleil);
+            font-weight: 600;
+        }
+
+        .dbg-body {
+            background: #141412;
+            border-radius: 0 0 14px 14px;
+            padding: 16px 20px;
+        }
+
+        .dbg-metrics {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .dbg-metric {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 9px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .dbg-metric .dm-val {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--neo);
+            letter-spacing: -0.015em;
+        }
+
+        .dbg-metric .dm-lbl {
+            font-size: 0.68rem;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 2px;
+        }
+
+        .dbg-metric.hl .dm-val {
+            color: var(--soleil);
+        }
+
+        .dbg-metric.red .dm-val {
+            color: #FF8585;
+        }
+
+        .dbg-chart-wrap {
+            position: relative;
+        }
+
+        .dbg-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 8px;
+        }
+
+        .dleg {
+            font-size: 0.68rem;
+            color: rgba(255, 255, 255, 0.38);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .dleg-sq {
+            width: 9px;
+            height: 9px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .dleg-line {
+            width: 16px;
+            height: 2px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .dbg-xaxis {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 36px 0 0;
+            margin-top: 3px;
+        }
+
+        .dbg-xaxis span {
+            font-size: 0.62rem;
+            color: rgba(255, 255, 255, 0.22);
+            width: 28px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        /* ═══ LEAD GATE (proto) ═══ */
+        .result-card.locked>*:not(.lead-gate) {
+            filter: blur(7px);
+            pointer-events: none;
+            user-select: none;
+            transition: filter .35s ease;
+        }
+
+        .lead-gate {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(13, 26, 20, 0.55) 0%, rgba(1, 114, 103, 0.45) 100%);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            border-radius: var(--radius);
+            transition: opacity .35s ease;
+            padding: 20px;
+        }
+
+        .lead-gate-card {
+            background: var(--surface);
+            padding: 28px 26px 22px;
+            border-radius: 18px;
+            box-shadow: 0 24px 60px -10px rgba(0, 0, 0, 0.35);
+            max-width: 360px;
+            width: 100%;
+            text-align: center;
+            color: var(--dark);
+        }
+
+        .lead-gate-icon {
+            font-size: 2rem;
+            margin-bottom: 4px;
+            display: inline-block;
+        }
+
+        .lead-gate-card h3 {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 1.22rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 6px;
+            letter-spacing: -0.01em;
+        }
+
+        .lead-gate-card>p {
+            font-size: 0.86rem;
+            color: var(--mid);
+            margin-bottom: 18px;
+            line-height: 1.4;
+        }
+
+        .lead-gate-card form {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .lead-gate-card input[type="email"],
+        .lead-gate-card input[type="text"],
+        .lead-gate-card input[type="tel"] {
+            width: 100%;
+            padding: 11px 13px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            background: var(--bg);
+            color: var(--dark);
+            transition: border-color .2s, background .2s;
+        }
+
+        .lead-gate-card input:focus {
+            outline: none;
+            border-color: var(--respire);
+            background: var(--surface);
+        }
+
+        .lead-gate-card input::placeholder {
+            color: var(--muted);
+        }
+
+        .lead-gate-consent {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 0.72rem;
+            color: var(--mid);
+            text-align: left;
+            margin: 4px 2px 0;
+            line-height: 1.35;
+        }
+
+        .lead-gate-consent input[type="checkbox"] {
+            width: auto;
+            margin: 2px 0 0 0;
+            flex-shrink: 0;
+            accent-color: var(--respire);
+        }
+
+        .lead-gate-card button {
+            margin-top: 8px;
+            padding: 13px 18px;
+            background: var(--respire);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background .2s, transform .1s;
+            letter-spacing: 0.01em;
+        }
+
+        .lead-gate-card button:hover:not(:disabled) {
+            background: var(--green-mid);
+        }
+
+        .lead-gate-card button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .lead-gate-card button:disabled {
+            opacity: 0.55;
+            cursor: wait;
+        }
+
+        .lead-gate-legal {
+            font-size: 0.68rem;
+            color: var(--muted);
+            margin-top: 10px;
+            line-height: 1.35;
+        }
+
+        /* DEBUG — bouton magique pour bypasser le lead gate (à retirer en prod) */
+        #debugBypass {
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            z-index: 9999;
+            padding: 10px 16px;
+            background: #8b5cf6;
+            color: #fff;
+            border: 2px dashed #fff;
+            border-radius: 999px;
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.45);
+            transition: transform .15s, box-shadow .15s;
+            letter-spacing: 0.02em;
+        }
+
+        #debugBypass:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(139, 92, 246, 0.55);
+        }
+
+        #debugBypass:active {
+            transform: translateY(0);
+        }
+
+        .profile-bar {
+            background: #0D1A14;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            border-bottom: 1px solid rgba(17, 228, 122, 0.18);
+        }
+
+        .profile-bar-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(255, 255, 255, 0.55);
+            margin-right: 4px;
+        }
+
+        .profile-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid rgba(17, 228, 122, 0.28);
+            border-radius: 10px;
+            padding: 8px 16px;
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            line-height: 1.15;
+        }
+
+        .profile-btn:hover {
+            background: rgba(17, 228, 122, 0.12);
+            border-color: var(--neo);
+        }
+
+        .profile-btn.active {
+            background: var(--neo);
+            color: #0D1A14;
+            border-color: var(--neo);
+        }
+
+        .profile-btn-sub {
+            font-size: 0.65rem;
+            font-weight: 500;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+
+        /* ═══════════ LAYOUT ONE-PAGE NO-SCROLL — Tests DA ═══════════ */
+        html, body { height: 100%; }
+
+        body {
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            background: var(--surface);
+        }
+
+        header, .hero, #debugPanel, .disclaimer { display: none !important; }
+
+        #titre-bar {
+            flex: 0 0 44px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark);
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        #profileBar { position: fixed; top: 7px; right: 12px; z-index: 9100; margin: 0; }
+
+        #top-section {
+            flex: 0 0 auto;
+            min-height: 56vh;
+            display: grid;
+            grid-template-columns: 37% 63%;
+            grid-template-rows: 1fr;
+            gap: 10px;
+            padding: 12px var(--page-x);
+        }
+
+        #left-panel { display: flex; flex-direction: column; gap: 8px; }
+        #left-panel .card { margin: 0; flex: 1; background: var(--tile); }
+        #ac-ap-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+        #right-panel {
+            display: grid;
+            grid-template-columns: 3fr 3fr 2fr;
+            grid-template-rows: auto 1fr;
+            gap: 8px;
+        }
+
+        .r-cell {
+            background: var(--dark);
+            color: #fff;
+            border-radius: 12px;
+            padding: 12px 14px;
+            border: 1px solid rgba(17, 228, 122, 0.10);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .r-cell-hd {
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            color: rgba(255, 255, 255, 0.30);
+            margin-bottom: 8px;
+            flex-shrink: 0;
+        }
+
+        #cell-eco { grid-column: 1; grid-row: 1; }
+        #cell-bonus-batt { grid-column: 2; grid-row: 1; }
+        #cell-graph { grid-column: 1 / span 2; grid-row: 2; }
+        #col3 { grid-column: 3; grid-row: 1 / span 2; display: flex; flex-direction: column; gap: 8px; }
+
+        /* Tuiles métriques : hauteur liée au texte (pas de vide noir).
+           Tampons qui comblent le trou pour aligner les bas : #cell-graph et #cell-impact. */
+        #cell-eco, #cell-bonus-batt { align-self: start; }
+        #cell-revente, #cell-eco-facture { flex: 0 0 auto; }
+        #cell-impact { flex: 1; }
+
+        /* cellules « métrique simple » : contenu centré (style autoconso/autoprod) */
+        #cell-eco, #cell-bonus-batt, #cell-eco-facture, #cell-revente {
+            justify-content: center;
+            gap: 8px;
+        }
+        #cell-eco .metric, #cell-bonus-batt .metric { width: 100%; }
+
+        /* hiérarchie : Économies = résultat principal, mis en avant en vert */
+        #cell-eco .metric {
+            background: rgba(17, 228, 122, 0.07);
+            border-color: rgba(17, 228, 122, 0.18);
+        }
+        #cell-eco .val {
+            color: var(--neo);
+        }
+
+        /* taille de chiffre homogène sur toutes les tuiles output */
+        .r-cell .metric .val { font-size: 1.6rem; }
+
+        /* gains chiffrés positifs en vert ; pilotage HP/HC en violet (charte) */
+        #cell-bonus-batt .val,
+        #cell-revente .val,
+        #cell-eco-facture .val { color: var(--neo); }
+        #cell-revente #ecoPilot { color: var(--violet); }
+
+        /* graphe projection : remplit la hauteur disponible (tuile tampon) */
+        #cell-graph .proj-chart { flex: 1; min-height: 0; margin: 0; }
+        #cell-graph .proj-chart svg { width: 100%; height: 100%; display: block; }
+
+        /* scénarios d'inflation du prix de l'élec sous le graphe */
+        #proj-scenarios {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+        .scenario {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 7px 9px;
+            text-align: left;
+            font-family: inherit;
+            color: inherit;
+            cursor: pointer;
+            transition: background .15s, border-color .15s;
+        }
+        .scenario:hover { background: rgba(255, 255, 255, 0.09); }
+        .scenario.active {
+            background: rgba(17, 228, 122, 0.12);
+            border-color: rgba(17, 228, 122, 0.4);
+        }
+        .scenario-name { font-size: 0.62rem; color: rgba(255, 255, 255, 0.4); line-height: 1.25; }
+        .scenario-val {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 0.98rem;
+            color: #fff;
+            margin-top: 3px;
+        }
+        #scenMoyen { color: var(--soleil); }
+        #scenCrise { color: var(--corail); }
+
+        /* compactage des composants existants pour tenir sans scroll */
+        #cell-eco .hero-wrap { padding: 12px 12px 10px; margin-bottom: 8px; }
+        #cell-eco .hero-num { font-size: 2.1rem; }
+        #cell-eco .chart-wrap { margin: 0; }
+        .r-cell .bloc, .r-cell .auto-section { margin: 0; padding: 0; border: none; }
+        .r-cell .eco-rows { margin-top: 0 !important; }
+
+        .facture-pct {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--neo);
+            line-height: 1.15;
+        }
+
+        .impact-prod { display: flex; flex-direction: column; }
+        .impact-prod-val {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: 1.6rem;
+            color: var(--soleil);
+            line-height: 1.1;
+        }
+        .impact-prod-lbl { font-size: 0.72rem; color: rgba(255, 255, 255, 0.5); }
+        .impact-foyers {
+            margin-top: 8px;
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        .impact-perte {
+            margin-top: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--corail);
+        }
+        .impact-perte.impact-perte-pos { color: var(--neo); }
+
+        #cta-strip {
+            flex: 0 0 52px;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #cta-strip .cta-btn { width: 60%; margin: 0; }
+
+        #inputs-section {
+            flex: 1 0 auto;
+            background: var(--surface);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 12px var(--page-x);
+        }
+
+        #zone-conso { display: flex; flex-direction: column; gap: 10px; }
+        #zone-prod { display: flex; flex-direction: column; }
+        #zone-prod .card { flex: 1; }
+
+        #inputs-section .card {
+            margin: 0;
+            background: var(--tile);
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(13, 26, 20, 0.04);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* appareils spécifiques : les tuiles remplissent la zone */
+        #card-appareils .tile-grid { flex: 1; }
+        #card-appareils .tile-btn { height: 100%; }
+
+        #js-stash {
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+
+        #projSection {
+            visibility: hidden;
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .result-card.locked > *:not(.lead-gate) {
+            filter: none;
+            pointer-events: auto;
+            user-select: auto;
+        }
+
+        .lead-gate {
+            position: fixed;
+            inset: 44px 0 0 0;
+            z-index: 9000;
+            border-radius: 0;
+        }
+
+        /* ═══ FLUX EN 3 PHASES : wizard → lead gate → app ═══ */
+        /* lead gate visible uniquement pendant la phase-gate */
+        body:not(.phase-gate) #leadGate { display: none !important; }
+
+        /* phase-wizard : on cache résultats + CTA, #inputs-section devient l'assistant */
+        .phase-wizard #top-section,
+        .phase-wizard #cta-strip { display: none; }
+
+        .phase-wizard #inputs-section {
+            display: block;
+        }
+        .phase-wizard #zone-conso,
+        .phase-wizard #zone-prod {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        #wizard-nav { display: none; }
+        .phase-wizard #wizard-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            max-width: 900px;
+            margin: 14px auto 4px;
+        }
+        #wizard-nav button {
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 11px 22px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+        }
+        #wizPrev { background: var(--surface); color: var(--dark); box-shadow: 0 1px 3px rgba(13, 26, 20, 0.08); }
+        #wizNext { background: var(--dark); color: #fff; }
+        #wizProgress { font-size: 0.8rem; font-weight: 600; color: var(--dark); }
+
+        #wizMsg { display: none; }
+        .phase-wizard #wizMsg.show {
+            display: block;
+            max-width: 900px;
+            margin: 10px auto 0;
+            padding: 9px 14px;
+            background: #fff;
+            color: var(--corail);
+            font-size: 0.82rem;
+            font-weight: 600;
+            border-radius: 10px;
+        }
+        .input-error {
+            border-color: var(--corail) !important;
+            box-shadow: 0 0 0 2px rgba(245, 129, 122, 0.25);
+        }
+
+        /* option Flex horaire masquée pour l'instant — contrat sur 2 colonnes */
+        .tile-btn[data-group="contrat"][data-val="flex"] { display: none; }
+        #fld-contrat .tile-grid { grid-template-columns: 1fr 1fr; }
+
+        /* labels des tuiles résultats : lisibles en blanc sur fond sombre */
+        .r-cell .metric .lbl { color: rgba(255, 255, 255, 0.9); }
+
+        /* Révélation progressive des champs Consommation (phase-wizard uniquement) */
+        .phase-wizard #card-foyer .field { display: none; }
+        .phase-wizard #card-appareils { display: none; }
+        .phase-wizard #card-foyer .field.rv-on { display: block; animation: rvIn .42s ease both; }
+        .phase-wizard #card-appareils.rv-on { display: flex; animation: rvIn .42s ease both; }
+
+        /* idem pour la carte Production */
+        .phase-wizard #card-prod .field,
+        .phase-wizard #card-prod .divider,
+        .phase-wizard #card-prod [id^="block-tarif"] { display: none; }
+        .phase-wizard #card-prod .field.rv-on { display: block; animation: rvIn .42s ease both; }
+        .phase-wizard #card-prod .divider.rv-on { display: block; }
+        .phase-wizard #card-prod [id^="block-tarif"].rv-on:not(.hidden) { display: block; animation: rvIn .42s ease both; }
+
+        @keyframes rvIn {
+            from { opacity: 0; transform: translateY(-16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body class="phase-wizard">
+
+    <header>
+        <div class="logo">Revolty<span>.</span></div>
+        <small>Simulateur v4.3 — moteur trois seaux</small>
+    </header>
+
+    <!-- DEBUG — bouton magique pour bypasser le lead gate (à retirer en prod) -->
+    <button type="button" id="debugBypass" title="Bypass le lead gate (debug interne)">🪄 Skip gate
+        (debug)</button>
+
+    <div class="hero">
+        <h1>Simulateur d'<em>autoconsommation</em><br />et économies</h1>
+        <p>Modèle saisonnier heure par heure — DPE, isolation, appareils spécifiques.</p>
+    </div>
+
+    <!-- ═══════════ LAYOUT ONE-PAGE — Tests DA ═══════════ -->
+    <div id="titre-bar">Revolty — votre simulation d'autoconsommation</div>
+
+    <!-- Lead gate (proto — aucune logique backend) — plein écran -->
+    <div class="lead-gate" id="leadGate">
+        <div class="lead-gate-card">
+            <div class="lead-gate-icon">🔓</div>
+            <h3>Découvrez vos économies</h3>
+            <p>Entrez vos coordonnées pour afficher vos résultats personnalisés</p>
+            <form id="leadGateForm">
+                <input type="email" id="leadEmail" placeholder="Email *" required />
+                <input type="text" id="leadFirstname" placeholder="Prénom *" required />
+                <input type="text" id="leadZip" placeholder="Code postal *" pattern="[0-9]{5}" maxlength="5"
+                    required />
+                <input type="tel" id="leadPhone" placeholder="Téléphone (optionnel — pour être rappelé)" />
+                <label class="lead-gate-consent">
+                    <input type="checkbox" id="leadConsent" required />
+                    <span>J'accepte d'être recontacté(e) par Revolty au sujet de ma simulation.</span>
+                </label>
+                <button type="submit">Voir mes résultats →</button>
+                <p class="lead-gate-legal">Données traitées par Revolty à des fins commerciales. Consentement
+                    révocable à tout moment.</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- ─── TOP SECTION ─── -->
+    <div id="top-section">
+        <div id="left-panel">
+
+            <!-- BATTERIE -->
+            <div class="card">
+                <div class="card-title"><span class="ico">🔋</span> Capacité de batterie</div>
+                <div class="field">
+                    <span class="field-label">Quelle capacité vous intéresse ?</span>
+                    <div class="objectif-selector">
+                        <button class="objectif-btn" data-batt="0"><span class="obj-icon">🔌</span><span
+                                class="obj-label">Sans</span><span class="obj-pct">Référence</span></button>
+                        <button class="objectif-btn" data-batt="5"><span class="obj-icon">⚡</span><span
+                                class="obj-label">5 kWh</span><span class="obj-pct">Revolty 5</span></button>
+                        <button class="objectif-btn active-confort" data-batt="10"><span class="obj-icon">⚡⚡</span><span
+                                class="obj-label">10 kWh</span><span class="obj-pct">Revolty 10</span></button>
+                        <button class="objectif-btn" data-batt="15"><span class="obj-icon">⚡⚡⚡</span><span
+                                class="obj-label">15 kWh</span><span class="obj-pct">Revolty 15</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Autoconsommation / Autoproduction -->
+            <div id="ac-ap-row">
+                <div class="r-cell">
+                    <div class="metric">
+                        <div class="val" id="outAutoConso">—</div>
+                        <div class="lbl">Autoconsommation</div>
+                    </div>
+                </div>
+                <div class="r-cell">
+                    <div class="metric">
+                        <div class="val" id="outAutoProd">—</div>
+                        <div class="lbl">Autoproduction</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dimensionnement -->
+            <div class="r-cell">
+                <div class="auto-section">
+                    <div class="auto-header"><span>Dimensionnement <span class="dim-badge" id="resDimBadge"></span></span>
+                    </div>
+                    <div class="bar-track" id="resDimBarTrack">
+                        <div class="bar-fill" id="resSurplusBar" style="width:68%"></div>
+                    </div>
+                </div>
+                <div id="resSurplusMsg" class="surplus-msg hidden"></div>
+            </div>
+
+        </div>
+
+        <div id="right-panel">
+
+            <!-- col1 row1 — Économies (€ / an) -->
+            <div class="r-cell" id="cell-eco">
+                <div class="metric">
+                    <div class="val" id="outEcoTotal">—</div>
+                    <div class="lbl">Économies par an</div>
+                </div>
+            </div>
+
+            <!-- col2 row1 — Bonus avec batterie -->
+            <div class="r-cell" id="cell-bonus-batt">
+                <div class="metric">
+                    <div class="val" id="ecoBatterie">—</div>
+                    <div class="lbl">grâce à la batterie</div>
+                </div>
+            </div>
+
+            <!-- col3 -->
+            <div id="col3">
+                <div class="r-cell" id="cell-revente">
+                    <div class="metric">
+                        <div class="val" id="outRevente">—</div>
+                        <div class="lbl" id="gainsAnnexesLbl">Gains revente &amp; pilotage</div>
+                    </div>
+                </div>
+                <div class="r-cell" id="cell-eco-facture">
+                    <div class="metric">
+                        <div class="val" id="outPctReduc">—</div>
+                        <div class="lbl">Réduction sur facture</div>
+                    </div>
+                </div>
+                <div class="r-cell" id="cell-impact">
+                    <div class="r-cell-hd">Impact</div>
+                    <div class="impact-prod">
+                        <span class="impact-prod-val" id="outProdAnnuelle">—</span>
+                        <span class="impact-prod-lbl" id="outProdLbl">Production annuelle</span>
+                    </div>
+                    <div class="impact-foyers" id="outFoyersEquiv">—</div>
+                    <div class="impact-perte" id="outPerteSansBatt">—</div>
+                    <div class="co2-card" id="outCo2BattRow" style="display:none">
+                        <div class="co2-icon">♻</div>
+                        <div>
+                            <div class="co2-val" id="outCo2Batt">—</div>
+                            <div class="co2-lbl" id="outCo2BattLbl">vs batterie neuve</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- col1+2 row2 — Graphe 10–20 ans -->
+            <div class="r-cell" id="cell-graph">
+                <div class="r-cell-hd">Projection dans le temps</div>
+                <div class="proj-total" id="projTotal">—</div>
+                <div class="proj-chart" id="projChartWrap"></div>
+                <div class="proj-legend">
+                    <span><span class="pleg-sq" style="background:#11E47A"></span>Autoconso directe</span>
+                    <span><span class="pleg-sq" style="background:#017267"></span>Bonus batterie</span>
+                    <span id="projLegendPilot" style="display:none"><span class="pleg-sq"
+                            style="background:#9B6DFF"></span>Pilotage HP/HC</span>
+                    <span><span class="pleg-sq" style="background:rgba(255,209,69,0.65)"></span>Surplus revendu</span>
+                </div>
+                <div id="proj-scenarios">
+                    <button type="button" class="scenario active" data-esc="0.04">
+                        <div class="scenario-name">EDF · prix élec +4 %/an</div>
+                        <div class="scenario-val" id="scenEdf">—</div>
+                    </button>
+                    <button type="button" class="scenario" data-esc="0.07">
+                        <div class="scenario-name">Tendanciel · +7 %/an</div>
+                        <div class="scenario-val" id="scenMoyen">—</div>
+                    </button>
+                    <button type="button" class="scenario" data-esc="0.10">
+                        <div class="scenario-name">Crise énergétique · +10 %/an</div>
+                        <div class="scenario-val" id="scenCrise">—</div>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ─── CTA STRIP ─── -->
+    <div id="cta-strip">
+        <a href="https://revolty.fr/reserver-ma-batterie" class="cta-btn" target="_blank">Réserver ma batterie
+            Revolty →</a>
+    </div>
+
+    <!-- ─── INPUTS SECTION ─── -->
+    <div id="inputs-section">
+
+        <!-- ══ ZONE CONSO ══ -->
+        <div id="zone-conso">
+
+        <!-- FOYER -->
+        <div class="card" id="card-foyer">
+            <div class="card-title"><span class="ico">🏠</span> Consommation</div>
+
+                <div class="field" id="fld-consomode">
+                    <span class="field-label">Comment renseigner votre consommation ?</span>
+                    <div class="tile-grid cols-2">
+                        <button type="button" class="tile-btn active" data-group="consoMode" data-val="estim"><span
+                                class="tile-icon">🧮</span><span class="tile-label">L'estimer</span></button>
+                        <button type="button" class="tile-btn" data-group="consoMode" data-val="manuel"><span
+                                class="tile-icon">✏️</span><span class="tile-label">Je la connais</span></button>
+                    </div>
+                </div>
+
+                <div id="estimFields">
+                    <div class="field" id="fld-persons">
+                        <span class="field-label">Nombre de personnes</span>
+                        <div class="tile-grid cols-5">
+                            <button type="button" class="tile-btn" data-group="persons" data-val="1"><span
+                                    class="tile-icon">1</span><span class="tile-label">personne</span></button>
+                            <button type="button" class="tile-btn" data-group="persons" data-val="2"><span
+                                    class="tile-icon">2</span><span class="tile-label">personnes</span></button>
+                            <button type="button" class="tile-btn" data-group="persons" data-val="3"><span
+                                    class="tile-icon">3</span><span class="tile-label">personnes</span></button>
+                            <button type="button" class="tile-btn active" data-group="persons" data-val="4"><span
+                                    class="tile-icon">4</span><span class="tile-label">personnes</span></button>
+                            <button type="button" class="tile-btn" data-group="persons" data-val="5"><span
+                                    class="tile-icon">5+</span><span class="tile-label">personnes</span></button>
+                        </div>
+                    </div>
+
+                    <div class="field" id="fld-surface">
+                        <span class="field-label">Surface du logement</span>
+                        <div class="slider-row">
+                            <input type="range" id="surface" min="30" max="250" step="10" value="140" />
+                            <span class="slider-val"><span id="surfaceVal">140</span> m²</span>
+                        </div>
+                    </div>
+
+                    <div class="field" id="fld-heat-e">
+                        <span class="field-label">Type de chauffage</span>
+                        <div class="tile-grid cols-3">
+                            <button type="button" class="tile-btn active" data-group="heat" data-val="gaz"><span
+                                    class="tile-icon">🔥</span><span class="tile-label">Gaz / Bois</span></button>
+                            <button type="button" class="tile-btn" data-group="heat" data-val="pompe"><span
+                                    class="tile-icon">🌡️</span><span class="tile-label">Pompe à chaleur</span></button>
+                            <button type="button" class="tile-btn" data-group="heat" data-val="elec"><span
+                                    class="tile-icon">🔌</span><span class="tile-label">Résistance élec</span></button>
+                        </div>
+                    </div>
+
+                    <div class="field" id="fld-presence">
+                        <span class="field-label">Présence</span>
+                        <div class="tile-grid cols-2">
+                            <button type="button" class="tile-btn active" data-group="journee" data-val="maison"><span
+                                    class="tile-icon">🏠</span><span class="tile-label">À la maison</span></button>
+                            <button type="button" class="tile-btn" data-group="journee" data-val="exterieur"><span
+                                    class="tile-icon">🏢</span><span class="tile-label">À l'extérieur</span></button>
+                        </div>
+                    </div>
+
+                    <div class="field" data-private>
+                        <span class="field-label">Isolation / Classe DPE</span>
+                        <div class="dpe-selector">
+                            <button class="dpe-btn" data-dpe="A" title="A — très performant (BBC, RT2012+)">A</button>
+                            <button class="dpe-btn" data-dpe="B" title="B — performant">B</button>
+                            <button class="dpe-btn" data-dpe="C" title="C — bon (construction récente)">C</button>
+                            <button class="dpe-btn active" data-dpe="D" title="D — moyen (années 80–90)">D</button>
+                            <button class="dpe-btn" data-dpe="E" title="E — énergivore (avant 1975)">E</button>
+                            <button class="dpe-btn" data-dpe="F" title="F — passoire thermique">F</button>
+                            <button class="dpe-btn" data-dpe="G" title="G — très passoire">G</button>
+                        </div>
+                        <p class="dpe-hint">Source : Open DPE ADEME 2021 — besoin thermique médian par classe (3 301
+                            maisons)</p>
+                    </div>
+
+                    <div class="field" data-private>
+                        <span class="field-label">Usage du chauffage</span>
+                        <div class="tile-grid cols-3">
+                            <button type="button" class="tile-btn" data-group="usage" data-val="econome"><span
+                                    class="tile-icon">🌱</span><span class="tile-label">Économe</span><span
+                                    class="tile-sub">~45 %</span></button>
+                            <button type="button" class="tile-btn active" data-group="usage" data-val="normal"><span
+                                    class="tile-icon">🏠</span><span class="tile-label">Normal</span><span
+                                    class="tile-sub">~70 %</span></button>
+                            <button type="button" class="tile-btn" data-group="usage" data-val="fond"><span
+                                    class="tile-icon">🔥</span><span class="tile-label">À fond</span><span
+                                    class="tile-sub">100 %</span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="manualField" style="display:none">
+                    <div class="field" id="fld-conso-m">
+                        <span class="field-label">Votre consommation annuelle</span>
+                        <div class="optional-input-row">
+                            <input type="number" id="consoManuelle" placeholder="ex : 4 500" min="500" max="30000"
+                                step="100" />
+                            <span class="unit">kWh / an</span>
+                        </div>
+                        <p class="dpe-hint">Chiffre indiqué sur votre facture EDF ou dans votre espace Enedis.</p>
+                    </div>
+
+                    <div class="field" id="fld-heat-m">
+                        <span class="field-label">Chauffage principal</span>
+                        <div class="tile-grid cols-3">
+                            <button type="button" class="tile-btn active" data-group="heat" data-val="gaz"><span
+                                    class="tile-icon">🔥</span><span class="tile-label">Gaz / Bois</span></button>
+                            <button type="button" class="tile-btn" data-group="heat" data-val="pompe"><span
+                                    class="tile-icon">🌡️</span><span class="tile-label">Pompe à chaleur</span></button>
+                            <button type="button" class="tile-btn" data-group="heat" data-val="elec"><span
+                                    class="tile-icon">🔌</span><span class="tile-label">Résistance élec</span></button>
+                        </div>
+                        <p class="dpe-hint">Détermine la saisonnalité (pic hiver) appliquée à votre conso.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- APPAREILS SPÉCIFIQUES (SEAU 3) -->
+            <div class="card" id="card-appareils">
+                <div class="card-title"><span class="ico">⚡</span> Appareils spécifiques</div>
+                <p class="dpe-hint" style="margin-top:-4px;margin-bottom:10px">Cliquez sur les appareils que vous
+                    possédez.</p>
+                <div class="tile-grid cols-5">
+                    <button type="button" class="tile-btn active" data-appliance="ecs-joule"><span
+                            class="tile-icon">🚿</span><span class="tile-label">Chauffe-eau</span><span
+                            class="tile-sub">Résistance</span></button>
+                    <button type="button" class="tile-btn" data-appliance="ecs-thermo"><span
+                            class="tile-icon">♨️</span><span class="tile-label">Chauffe-eau</span><span
+                            class="tile-sub">Thermo</span></button>
+                    <button type="button" class="tile-btn active" data-appliance="ve"><span
+                            class="tile-icon">🚗</span><span class="tile-label">Véhicule</span><span
+                            class="tile-sub">électrique</span></button>
+                    <button type="button" class="tile-btn" data-appliance="piscine"><span
+                            class="tile-icon">🏊</span><span class="tile-label">Piscine</span><span
+                            class="tile-sub">&nbsp;</span></button>
+                    <button type="button" class="tile-btn active" data-appliance="clim"><span
+                            class="tile-icon">❄️</span><span class="tile-label">Climatisation</span><span
+                            class="tile-sub">&nbsp;</span></button>
+                </div>
+            </div>
+
+        </div>
+        <!-- /#zone-conso -->
+
+        <!-- ══ ZONE PROD ══ -->
+        <div id="zone-prod">
+
+            <!-- INSTALLATION -->
+            <div class="card" id="card-prod">
+                <div class="card-title"><span class="ico">☀️</span> Production</div>
+
+                <div class="field" id="fld-dept">
+                    <span class="field-label">Département</span>
+                    <select id="dept"></select>
+                </div>
+
+                <div class="field" id="fld-puissance">
+                    <span class="field-label">Puissance installée</span>
+                    <div class="tile-grid cols-2" style="margin-bottom:8px">
+                        <button type="button" class="tile-btn active" data-group="hasPv" data-val="oui"><span
+                                class="tile-icon">☀️</span><span class="tile-label">J'ai des PV</span></button>
+                        <button type="button" class="tile-btn" data-group="hasPv" data-val="non"><span
+                                class="tile-icon">🏠</span><span class="tile-label">Je n'ai pas de PV</span><span
+                                class="tile-sub">dimensionnement auto</span></button>
+                    </div>
+                    <div class="optional-input-row" id="kwcField">
+                        <input type="number" id="kwcInput" min="0" max="20" step="0.1" value="6" />
+                        <span class="unit">kWc</span>
+                    </div>
+                    <div id="kwcHelper" style="font-size:0.68rem;color:var(--muted);margin-top:5px">
+                        ex : 6 kWc ≈ 15 panneaux 400 Wc
+                    </div>
+                    <div id="kwcTriWarn" style="display:none;font-size:0.68rem;color:#ffb454;margin-top:5px">
+                        ⚠️ Au-delà de 9 kWc, installation triphasée requise
+                    </div>
+                </div>
+
+                <div class="divider" id="prod-divider"></div>
+
+                <div class="field" id="fld-contrat">
+                    <span class="field-label">Type de contrat électricité</span>
+                    <div class="tile-grid cols-3">
+                        <button type="button" class="tile-btn active" data-group="contrat" data-val="base"><span
+                                class="tile-icon">💡</span><span class="tile-label">Tarif Base</span></button>
+                        <button type="button" class="tile-btn" data-group="contrat" data-val="hphc"><span
+                                class="tile-icon">⏰</span><span class="tile-label">HP / HC</span><span class="tile-sub"
+                                style="color:var(--violet);font-weight:600">+ pilotage intelligent</span></button>
+                        <button type="button" class="tile-btn" data-group="contrat" data-val="flex"><span
+                                class="tile-icon">📈</span><span class="tile-label">Flex horaire</span><span
+                                class="tile-sub" style="color:var(--violet);font-weight:600">+
+                                smart_flex</span></button>
+                    </div>
+                </div>
+
+                <div id="block-tarif-flex" class="hidden">
+                    <div class="tarif-custom">
+                        <div class="tarif-custom-field" style="flex:1">
+                            <label>Scénario de prix spot</label>
+                            <div class="tile-grid cols-3" style="margin-top:6px">
+                                <button type="button" class="tile-btn" data-group="flexScenario" data-val="p10"><span
+                                        class="tile-label">Bas (p10)</span></button>
+                                <button type="button" class="tile-btn active" data-group="flexScenario"
+                                    data-val="p50"><span class="tile-label">Médian (p50)</span></button>
+                                <button type="button" class="tile-btn" data-group="flexScenario" data-val="p90"><span
+                                        class="tile-label">Haut (p90)</span></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-size:0.68rem; color:var(--muted); margin-top:5px;">
+                        Tarif indexé sur le spot Day-ahead FR (ENTSO-E 2024-2026), TVA + acheminement inclus. La
+                        fourchette p10–p90 reflète la variabilité historique.
+                    </div>
+                </div>
+
+                <div id="block-tarif-base">
+                    <div class="tarif-custom">
+                        <div class="tarif-custom-field"><label>Prix Base (€/kWh)</label><input type="number"
+                                id="tarifBase" value="0.1940" step="0.001" min="0.05" max="0.5" /></div>
+                    </div>
+                    <div style="font-size:0.68rem; color:var(--muted); margin-top:5px;">Pré-rempli TRV mars 2026.
+                        Modifiable.</div>
+                </div>
+
+                <div id="block-tarifs-custom" class="hidden">
+                    <div class="tarif-custom">
+                        <div class="tarif-custom-field"><label>Prix HP (€/kWh)</label><input type="number" id="tarifHP"
+                                value="0.2065" step="0.001" min="0.05" max="0.5" /></div>
+                        <div class="tarif-custom-field"><label>Prix HC (€/kWh)</label><input type="number" id="tarifHC"
+                                value="0.1579" step="0.001" min="0.05" max="0.5" /></div>
+                    </div>
+                    <div style="font-size:0.68rem; color:var(--muted); margin-top:5px;">Pré-rempli TRV mars 2026.
+                        Modifiable.</div>
+                </div>
+
+                <div class="field" id="fld-rachat">
+                    <span class="field-label">Tarif de rachat du surplus</span>
+                    <div class="optional-input-row">
+                        <input type="number" id="rachatInput" min="0" max="0.5" step="0.001" value="0"
+                            placeholder="0" />
+                        <span class="unit">€ / kWh</span>
+                    </div>
+                    <div style="font-size:0.68rem;color:var(--muted);margin-top:5px">
+                        0 si pas de contrat de revente · EDF OA actuel ≈ 0,04 €/kWh
+                    </div>
+                </div>
+
+                <div class="field" data-private>
+                    <span class="field-label">Orientation des panneaux</span>
+                    <div class="tile-grid cols-3">
+                        <button type="button" class="tile-btn" data-group="orient" data-val="est"><span
+                                class="tile-icon">🌅</span><span class="tile-label">Est</span><span
+                                class="tile-sub">matin</span></button>
+                        <button type="button" class="tile-btn active" data-group="orient" data-val="sud"><span
+                                class="tile-icon">☀️</span><span class="tile-label">Sud</span><span
+                                class="tile-sub">optimal</span></button>
+                        <button type="button" class="tile-btn" data-group="orient" data-val="ouest"><span
+                                class="tile-icon">🌇</span><span class="tile-label">Ouest</span><span
+                                class="tile-sub">soir</span></button>
+                    </div>
+                </div>
+
+                <div class="field" data-private>
+                    <span class="field-label">Inclinaison toiture</span>
+                    <div class="tile-grid cols-3">
+                        <button type="button" class="tile-btn" data-group="incl" data-val="20"><span
+                                class="tile-icon">📐</span><span class="tile-label">20°</span><span
+                                class="tile-sub">plat</span></button>
+                        <button type="button" class="tile-btn active" data-group="incl" data-val="35"><span
+                                class="tile-icon">📐</span><span class="tile-label">35°</span><span
+                                class="tile-sub">standard</span></button>
+                        <button type="button" class="tile-btn" data-group="incl" data-val="45"><span
+                                class="tile-icon">📐</span><span class="tile-label">45°</span><span
+                                class="tile-sub">pentu</span></button>
+                    </div>
+                </div>
+
+                <div class="field" data-private>
+                    <span class="field-label">Ombrage</span>
+                    <div class="tile-grid cols-4">
+                        <button type="button" class="tile-btn active" data-group="ombrage" data-val="0"><span
+                                class="tile-icon">☀️</span><span class="tile-label">Aucun</span><span
+                                class="tile-sub">&nbsp;</span></button>
+                        <button type="button" class="tile-btn" data-group="ombrage" data-val="0.1"><span
+                                class="tile-icon">🌤️</span><span class="tile-label">Léger</span><span
+                                class="tile-sub">10 %</span></button>
+                        <button type="button" class="tile-btn" data-group="ombrage" data-val="0.2"><span
+                                class="tile-icon">⛅</span><span class="tile-label">Moyen</span><span class="tile-sub">20
+                                %</span></button>
+                        <button type="button" class="tile-btn" data-group="ombrage" data-val="0.3"><span
+                                class="tile-icon">☁️</span><span class="tile-label">Fort</span><span class="tile-sub">30
+                                %</span></button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /#zone-prod -->
+
+        <!-- navigation du wizard (visible uniquement en phase-wizard) -->
+        <div id="wizMsg"></div>
+        <div id="wizard-nav">
+            <button type="button" id="wizPrev">← Précédent</button>
+            <span id="wizProgress">Étape 1 / 2</span>
+            <button type="button" id="wizNext">Suivant →</button>
+        </div>
+
+    </div>
+    <!-- /#inputs-section -->
+
+    <!-- ─── STASH : composants conservés pour le moteur JS (hors écran) ─── -->
+    <div class="result-card locked" id="js-stash">
+        <div class="result-eyebrow">Résultats pour votre configuration</div>
+
+        <!-- non affichés, conservés pour le moteur JS -->
+        <div class="metrics">
+            <div class="metric">
+                <div class="val" id="outKwc">—</div>
+                <div class="lbl">Puissance installée</div>
+            </div>
+            <div class="metric">
+                <div class="val" id="outSurplusKwh">—</div>
+                <div class="lbl">Surplus injecté / an</div>
+            </div>
+        </div>
+
+        <!-- retirés de #cell-eco lors de la simplification — conservés pour le moteur JS -->
+        <div class="delta-row" id="outDeltaBattRow">
+            <span class="delta-lbl">Batterie <span id="outProduct">—</span> :</span>
+            <span class="delta-val" id="outDeltaBatt">—</span>
+        </div>
+        <div class="eco-rows">
+            <div class="eco-row"><span class="eco-lbl">☀️ Autoconso directe</span><span class="eco-val green"
+                    id="ecoDirecte">—</span></div>
+            <div class="eco-row"><span class="eco-lbl">⚡ Revente surplus</span><span class="eco-val"
+                    id="ecoRevente">—</span></div>
+        </div>
+        <div class="chart-wrap">
+            <svg id="monthChart" width="100%" height="105" viewBox="0 0 340 105" preserveAspectRatio="none"
+                style="display:block;overflow:visible;"></svg>
+        </div>
+
+        <!-- retirés de #cell-bonus-batt lors de la simplification — conservés pour le moteur JS -->
+        <div class="eco-row" id="ecoBatterieRow"></div>
+        <div id="ecoPilotRow" style="display:none">
+            <div class="metric"><div class="val" id="ecoPilot">—</div><div class="lbl">Gains pilotage</div></div>
+        </div>
+        <div class="metrics" id="outBattMetrics">
+            <div class="metric">
+                <div class="val" id="outKwhRestitue">—</div>
+                <div class="lbl">Restitués par la batterie</div>
+            </div>
+        </div>
+        <div class="tarif-note" id="tarifNote">TRV Base mars 2026 : 0,194 €/kWh · Rachat : 0,04 €/kWh</div>
+        <div class="methodo-toggle">
+            <button class="info-btn" id="infoBtn" title="Méthodologie">i</button>
+        </div>
+        <div class="methodo-panel" id="methodPanel">
+            <h4>Modèle trois seaux v4</h4>
+            La consommation est décomposée en trois composantes indépendantes :
+            <br><br><strong>Seau 1 — Usages courants</strong> : électroménager, éclairage, audiovisuel,
+            informatique, cuisson. Driver : nombre de personnes. Source : Panel Elecdom ADEME/Enertech/RTE 2021.
+            Profil horaire : RES1 Enedis corrigé (contribution ECS et clim nationales soustraites).
+            <br><br><strong>Seau 2 — Chauffage</strong> :
+            <code>surface × Bch[DPE] × coeff[heat] × behav[DPE]</code>. Bch =
+            besoin thermique bâtiment (kWh_th/m²/an), issu de l'Open DPE ADEME sur 3 301 maisons.
+            <code>coeff</code> = 0 (gaz), 0,33 (PAC air/eau ≥2017, COP=3), 0,87 (résistance, pertes distribution
+            3CL). <code>behav</code> capture l'effet « prebound » : la conso mesurée est inférieure au besoin
+            théorique 3CL,
+            écart croissant avec la dégradation DPE (1,0 sur A–C → 0,55 sur G).
+            Sources : Sunikka-Blank &amp; Galvin (BRI 2012), Allibe (thèse EDF R&amp;D / Mines ParisTech 2012),
+            ENL/SDES 2020.
+            Saisonnalité fort hiver.
+            <br><br><strong>Seau 3 — Appareils spécifiques</strong> : ECS (profil 23h mesuré, Panel Elecdom), VE
+            (même profil nocturne), piscine (8h–18h mai–sept), clim (14h–18h juin–août, modulée par
+            zone climatique RT2012 H1/H2/H3 — 130 kWh nord → 580 kWh Méditerranée). Addition pure — pas de
+            double-comptage avec RES1 corrigé.
+            <h4>Simulation batterie</h4>
+            SOC propagé heure par heure, 3 passes de convergence vers régime permanent. Rendement aller-retour
+            LFP : 0,92 (charge 0,96 × décharge 0,96).
+            <h4>Sources</h4>
+            PVGIS v5.3 JRC (productible par département, profils horaires TMY, 96 préfectures), Enedis Open Data
+            (profils RES1), Panel Elecdom ADEME 2021 (seaux 1 et 3), Open DPE ADEME post-juillet 2021 (seau 2),
+            EDF OA S06 T1 2026 (rachat 0,04 €/kWh).
+        </div>
+
+        <!-- projSection : projChartWrap + projTotal déplacés dans #cell-graph -->
+        <div class="bloc" id="projSection" style="display:none">
+            <div class="bloc-label">Projection sur 20 ans</div>
+            <div class="proj-sub" id="projSub">Hypothèse : +4 % / an sur le prix de l'électricité · Rachat surplus
+                fixe 20 ans</div>
+        </div>
+
+        <!-- paybackSection : non placé dans le layout v1, conservé pour le moteur JS -->
+        <div class="bloc" id="paybackSection" style="display:none">
+            <div class="bloc-label">Rentabilité batterie</div>
+            <div class="metrics" style="margin-bottom:10px">
+                <div class="metric">
+                    <div class="val" id="paybackCapex">—</div>
+                    <div class="lbl">Investissement (576 €/kWh TTC)</div>
+                </div>
+                <div class="metric">
+                    <div class="val" id="paybackEco">—</div>
+                    <div class="lbl">Économies totales / an</div>
+                    <div id="paybackBreakdown"
+                        style="font-size:0.65rem;color:var(--muted);margin-top:4px;line-height:1.3"></div>
+                </div>
+                <div class="metric">
+                    <div class="val" id="paybackYears">—</div>
+                    <div class="lbl">Retour sur investissement</div>
+                </div>
+            </div>
+            <div class="proj-chart" id="paybackChartWrap"></div>
+            <div class="proj-sub" style="margin-top:8px">Cumul net (économies − CAPEX). Inflation élec +4 %/an. Le
+                point violet marque le break-even.</div>
+        </div>
+
+        <p class="disclaimer">Estimation indicative basée sur des données statistiques nationales. Un devis précis
+            nécessite une visite technique.</p>
+    </div>
+
+    <!-- ── DEBUG ──────────────────────────────────────────────────────────────── -->
+    <div id="debugPanel" data-private>
+        <div class="dbg-header">
+            <span class="dbg-title">🔬 Debug — Journée type heure par heure</span>
+            <div class="dbg-controls">
+                <div class="dbg-months" id="dbgMonths">
+                    <button class="dbg-m active" data-m="0">Jan</button><button class="dbg-m" data-m="1">Fév</button>
+                    <button class="dbg-m" data-m="2">Mar</button><button class="dbg-m" data-m="3">Avr</button>
+                    <button class="dbg-m" data-m="4">Mai</button><button class="dbg-m" data-m="5">Jun</button>
+                    <button class="dbg-m" data-m="6">Jul</button><button class="dbg-m" data-m="7">Aoû</button>
+                    <button class="dbg-m" data-m="8">Sep</button><button class="dbg-m" data-m="9">Oct</button>
+                    <button class="dbg-m" data-m="10">Nov</button><button class="dbg-m" data-m="11">Déc</button>
+                </div>
+                <div class="dbg-daytype">
+                    <button class="dbg-dt active" data-we="0">Semaine</button>
+                    <button class="dbg-dt" data-we="1">Weekend</button>
+                </div>
+            </div>
+        </div>
+        <div class="dbg-body">
+            <div class="dbg-metrics" id="dbgMetrics"></div>
+            <div class="dbg-chart-wrap">
+                <div class="dbg-legend">
+                    <span class="dleg"><span class="dleg-sq" style="background:#11E47A"></span>Autoconso directe</span>
+                    <span class="dleg"><span class="dleg-sq" style="background:#017267"></span>Restitution
+                        batterie</span>
+                    <span class="dleg"><span class="dleg-sq" style="background:rgba(255,255,255,0.15)"></span>Achat
+                        réseau</span>
+                    <span class="dleg" id="dlegPilot" style="display:none"><span class="dleg-sq"
+                            style="background:#9B6DFF"></span>Recharge HC pilotée</span>
+                    <span class="dleg"><span class="dleg-sq" style="background:rgba(245,166,35,0.55)"></span>Surplus
+                        revendu</span>
+                    <span class="dleg"><span class="dleg-line" style="background:#FFD145"></span>Production PV</span>
+                    <span class="dleg"><span class="dleg-line" style="background:#11E47A"></span>SOC batterie</span>
+                </div>
+                <svg id="dbgChart" width="100%" viewBox="0 0 900 220" preserveAspectRatio="none"
+                    style="display:block;overflow:visible;"></svg>
+                <div class="dbg-xaxis" id="dbgXAxis"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
         (function () {
             // ═══════════════════════════════════════════════════════════════════════════
             // CONSTANTES — PRODUCTION
@@ -4096,4 +6623,7 @@
             // ── INIT
             compute();
         })();
-    
+    </script>
+</body>
+
+</html>

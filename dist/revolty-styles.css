@@ -25,6 +25,10 @@
             --muted: #8A9E96;
             --border: #D6E4DE;
             --radius: 16px;
+            /* marge latérale dynamique : étroite sur mobile, large sur grand écran */
+            --page-x: clamp(16px, 6vw, 150px);
+            /* gris clair des tuiles d'inputs (fond de page blanc) */
+            --tile: #f6f7f9;
         }
 
         * {
@@ -1526,3 +1530,334 @@
             opacity: 0.7;
             margin-top: 2px;
         }
+
+        /* ═══════════ LAYOUT ONE-PAGE NO-SCROLL — Tests DA ═══════════ */
+        html, body { height: 100%; }
+
+        body {
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            background: var(--surface);
+        }
+
+        header, .hero, #debugPanel, .disclaimer { display: none !important; }
+
+        #titre-bar {
+            flex: 0 0 44px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark);
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        #profileBar { position: fixed; top: 7px; right: 12px; z-index: 9100; margin: 0; }
+
+        #top-section {
+            flex: 0 0 auto;
+            min-height: 56vh;
+            display: grid;
+            grid-template-columns: 37% 63%;
+            grid-template-rows: 1fr;
+            gap: 10px;
+            padding: 12px var(--page-x);
+        }
+
+        #left-panel { display: flex; flex-direction: column; gap: 8px; }
+        #left-panel .card { margin: 0; flex: 1; background: var(--tile); }
+        #ac-ap-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+        #right-panel {
+            display: grid;
+            grid-template-columns: 3fr 3fr 2fr;
+            grid-template-rows: auto 1fr;
+            gap: 8px;
+        }
+
+        .r-cell {
+            background: var(--dark);
+            color: #fff;
+            border-radius: 12px;
+            padding: 12px 14px;
+            border: 1px solid rgba(17, 228, 122, 0.10);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .r-cell-hd {
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            color: rgba(255, 255, 255, 0.30);
+            margin-bottom: 8px;
+            flex-shrink: 0;
+        }
+
+        #cell-eco { grid-column: 1; grid-row: 1; }
+        #cell-bonus-batt { grid-column: 2; grid-row: 1; }
+        #cell-graph { grid-column: 1 / span 2; grid-row: 2; }
+        #col3 { grid-column: 3; grid-row: 1 / span 2; display: flex; flex-direction: column; gap: 8px; }
+
+        /* Tuiles métriques : hauteur liée au texte (pas de vide noir).
+           Tampons qui comblent le trou pour aligner les bas : #cell-graph et #cell-impact. */
+        #cell-eco, #cell-bonus-batt { align-self: start; }
+        #cell-revente, #cell-eco-facture { flex: 0 0 auto; }
+        #cell-impact { flex: 1; }
+
+        /* cellules « métrique simple » : contenu centré (style autoconso/autoprod) */
+        #cell-eco, #cell-bonus-batt, #cell-eco-facture, #cell-revente {
+            justify-content: center;
+            gap: 8px;
+        }
+        #cell-eco .metric, #cell-bonus-batt .metric { width: 100%; }
+
+        /* hiérarchie : Économies = résultat principal, mis en avant en vert */
+        #cell-eco .metric {
+            background: rgba(17, 228, 122, 0.07);
+            border-color: rgba(17, 228, 122, 0.18);
+        }
+        #cell-eco .val {
+            color: var(--neo);
+        }
+
+        /* taille de chiffre homogène sur toutes les tuiles output */
+        .r-cell .metric .val { font-size: 1.6rem; }
+
+        /* gains chiffrés positifs en vert ; pilotage HP/HC en violet (charte) */
+        #cell-bonus-batt .val,
+        #cell-revente .val,
+        #cell-eco-facture .val { color: var(--neo); }
+        #cell-revente #ecoPilot { color: var(--violet); }
+
+        /* graphe projection : remplit la hauteur disponible (tuile tampon) */
+        #cell-graph .proj-chart { flex: 1; min-height: 0; margin: 0; }
+        #cell-graph .proj-chart svg { width: 100%; height: 100%; display: block; }
+
+        /* scénarios d'inflation du prix de l'élec sous le graphe */
+        #proj-scenarios {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+        .scenario {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 7px 9px;
+            text-align: left;
+            font-family: inherit;
+            color: inherit;
+            cursor: pointer;
+            transition: background .15s, border-color .15s;
+        }
+        .scenario:hover { background: rgba(255, 255, 255, 0.09); }
+        .scenario.active {
+            background: rgba(17, 228, 122, 0.12);
+            border-color: rgba(17, 228, 122, 0.4);
+        }
+        .scenario-name { font-size: 0.62rem; color: rgba(255, 255, 255, 0.4); line-height: 1.25; }
+        .scenario-val {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 0.98rem;
+            color: #fff;
+            margin-top: 3px;
+        }
+        #scenMoyen { color: var(--soleil); }
+        #scenCrise { color: var(--corail); }
+
+        /* compactage des composants existants pour tenir sans scroll */
+        #cell-eco .hero-wrap { padding: 12px 12px 10px; margin-bottom: 8px; }
+        #cell-eco .hero-num { font-size: 2.1rem; }
+        #cell-eco .chart-wrap { margin: 0; }
+        .r-cell .bloc, .r-cell .auto-section { margin: 0; padding: 0; border: none; }
+        .r-cell .eco-rows { margin-top: 0 !important; }
+
+        .facture-pct {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--neo);
+            line-height: 1.15;
+        }
+
+        .impact-prod { display: flex; flex-direction: column; }
+        .impact-prod-val {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: 1.6rem;
+            color: var(--soleil);
+            line-height: 1.1;
+        }
+        .impact-prod-lbl { font-size: 0.72rem; color: rgba(255, 255, 255, 0.5); }
+        .impact-foyers {
+            margin-top: 8px;
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        .impact-perte {
+            margin-top: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--corail);
+        }
+        .impact-perte.impact-perte-pos { color: var(--neo); }
+
+        #cta-strip {
+            flex: 0 0 52px;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #cta-strip .cta-btn { width: 60%; margin: 0; }
+
+        #inputs-section {
+            flex: 1 0 auto;
+            background: var(--surface);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 12px var(--page-x);
+        }
+
+        #zone-conso { display: flex; flex-direction: column; gap: 10px; }
+        #zone-prod { display: flex; flex-direction: column; }
+        #zone-prod .card { flex: 1; }
+
+        #inputs-section .card {
+            margin: 0;
+            background: var(--tile);
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(13, 26, 20, 0.04);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* appareils spécifiques : les tuiles remplissent la zone */
+        #card-appareils .tile-grid { flex: 1; }
+        #card-appareils .tile-btn { height: 100%; }
+
+        #js-stash {
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+
+        #projSection {
+            visibility: hidden;
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .result-card.locked > *:not(.lead-gate) {
+            filter: none;
+            pointer-events: auto;
+            user-select: auto;
+        }
+
+        .lead-gate {
+            position: fixed;
+            inset: 44px 0 0 0;
+            z-index: 9000;
+            border-radius: 0;
+        }
+
+        /* ═══ FLUX EN 3 PHASES : wizard → lead gate → app ═══ */
+        /* lead gate visible uniquement pendant la phase-gate */
+        body:not(.phase-gate) #leadGate { display: none !important; }
+
+        /* phase-wizard : on cache résultats + CTA, #inputs-section devient l'assistant */
+        .phase-wizard #top-section,
+        .phase-wizard #cta-strip { display: none; }
+
+        .phase-wizard #inputs-section {
+            display: block;
+        }
+        .phase-wizard #zone-conso,
+        .phase-wizard #zone-prod {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        #wizard-nav { display: none; }
+        .phase-wizard #wizard-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            max-width: 900px;
+            margin: 14px auto 4px;
+        }
+        #wizard-nav button {
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 11px 22px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+        }
+        #wizPrev { background: var(--surface); color: var(--dark); box-shadow: 0 1px 3px rgba(13, 26, 20, 0.08); }
+        #wizNext { background: var(--dark); color: #fff; }
+        #wizProgress { font-size: 0.8rem; font-weight: 600; color: var(--dark); }
+
+        #wizMsg { display: none; }
+        .phase-wizard #wizMsg.show {
+            display: block;
+            max-width: 900px;
+            margin: 10px auto 0;
+            padding: 9px 14px;
+            background: #fff;
+            color: var(--corail);
+            font-size: 0.82rem;
+            font-weight: 600;
+            border-radius: 10px;
+        }
+        .input-error {
+            border-color: var(--corail) !important;
+            box-shadow: 0 0 0 2px rgba(245, 129, 122, 0.25);
+        }
+
+        /* option Flex horaire masquée pour l'instant — contrat sur 2 colonnes */
+        .tile-btn[data-group="contrat"][data-val="flex"] { display: none; }
+        #fld-contrat .tile-grid { grid-template-columns: 1fr 1fr; }
+
+        /* labels des tuiles résultats : lisibles en blanc sur fond sombre */
+        .r-cell .metric .lbl { color: rgba(255, 255, 255, 0.9); }
+
+        /* Révélation progressive des champs Consommation (phase-wizard uniquement) */
+        .phase-wizard #card-foyer .field { display: none; }
+        .phase-wizard #card-appareils { display: none; }
+        .phase-wizard #card-foyer .field.rv-on { display: block; animation: rvIn .42s ease both; }
+        .phase-wizard #card-appareils.rv-on { display: flex; animation: rvIn .42s ease both; }
+
+        /* idem pour la carte Production */
+        .phase-wizard #card-prod .field,
+        .phase-wizard #card-prod .divider,
+        .phase-wizard #card-prod [id^="block-tarif"] { display: none; }
+        .phase-wizard #card-prod .field.rv-on { display: block; animation: rvIn .42s ease both; }
+        .phase-wizard #card-prod .divider.rv-on { display: block; }
+        .phase-wizard #card-prod [id^="block-tarif"].rv-on:not(.hidden) { display: block; animation: rvIn .42s ease both; }
+
+        @keyframes rvIn {
+            from { opacity: 0; transform: translateY(-16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    
