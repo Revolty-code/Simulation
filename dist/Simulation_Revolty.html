@@ -18,17 +18,16 @@
         <small>Simulateur v4.3 — moteur trois seaux</small>
     </header>
 
-    <!-- DEBUG — bouton magique pour bypasser le lead gate (à retirer en prod) -->
-    <button type="button" id="debugBypass" title="Bypass le lead gate (debug interne)">🪄 Skip gate
-        (debug)</button>
-
     <div class="hero">
         <h1>Simulateur d'<em>autoconsommation</em><br />et économies</h1>
         <p>Modèle saisonnier heure par heure — DPE, isolation, appareils spécifiques.</p>
     </div>
 
     <!-- ═══════════ LAYOUT ONE-PAGE — Tests DA ═══════════ -->
-    <div id="titre-bar">Revolty — votre simulation d'autoconsommation</div>
+    <div id="titre-bar">Votre simulation de batterie Revolty</div>
+
+    <!-- Bandeau d'accueil résultats — cadre la lecture (notamment dimensionnement auto) -->
+    <div id="intro-banner"><span id="introBannerText">—</span></div>
 
     <!-- Lead gate (proto — aucune logique backend) — plein écran -->
     <div class="lead-gate" id="leadGate">
@@ -37,11 +36,8 @@
             <h3>Découvrez vos économies</h3>
             <p>Entrez vos coordonnées pour afficher vos résultats personnalisés</p>
             <form id="leadGateForm">
-                <input type="email" id="leadEmail" placeholder="Email *" required />
                 <input type="text" id="leadFirstname" placeholder="Prénom *" required />
-                <input type="text" id="leadZip" placeholder="Code postal *" pattern="[0-9]{5}" maxlength="5"
-                    required />
-                <input type="tel" id="leadPhone" placeholder="Téléphone (optionnel — pour être rappelé)" />
+                <input type="email" id="leadEmail" placeholder="Email *" required />
                 <label class="lead-gate-consent">
                     <input type="checkbox" id="leadConsent" required />
                     <span>J'accepte d'être recontacté(e) par Revolty au sujet de ma simulation.</span>
@@ -55,121 +51,177 @@
 
     <!-- ─── TOP SECTION ─── -->
     <div id="top-section">
-        <div id="left-panel">
 
-            <!-- BATTERIE -->
-            <div class="card">
-                <div class="card-title"><span class="ico">🔋</span> Capacité de batterie</div>
-                <div class="field">
-                    <span class="field-label">Quelle capacité vous intéresse ?</span>
-                    <div class="objectif-selector">
-                        <button class="objectif-btn" data-batt="0"><span class="obj-icon">🔌</span><span
-                                class="obj-label">Sans</span><span class="obj-pct">Référence</span></button>
-                        <button class="objectif-btn" data-batt="5"><span class="obj-icon">⚡</span><span
-                                class="obj-label">5 kWh</span><span class="obj-pct">Revolty 5</span></button>
-                        <button class="objectif-btn active-confort" data-batt="10"><span class="obj-icon">⚡⚡</span><span
-                                class="obj-label">10 kWh</span><span class="obj-pct">Revolty 10</span></button>
-                        <button class="objectif-btn" data-batt="15"><span class="obj-icon">⚡⚡⚡</span><span
-                                class="obj-label">15 kWh</span><span class="obj-pct">Revolty 15</span></button>
-                    </div>
+        <!-- ══ COLONNE 1 — DIMENSIONNEMENT ══ -->
+        <div class="col-card" id="col-dim">
+            <div class="col-card-hd">Dimensionnement</div>
+
+            <!-- Choix de la capacité batterie : un seul bloc -->
+            <div class="batt-choice">
+                <div class="sub-hd">Votre modèle Revolty</div>
+                <div class="objectif-selector" id="battSelector">
+                    <button class="objectif-btn" data-batt="0"><span class="obj-icon">🔌</span><span
+                            class="obj-label">Sans</span><span class="obj-pct">batterie</span></button>
+                    <button class="objectif-btn" data-batt="5"><span class="obj-icon">⚡</span><span
+                            class="obj-label">5 kWh</span><span class="obj-pct">Revolty 5</span></button>
+                    <button class="objectif-btn active-confort" data-batt="10"><span class="obj-icon">⚡⚡</span><span
+                            class="obj-label">10 kWh</span><span class="obj-pct">Revolty 10</span></button>
+                    <button class="objectif-btn" data-batt="15"><span class="obj-icon">⚡⚡⚡</span><span
+                            class="obj-label">15 kWh</span><span class="obj-pct">Revolty 15</span></button>
                 </div>
+            </div>
+
+            <!-- Schéma : maison + panneaux + batterie, flèches vers production & capacité -->
+            <div class="dim-schema">
+                <svg viewBox="0 0 320 168" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="arrSun" markerWidth="8" markerHeight="8" refX="6" refY="3.6" orient="auto">
+                            <path d="M0,0 L7.5,3.6 L0,7.2 Z" fill="#C8860B" />
+                        </marker>
+                        <marker id="arrNeo" markerWidth="8" markerHeight="8" refX="6" refY="3.6" orient="auto">
+                            <path d="M0,0 L7.5,3.6 L0,7.2 Z" fill="#017267" />
+                        </marker>
+                    </defs>
+                    <!-- soleil -->
+                    <g stroke="#FFD145" stroke-width="2" stroke-linecap="round">
+                        <line x1="32" y1="6" x2="32" y2="14" />
+                        <line x1="32" y1="46" x2="32" y2="54" />
+                        <line x1="8" y1="30" x2="16" y2="30" />
+                        <line x1="48" y1="30" x2="56" y2="30" />
+                        <line x1="15" y1="13" x2="20" y2="18" />
+                        <line x1="44" y1="42" x2="49" y2="47" />
+                        <line x1="49" y1="13" x2="44" y2="18" />
+                        <line x1="20" y1="42" x2="15" y2="47" />
+                    </g>
+                    <circle cx="32" cy="30" r="11" fill="#FFD145" />
+                    <!-- maison -->
+                    <polygon points="36,92 78,56 120,92" fill="rgba(13,26,20,0.05)"
+                        stroke="rgba(13,26,20,0.55)" stroke-width="1.6" stroke-linejoin="round" />
+                    <rect x="46" y="92" width="64" height="49" rx="2" fill="rgba(13,26,20,0.04)"
+                        stroke="rgba(13,26,20,0.55)" stroke-width="1.6" />
+                    <rect x="70" y="117" width="15" height="24" rx="1" fill="rgba(13,26,20,0.20)" />
+                    <!-- panneaux PV sur le toit -->
+                    <g transform="translate(47,87) rotate(-40.6)">
+                        <rect x="2" y="-14" width="8" height="11" rx="1" fill="#FFD145" stroke="#c9a435"
+                            stroke-width="0.7" />
+                        <rect x="12" y="-14" width="8" height="11" rx="1" fill="#FFD145" stroke="#c9a435"
+                            stroke-width="0.7" />
+                        <rect x="22" y="-14" width="8" height="11" rx="1" fill="#FFD145" stroke="#c9a435"
+                            stroke-width="0.7" />
+                    </g>
+                    <!-- batterie attenante à la maison -->
+                    <rect x="119" y="100" width="12" height="4" rx="1" fill="#017267" />
+                    <rect x="110" y="104" width="30" height="37" rx="4" fill="rgba(17,228,122,0.10)"
+                        stroke="#017267" stroke-width="1.7" />
+                    <rect id="schemaBattFill" x="114" y="118" width="22" height="20" rx="2"
+                        fill="rgba(1,114,103,0.40)" />
+                    <text x="125" y="127" font-size="13" text-anchor="middle">⚡</text>
+                    <!-- flèche panneaux → production -->
+                    <path d="M84,52 C 124,22 158,30 188,42" fill="none" stroke="#C8860B" stroke-width="2.3"
+                        stroke-linecap="round" marker-end="url(#arrSun)" />
+                    <!-- flèche batterie → capacité -->
+                    <path d="M141,120 C 164,133 174,123 188,114" fill="none" stroke="#017267" stroke-width="2.3"
+                        stroke-linecap="round" marker-end="url(#arrNeo)" />
+                    <!-- puissance installée (au-dessus) puis production annuelle -->
+                    <text x="196" y="18" font-size="7" fill="#0D1A14"
+                        font-family="DM Sans,sans-serif">PUISSANCE INSTALLÉE</text>
+                    <text id="schemaKwcVal" x="195" y="35" font-size="15" font-weight="700" fill="#C8860B"
+                        font-family="Bricolage Grotesque,sans-serif">—</text>
+                    <text x="196" y="53" font-size="7" fill="#0D1A14"
+                        font-family="DM Sans,sans-serif">PRODUCTION / AN</text>
+                    <text id="outProdAnnuelle" x="195" y="70" font-size="15" font-weight="700" fill="#C8860B"
+                        font-family="Bricolage Grotesque,sans-serif">—</text>
+                    <text id="outProdLbl" x="196" y="80" font-size="7" fill="#0D1A14"
+                        font-family="DM Sans,sans-serif"></text>
+                    <!-- valeur capacité batterie -->
+                    <text x="196" y="107" font-size="7.5" fill="#0D1A14"
+                        font-family="DM Sans,sans-serif">CAPACITÉ BATTERIE</text>
+                    <text id="schemaBattVal" x="195" y="127" font-size="15" font-weight="700" fill="#017267"
+                        font-family="Bricolage Grotesque,sans-serif">10 kWh</text>
+                    <!-- consommation annuelle, sous la maison -->
+                    <text x="78" y="151" font-size="7" fill="#0D1A14" text-anchor="middle"
+                        font-family="DM Sans,sans-serif">CONSOMMATION / AN</text>
+                    <text id="schemaConsoVal" x="78" y="163" font-size="12" font-weight="700" fill="#0D1A14"
+                        text-anchor="middle" font-family="Bricolage Grotesque,sans-serif">—</text>
+                </svg>
             </div>
 
             <!-- Autoconsommation / Autoproduction -->
-            <div id="ac-ap-row">
-                <div class="r-cell">
-                    <div class="metric">
-                        <div class="val" id="outAutoConso">—</div>
-                        <div class="lbl">Autoconsommation</div>
-                    </div>
+            <div class="dim-stats">
+                <div class="dim-stat">
+                    <span class="dim-stat-lbl">Autoconsommation</span>
+                    <span class="dim-stat-val" id="outAutoConso">—</span>
                 </div>
-                <div class="r-cell">
-                    <div class="metric">
-                        <div class="val" id="outAutoProd">—</div>
-                        <div class="lbl">Autoproduction</div>
-                    </div>
+                <div class="dim-stat">
+                    <span class="dim-stat-lbl">Autoproduction</span>
+                    <span class="dim-stat-val" id="outAutoProd">—</span>
                 </div>
             </div>
 
-            <!-- Dimensionnement -->
-            <div class="r-cell">
-                <div class="auto-section">
-                    <div class="auto-header"><span>Dimensionnement <span class="dim-badge" id="resDimBadge"></span></span>
-                    </div>
-                    <div class="bar-track" id="resDimBarTrack">
-                        <div class="bar-fill" id="resSurplusBar" style="width:68%"></div>
-                    </div>
+            <!-- Jauge de dimensionnement -->
+            <div class="auto-section">
+                <div class="dim-jauge-hd">
+                    <span class="sub-hd">Dimensionnement</span>
+                    <span class="dim-badge" id="resDimBadge"></span>
                 </div>
-                <div id="resSurplusMsg" class="surplus-msg hidden"></div>
+                <div class="bar-track" id="resDimBarTrack">
+                    <div class="bar-fill" id="resSurplusBar" style="width:68%"></div>
+                </div>
             </div>
-
+            <div id="resSurplusMsg" class="surplus-msg hidden" style="display:none"></div>
         </div>
 
-        <div id="right-panel">
+        <!-- ══ COLONNE 2 — ÉCONOMIES ══ -->
+        <div class="col-card" id="col-eco">
+            <div class="col-card-hd">Économies</div>
 
-            <!-- col1 row1 — Économies (€ / an) -->
-            <div class="r-cell" id="cell-eco">
-                <div class="metric">
+            <div class="eco-top-row">
+                <div class="eco-hero">
+                    <div class="sub-hd">Économies par an</div>
                     <div class="val" id="outEcoTotal">—</div>
-                    <div class="lbl">Économies par an</div>
                 </div>
-            </div>
-
-            <!-- col2 row1 — Bonus avec batterie -->
-            <div class="r-cell" id="cell-bonus-batt">
-                <div class="metric">
+                <div class="eco-side-box" id="cell-bonus-batt">
+                    <div class="sub-hd">Dont</div>
                     <div class="val" id="ecoBatterie">—</div>
-                    <div class="lbl">grâce à la batterie</div>
+                    <div class="eco-side-note">grâce à la batterie</div>
                 </div>
             </div>
 
-            <!-- col3 -->
-            <div id="col3">
-                <div class="r-cell" id="cell-revente">
-                    <div class="metric">
+            <div class="eco-row2">
+                <div class="col-metric" id="cell-eco-facture">
+                    <div class="sub-hd">Réduction sur facture</div>
+                    <div class="val" id="outPctReduc">—</div>
+                </div>
+                <div class="eco-rp-pair">
+                    <div class="col-metric" id="cell-revente">
+                        <div class="sub-hd">Revente <span class="info-i" data-info="revente">i</span></div>
                         <div class="val" id="outRevente">—</div>
-                        <div class="lbl" id="gainsAnnexesLbl">Gains revente &amp; pilotage</div>
                     </div>
-                </div>
-                <div class="r-cell" id="cell-eco-facture">
-                    <div class="metric">
-                        <div class="val" id="outPctReduc">—</div>
-                        <div class="lbl">Réduction sur facture</div>
-                    </div>
-                </div>
-                <div class="r-cell" id="cell-impact">
-                    <div class="r-cell-hd">Impact</div>
-                    <div class="impact-prod">
-                        <span class="impact-prod-val" id="outProdAnnuelle">—</span>
-                        <span class="impact-prod-lbl" id="outProdLbl">Production annuelle</span>
-                    </div>
-                    <div class="impact-foyers" id="outFoyersEquiv">—</div>
-                    <div class="impact-perte" id="outPerteSansBatt">—</div>
-                    <div class="co2-card" id="outCo2BattRow" style="display:none">
-                        <div class="co2-icon">♻</div>
-                        <div>
-                            <div class="co2-val" id="outCo2Batt">—</div>
-                            <div class="co2-lbl" id="outCo2BattLbl">vs batterie neuve</div>
-                        </div>
+                    <div class="col-metric" id="cell-pilotage">
+                        <div class="sub-hd">Pilotage <span class="info-i" data-info="pilotage">i</span></div>
+                        <div class="val" id="outPilotage">—</div>
                     </div>
                 </div>
             </div>
 
-            <!-- col1+2 row2 — Graphe 10–20 ans -->
-            <div class="r-cell" id="cell-graph">
-                <div class="r-cell-hd">Projection dans le temps</div>
+            <!-- Graphe projection sur 20 ans -->
+            <div class="proj-block" id="cell-graph">
+                <div class="sub-hd">Projection sur 20 ans</div>
                 <div class="proj-total" id="projTotal">—</div>
                 <div class="proj-chart" id="projChartWrap"></div>
                 <div class="proj-legend">
-                    <span><span class="pleg-sq" style="background:#11E47A"></span>Autoconso directe</span>
-                    <span><span class="pleg-sq" style="background:#017267"></span>Bonus batterie</span>
+                    <span><span class="pleg-sq" style="background:#11E47A"></span>Panneaux solaires</span>
+                    <span id="projLegBatt" style="display:none"><span class="pleg-sq"
+                            style="background:#017267"></span>Bonus batterie</span>
                     <span id="projLegendPilot" style="display:none"><span class="pleg-sq"
                             style="background:#9B6DFF"></span>Pilotage HP/HC</span>
-                    <span><span class="pleg-sq" style="background:rgba(255,209,69,0.65)"></span>Surplus revendu</span>
+                    <span id="projLegSurplus" style="display:none"><span class="pleg-sq"
+                            style="background:rgba(255,209,69,0.65)"></span>Surplus revendu</span>
                 </div>
+                <div class="subsub-hd">Scénarios</div>
                 <div id="proj-scenarios">
                     <button type="button" class="scenario active" data-esc="0.04">
-                        <div class="scenario-name">EDF · prix élec +4 %/an</div>
+                        <div class="scenario-name">Croissance prévue EDF · +4 %/an</div>
                         <div class="scenario-val" id="scenEdf">—</div>
                     </button>
                     <button type="button" class="scenario" data-esc="0.07">
@@ -182,14 +234,38 @@
                     </button>
                 </div>
             </div>
+        </div>
 
+        <!-- ══ COLONNE 3 — IMPACT (+ CTA sous la colonne) ══ -->
+        <div class="impact-col-wrap">
+            <div class="col-card" id="col-impact">
+                <div class="col-card-hd">Impact</div>
+                <div class="impact-body">
+                    <div class="impact-sect">
+                        <div class="sub-hd">Gaspillage solaire</div>
+                        <div class="impact-perte" id="outPerteSansBatt">—</div>
+                    </div>
+                    <div class="impact-sect" id="impact-co2-block" style="display:none">
+                        <div class="sub-hd">Empreinte carbone</div>
+                        <div class="co2-card" id="outCo2BattRow">
+                            <div class="co2-icon">♻</div>
+                            <div>
+                                <div class="co2-val" id="outCo2Batt">—</div>
+                                <div class="co2-lbl" id="outCo2BattLbl">vs batterie neuve</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a href="https://revolty.fr/reserver-ma-batterie" class="cta-btn" id="impact-cta"
+                target="_blank">Réserver ma batterie Revolty →</a>
         </div>
     </div>
 
-    <!-- ─── CTA STRIP ─── -->
-    <div id="cta-strip">
-        <a href="https://revolty.fr/reserver-ma-batterie" class="cta-btn" target="_blank">Réserver ma batterie
-            Revolty →</a>
+    <!-- ─── SÉPARATEUR RÉSULTATS / SAISIE ─── -->
+    <div id="inputs-header">
+        <h2>Modifier mes déclarations</h2>
+        <p>Ajustez les champs ci-dessous : vos résultats se recalculent automatiquement.</p>
     </div>
 
     <!-- ─── INPUTS SECTION ─── -->
@@ -232,7 +308,7 @@
                     <div class="field" id="fld-surface">
                         <span class="field-label">Surface du logement</span>
                         <div class="slider-row">
-                            <input type="range" id="surface" min="30" max="250" step="10" value="140" />
+                            <input type="range" id="surface" min="30" max="250" step="5" value="140" />
                             <span class="slider-val"><span id="surfaceVal">140</span> m²</span>
                         </div>
                     </div>
@@ -245,17 +321,19 @@
                             <button type="button" class="tile-btn" data-group="heat" data-val="pompe"><span
                                     class="tile-icon">🌡️</span><span class="tile-label">Pompe à chaleur</span></button>
                             <button type="button" class="tile-btn" data-group="heat" data-val="elec"><span
-                                    class="tile-icon">🔌</span><span class="tile-label">Résistance élec</span></button>
+                                    class="tile-icon">🔌</span><span class="tile-label">Résistance électrique</span></button>
                         </div>
                     </div>
 
                     <div class="field" id="fld-presence">
-                        <span class="field-label">Présence</span>
+                        <span class="field-label">Présence dans le logement en journée</span>
                         <div class="tile-grid cols-2">
                             <button type="button" class="tile-btn active" data-group="journee" data-val="maison"><span
-                                    class="tile-icon">🏠</span><span class="tile-label">À la maison</span></button>
+                                    class="tile-icon">🏠</span><span class="tile-label">Souvent présent</span><span
+                                    class="tile-sub">5 j/sem. et +</span></button>
                             <button type="button" class="tile-btn" data-group="journee" data-val="exterieur"><span
-                                    class="tile-icon">🏢</span><span class="tile-label">À l'extérieur</span></button>
+                                    class="tile-icon">🏢</span><span class="tile-label">Souvent absent</span><span
+                                    class="tile-sub">moins de 5 j/sem.</span></button>
                         </div>
                     </div>
 
@@ -309,7 +387,7 @@
                             <button type="button" class="tile-btn" data-group="heat" data-val="pompe"><span
                                     class="tile-icon">🌡️</span><span class="tile-label">Pompe à chaleur</span></button>
                             <button type="button" class="tile-btn" data-group="heat" data-val="elec"><span
-                                    class="tile-icon">🔌</span><span class="tile-label">Résistance élec</span></button>
+                                    class="tile-icon">🔌</span><span class="tile-label">Résistance électrique</span></button>
                         </div>
                         <p class="dpe-hint">Détermine la saisonnalité (pic hiver) appliquée à votre conso.</p>
                     </div>
@@ -327,10 +405,10 @@
                             class="tile-sub">Résistance</span></button>
                     <button type="button" class="tile-btn" data-appliance="ecs-thermo"><span
                             class="tile-icon">♨️</span><span class="tile-label">Chauffe-eau</span><span
-                            class="tile-sub">Thermo</span></button>
+                            class="tile-sub">Thermodynamique</span></button>
                     <button type="button" class="tile-btn active" data-appliance="ve"><span
-                            class="tile-icon">🚗</span><span class="tile-label">Véhicule</span><span
-                            class="tile-sub">électrique</span></button>
+                            class="tile-icon">🚗</span><span class="tile-label">Véhicule électrique</span><span
+                            class="tile-sub">&nbsp;</span></button>
                     <button type="button" class="tile-btn" data-appliance="piscine"><span
                             class="tile-icon">🏊</span><span class="tile-label">Piscine</span><span
                             class="tile-sub">&nbsp;</span></button>
@@ -359,17 +437,19 @@
                     <span class="field-label">Puissance installée</span>
                     <div class="tile-grid cols-2" style="margin-bottom:8px">
                         <button type="button" class="tile-btn active" data-group="hasPv" data-val="oui"><span
-                                class="tile-icon">☀️</span><span class="tile-label">J'ai des PV</span></button>
+                                class="tile-icon">☀️</span><span class="tile-label">J'ai des PV</span><span
+                                class="tile-sub">PV = panneaux photovoltaïques</span></button>
                         <button type="button" class="tile-btn" data-group="hasPv" data-val="non"><span
-                                class="tile-icon">🏠</span><span class="tile-label">Je n'ai pas de PV</span><span
-                                class="tile-sub">dimensionnement auto</span></button>
+                                class="tile-icon">🏠</span><span class="tile-label">Pas encore de PV</span><span
+                                class="tile-sub">on simule une installation</span></button>
                     </div>
                     <div class="optional-input-row" id="kwcField">
                         <input type="number" id="kwcInput" min="0" max="20" step="0.1" value="6" />
                         <span class="unit">kWc</span>
                     </div>
-                    <div id="kwcHelper" style="font-size:0.68rem;color:var(--muted);margin-top:5px">
-                        ex : 6 kWc ≈ 15 panneaux 400 Wc
+                    <div id="kwcHelper"
+                        style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:0.64rem;letter-spacing:0.03em;color:var(--dark);margin-top:6px">
+                        Ex : 6 kWc ≈ 15 panneaux 400 Wc
                     </div>
                     <div id="kwcTriWarn" style="display:none;font-size:0.68rem;color:#ffb454;margin-top:5px">
                         ⚠️ Au-delà de 9 kWc, installation triphasée requise
@@ -384,8 +464,8 @@
                         <button type="button" class="tile-btn active" data-group="contrat" data-val="base"><span
                                 class="tile-icon">💡</span><span class="tile-label">Tarif Base</span></button>
                         <button type="button" class="tile-btn" data-group="contrat" data-val="hphc"><span
-                                class="tile-icon">⏰</span><span class="tile-label">HP / HC</span><span class="tile-sub"
-                                style="color:var(--violet);font-weight:600">+ pilotage intelligent</span></button>
+                                class="tile-icon">⏰</span><span class="tile-label">Heures Pleines / Heures
+                                Creuses</span></button>
                         <button type="button" class="tile-btn" data-group="contrat" data-val="flex"><span
                                 class="tile-icon">📈</span><span class="tile-label">Flex horaire</span><span
                                 class="tile-sub" style="color:var(--violet);font-weight:600">+
@@ -433,6 +513,8 @@
                         Modifiable.</div>
                 </div>
 
+                <div class="divider" id="rachat-divider"></div>
+
                 <div class="field" id="fld-rachat">
                     <span class="field-label">Tarif de rachat du surplus</span>
                     <div class="optional-input-row">
@@ -441,7 +523,7 @@
                         <span class="unit">€ / kWh</span>
                     </div>
                     <div style="font-size:0.68rem;color:var(--muted);margin-top:5px">
-                        0 si pas de contrat de revente · EDF OA actuel ≈ 0,04 €/kWh
+                        0 si pas de contrat de revente · EDF Obligation d'Achat actuel ≈ 0,04 €/kWh
                     </div>
                 </div>
 
@@ -572,8 +654,9 @@
             ENL/SDES 2020.
             Saisonnalité fort hiver.
             <br><br><strong>Seau 3 — Appareils spécifiques</strong> : ECS (profil 23h mesuré, Panel Elecdom), VE
-            (même profil nocturne), piscine (8h–18h mai–sept), clim (14h–18h juin–août, modulée par
-            zone climatique RT2012 H1/H2/H3 — 130 kWh nord → 580 kWh Méditerranée). Addition pure — pas de
+            (même profil nocturne), piscine (8h–18h mai–sept), clim (14h–18h juin–août, modèle
+            surface × intensité kWh/m² par zone RT2012 — ancrage ADEME 2,3 kWh/m², ~1 kWh/m² nord
+            → ~4 kWh/m² Méditerranée, +35% si chauffage PAC réversible). Addition pure — pas de
             double-comptage avec RES1 corrigé.
             <h4>Simulation batterie</h4>
             SOC propagé heure par heure, 3 passes de convergence vers régime permanent. Rendement aller-retour
@@ -581,7 +664,7 @@
             <h4>Sources</h4>
             PVGIS v5.3 JRC (productible par département, profils horaires TMY, 96 préfectures), Enedis Open Data
             (profils RES1), Panel Elecdom ADEME 2021 (seaux 1 et 3), Open DPE ADEME post-juillet 2021 (seau 2),
-            EDF OA S06 T1 2026 (rachat 0,04 €/kWh).
+            EDF Obligation d'Achat S06 T1 2026 (rachat 0,04 €/kWh).
         </div>
 
         <!-- projSection : projChartWrap + projTotal déplacés dans #cell-graph -->
@@ -614,9 +697,6 @@
             <div class="proj-sub" style="margin-top:8px">Cumul net (économies − CAPEX). Inflation élec +4 %/an. Le
                 point violet marque le break-even.</div>
         </div>
-
-        <p class="disclaimer">Estimation indicative basée sur des données statistiques nationales. Un devis précis
-            nécessite une visite technique.</p>
     </div>
 
     <!-- ── DEBUG ──────────────────────────────────────────────────────────────── -->
@@ -661,7 +741,38 @@
         </div>
     </div>
 
+    <!-- ─── MENTIONS LÉGALES — bandeau bas de page, visible en phase résultats ─── -->
+    <div class="disclaimer">
+        <p>Cette simulation est une estimation indicative, calculée à partir de données statistiques
+            nationales et des informations que vous avez saisies. Elle ne constitue ni un devis, ni une
+            étude de dimensionnement, ni un conseil personnalisé.</p>
+    </div>
+
+    <!-- ─── MODALE — hypothèse de dimensionnement PV (mode « Pas encore de PV ») ─── -->
+    <div id="pvNoticeOverlay" class="pv-notice-overlay">
+        <div class="pv-notice-card">
+            <div class="pv-notice-icon">☀️</div>
+            <h3>À propos du dimensionnement solaire</h3>
+            <p>Nous vous proposons un dimensionnement solaire calculé à partir de votre profil de
+                consommation. Il s'agit d'une <strong>hypothèse de travail</strong> destinée à illustrer
+                le potentiel d'une batterie Revolty. Ce n'est ni un devis, ni une étude de
+                dimensionnement adaptée à votre logement.</p>
+            <p><strong>Revolty ne commercialise pas de panneaux photovoltaïques. Pour tout projet solaire,
+                rapprochez-vous d'un installateur photovoltaïque professionnel certifié RGE.</strong></p>
+            <button type="button" id="pvNoticeOk">J'ai compris</button>
+        </div>
+    </div>
+
+    <!-- ─── MODALE INFO — explications Revente / Pilotage ─── -->
+    <div id="infoModalOverlay" class="pv-notice-overlay">
+        <div class="pv-notice-card">
+            <div class="pv-notice-icon">ℹ️</div>
+            <h3 id="infoModalTitle">—</h3>
+            <p id="infoModalText">—</p>
+            <button type="button" id="infoModalOk">J'ai compris</button>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/gh/Revolty-code/Simulation@main/dist/revolty-app.js"></script>
 </body>
 
-</html>

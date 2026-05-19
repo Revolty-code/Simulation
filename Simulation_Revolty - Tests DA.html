@@ -227,12 +227,12 @@
 
         .field-label {
             display: block;
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--dark);
             margin-bottom: 9px;
+            line-height: 1.2;
         }
 
         /* ── DPE SELECTOR ─────────────────────────────────────────────────────── */
@@ -711,13 +711,13 @@
             font-family: 'Bricolage Grotesque', sans-serif;
             font-size: 1.05rem;
             font-weight: 700;
-            color: var(--neo);
+            color: var(--respire);
             letter-spacing: -0.015em;
         }
 
         .co2-lbl {
             font-size: 0.72rem;
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--dark);
             margin-top: 2px;
             line-height: 1.3;
         }
@@ -828,7 +828,7 @@
             display: flex;
             justify-content: space-between;
             font-size: 0.78rem;
-            color: rgba(255, 255, 255, 0.45);
+            color: var(--muted);
             margin-bottom: 7px;
             align-items: center;
         }
@@ -844,28 +844,28 @@
         }
 
         .dim-sous {
-            background: rgba(220, 80, 80, 0.2);
-            color: #FF8585;
+            background: rgba(220, 80, 80, 0.15);
+            color: #C0392B;
         }
 
         .dim-ok {
-            background: rgba(17, 228, 122, 0.15);
-            color: var(--neo);
+            background: rgba(17, 228, 122, 0.18);
+            color: var(--respire);
         }
 
         .dim-sur {
-            background: rgba(26, 107, 138, 0.25);
-            color: #5BC4E8;
+            background: rgba(26, 107, 138, 0.18);
+            color: #1A6B8A;
         }
 
         .dim-max {
-            background: rgba(139, 92, 246, 0.22);
-            color: #B794F6;
+            background: rgba(139, 92, 246, 0.16);
+            color: #6A3FB5;
         }
 
         .bar-track {
             height: 7px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(13, 26, 20, 0.10);
             border-radius: 4px;
             overflow: hidden;
         }
@@ -880,31 +880,31 @@
         .surplus-msg {
             margin-top: 8px;
             font-size: 0.78rem;
-            color: rgba(255, 255, 255, 0.5);
-            background: rgba(255, 255, 255, 0.05);
+            color: var(--muted);
+            background: rgba(13, 26, 20, 0.03);
             border-radius: 8px;
             padding: 8px 12px;
             line-height: 1.45;
         }
 
         .surplus-msg.sous {
-            color: #FF9E9E;
-            background: rgba(220, 80, 80, 0.1);
+            color: #C0392B;
+            background: rgba(220, 80, 80, 0.10);
         }
 
         .surplus-msg.ok {
-            color: var(--neo);
-            background: rgba(17, 228, 122, 0.1);
+            color: var(--respire);
+            background: rgba(17, 228, 122, 0.12);
         }
 
         .surplus-msg.sur {
-            color: #5BC4E8;
+            color: #1A6B8A;
             background: rgba(26, 107, 138, 0.12);
         }
 
         .surplus-msg.max {
-            color: #B794F6;
-            background: rgba(139, 92, 246, 0.14);
+            color: #6A3FB5;
+            background: rgba(139, 92, 246, 0.12);
         }
 
         .cta-btn {
@@ -931,13 +931,70 @@
             box-shadow: 0 8px 24px rgba(17, 228, 122, 0.35);
         }
 
-        .disclaimer {
-            margin-top: 11px;
-            font-size: 0.68rem;
-            color: rgba(255, 255, 255, 0.2);
-            text-align: center;
-            line-height: 1.5;
+        /* Bandeau mentions légales : visible uniquement en phase résultats */
+        .disclaimer { display: none; }
+        .phase-app .disclaimer {
+            display: block;
+            margin: 24px clamp(16px, 6vw, 150px);
+            background: #f6f7f9;
+            border: 1px solid #D6E4DE;
+            border-radius: 10px;
+            padding: 14px 18px;
+            font-size: 0.74rem;
+            color: #5a6b64;
+            text-align: left;
+            line-height: 1.55;
         }
+        .disclaimer p { margin: 0; }
+
+        /* Modale hypothèse PV — bloquante, fermée par « J'ai compris » */
+        .pv-notice-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9500;
+            background: rgba(13, 26, 20, 0.55);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .pv-notice-overlay.show { display: flex; }
+        .pv-notice-card {
+            background: #f6f7f9;
+            border-radius: 16px;
+            padding: 26px 26px 24px;
+            max-width: 440px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+        .pv-notice-icon { font-size: 2.2rem; text-align: center; }
+        .pv-notice-card h3 {
+            margin: 8px 0 14px;
+            color: #0D1A14;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        .pv-notice-card p {
+            font-size: 0.85rem;
+            color: #5a6b64;
+            line-height: 1.55;
+            margin: 0 0 10px;
+        }
+        .pv-notice-card button {
+            display: block;
+            width: 100%;
+            margin-top: 14px;
+            background: #11E47A;
+            color: #0D1A14;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            border: none;
+            border-radius: 999px;
+            padding: 13px 32px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .pv-notice-card button:hover { background: #1af585; }
 
         .hidden {
             display: none;
@@ -1009,14 +1066,14 @@
             font-family: 'Bricolage Grotesque', sans-serif;
             font-size: 1.6rem;
             font-weight: 800;
-            color: var(--neo);
+            color: var(--respire);
             letter-spacing: -0.025em;
             margin-bottom: 4px;
         }
 
         .proj-sub {
             font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.35);
+            color: var(--muted);
             margin-bottom: 14px;
         }
 
@@ -1034,7 +1091,7 @@
 
         .proj-legend span {
             font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--dark);
             display: flex;
             align-items: center;
             gap: 5px;
@@ -1459,35 +1516,6 @@
             line-height: 1.35;
         }
 
-        /* DEBUG — bouton magique pour bypasser le lead gate (à retirer en prod) */
-        #debugBypass {
-            position: fixed;
-            bottom: 16px;
-            right: 16px;
-            z-index: 9999;
-            padding: 10px 16px;
-            background: #8b5cf6;
-            color: #fff;
-            border: 2px dashed #fff;
-            border-radius: 999px;
-            font-family: 'Instrument Sans', sans-serif;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.45);
-            transition: transform .15s, box-shadow .15s;
-            letter-spacing: 0.02em;
-        }
-
-        #debugBypass:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 28px rgba(139, 92, 246, 0.55);
-        }
-
-        #debugBypass:active {
-            transform: translateY(0);
-        }
-
         .profile-bar {
             background: #0D1A14;
             padding: 14px 24px;
@@ -1552,7 +1580,7 @@
             background: var(--surface);
         }
 
-        header, .hero, #debugPanel, .disclaimer { display: none !important; }
+        header, .hero, #debugPanel { display: none !important; }
 
         #titre-bar {
             flex: 0 0 44px;
@@ -1570,25 +1598,80 @@
 
         #profileBar { position: fixed; top: 7px; right: 12px; z-index: 9100; margin: 0; }
 
+        #intro-banner {
+            flex: 0 0 auto;
+            background: var(--tile);
+            border-bottom: 1px solid var(--border);
+            color: var(--dark);
+            padding: 9px var(--page-x);
+            font-size: 0.82rem;
+            line-height: 1.4;
+            text-align: center;
+        }
+        #intro-banner strong { font-weight: 800; }
+        .phase-wizard #intro-banner { display: none; }
+
         #top-section {
             flex: 0 0 auto;
             min-height: 56vh;
             display: grid;
-            grid-template-columns: 37% 63%;
-            grid-template-rows: 1fr;
+            grid-template-columns: 1.05fr 1.4fr 0.8fr;
             gap: 10px;
             padding: 12px var(--page-x);
         }
 
-        #left-panel { display: flex; flex-direction: column; gap: 8px; }
-        #left-panel .card { margin: 0; flex: 1; background: var(--tile); }
-        #ac-ap-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-
-        #right-panel {
-            display: grid;
-            grid-template-columns: 3fr 3fr 2fr;
-            grid-template-rows: auto 1fr;
+        /* Chaque colonne = une seule tuile claire, avec son titre. */
+        .col-card {
+            background: var(--tile);
+            color: var(--dark);
+            border-radius: 14px;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow: hidden;
+        }
+        .col-card-hd {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--dark);
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        /* colonne Dimensionnement : fond vert melon d'eau */
+        #col-dim { background: var(--melon); }
+        /* sous-titre de bloc : même police que les titres de colonne, plus petit */
+        .sub-hd {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--dark);
+            margin-bottom: 3px;
+            line-height: 1.2;
+        }
+        /* bloc unique de choix de batterie */
+        .batt-choice {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 10px 12px 12px;
+        }
+        /* en-tête de la jauge de dimensionnement : sous-titre + badge alignés */
+        .dim-jauge-hd {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
             gap: 8px;
+        }
+        /* note en taille normale sous une valeur (ex : « grâce à la batterie ») */
+        .eco-side-note {
+            font-size: 0.74rem;
+            color: var(--dark);
+            margin-top: 3px;
+            line-height: 1.2;
         }
 
         .r-cell {
@@ -1606,50 +1689,186 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.09em;
-            color: rgba(255, 255, 255, 0.30);
+            color: var(--muted);
             margin-bottom: 8px;
             flex-shrink: 0;
         }
 
-        #cell-eco { grid-column: 1; grid-row: 1; }
-        #cell-bonus-batt { grid-column: 2; grid-row: 1; }
-        #cell-graph { grid-column: 1 / span 2; grid-row: 2; }
-        #col3 { grid-column: 3; grid-row: 1 / span 2; display: flex; flex-direction: column; gap: 8px; }
-
-        /* Tuiles métriques : hauteur liée au texte (pas de vide noir).
-           Tampons qui comblent le trou pour aligner les bas : #cell-graph et #cell-impact. */
-        #cell-eco, #cell-bonus-batt { align-self: start; }
-        #cell-revente, #cell-eco-facture { flex: 0 0 auto; }
-        #cell-impact { flex: 1; }
-
-        /* cellules « métrique simple » : contenu centré (style autoconso/autoprod) */
-        #cell-eco, #cell-bonus-batt, #cell-eco-facture, #cell-revente {
+        /* ─── Colonne Dimensionnement ─── */
+        #battSelector { margin-top: 2px; }
+        .dim-schema {
+            flex: 1;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 8px;
         }
-        #cell-eco .metric, #cell-bonus-batt .metric { width: 100%; }
-
-        /* hiérarchie : Économies = résultat principal, mis en avant en vert */
-        #cell-eco .metric {
-            background: rgba(17, 228, 122, 0.07);
-            border-color: rgba(17, 228, 122, 0.18);
+        .dim-schema svg { width: 100%; height: 100%; max-height: 210px; }
+        .dim-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .dim-stat {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 9px 6px;
+            text-align: center;
         }
-        #cell-eco .val {
-            color: var(--neo);
+        .dim-stat-val {
+            display: block;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 1.35rem;
+            color: var(--dark);
+            letter-spacing: -0.02em;
+        }
+        .dim-stat-lbl {
+            display: block;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 0.7rem;
+            color: var(--dark);
+            margin-bottom: 2px;
         }
 
-        /* taille de chiffre homogène sur toutes les tuiles output */
-        .r-cell .metric .val { font-size: 1.6rem; }
+        /* ─── Colonne Économies ─── */
+        .eco-hero {
+            background: rgba(17, 228, 122, 0.12);
+            border: 1px solid rgba(1, 114, 103, 0.30);
+            border-radius: 11px;
+            padding: 14px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .eco-hero .val {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: 2rem;
+            color: var(--respire);
+            letter-spacing: -0.02em;
+            line-height: 1.05;
+        }
+        .eco-hero .lbl {
+            font-size: 0.74rem;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+        /* Ligne haute : Économies/an (2/3) + Réduction facture (1/3) */
+        .eco-top-row { display: flex; gap: 8px; flex-shrink: 0; }
+        .eco-top-row .eco-hero { flex: 2; }
+        .eco-side-box {
+            flex: 1;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 14px 8px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .eco-side-box .val {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--respire);
+            letter-spacing: -0.02em;
+        }
+        .eco-side-box .lbl {
+            font-size: 0.71rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
 
-        /* gains chiffrés positifs en vert ; pilotage HP/HC en violet (charte) */
-        #cell-bonus-batt .val,
-        #cell-revente .val,
-        #cell-eco-facture .val { color: var(--neo); }
-        #cell-revente #ecoPilot { color: var(--violet); }
+        .col-metric {
+            text-align: center;
+            padding: 9px 0;
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        /* facture (50 %) + paire revente/pilotage (50 %, eux-mêmes 50/50) */
+        .eco-row2 { display: flex; gap: 10px; flex-shrink: 0; }
+        .eco-row2 > .col-metric { flex: 1; }
+        .eco-rp-pair { flex: 1; display: flex; gap: 10px; }
+        .eco-rp-pair > .col-metric { flex: 1; border-top: 1px solid var(--border); }
+        /* petit point d'info cliquable */
+        .info-i {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--border);
+            color: var(--dark);
+            font-size: 0.58rem;
+            font-weight: 700;
+            font-style: normal;
+            cursor: pointer;
+            vertical-align: middle;
+            transition: background 0.15s;
+        }
+        .info-i:hover { background: var(--muted); color: #fff; }
+        /* sous-sous-titre (ex : Scénarios) */
+        .subsub-hd {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--dark);
+            margin-top: 8px;
+        }
+        .col-metric .val {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 1.45rem;
+            color: var(--respire);
+            letter-spacing: -0.02em;
+        }
+        .col-metric .lbl {
+            font-size: 0.71rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
 
-        /* graphe projection : remplit la hauteur disponible (tuile tampon) */
+        /* graphe projection : remplit la hauteur disponible */
+        .proj-block {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 150px;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+        }
         #cell-graph .proj-chart { flex: 1; min-height: 0; margin: 0; }
         #cell-graph .proj-chart svg { width: 100%; height: 100%; display: block; }
+        /* barres de projection : montée en escalier depuis l'axe des abscisses */
+        @keyframes projBarIn {
+            from { transform: scaleY(0); }
+            to { transform: scaleY(1); }
+        }
+        .proj-bar {
+            transform-box: view-box;
+            transform-origin: 0 176px;
+            animation: projBarIn 0.25s ease-out backwards;
+        }
+
+        /* ─── Colonne Impact (+ CTA sous la colonne, aligné au bas des autres colonnes) ─── */
+        .impact-col-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 0;
+        }
+        #col-impact { flex: 1; }
+        #col-impact .impact-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 14px;
+        }
+        .impact-sect { display: flex; flex-direction: column; }
+        #impact-cta { flex-shrink: 0; margin: 0; }
 
         /* scénarios d'inflation du prix de l'élec sous le graphe */
         #proj-scenarios {
@@ -1660,8 +1879,8 @@
             flex-shrink: 0;
         }
         .scenario {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: var(--surface);
+            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 7px 9px;
             text-align: left;
@@ -1670,28 +1889,24 @@
             cursor: pointer;
             transition: background .15s, border-color .15s;
         }
-        .scenario:hover { background: rgba(255, 255, 255, 0.09); }
+        .scenario:hover { border-color: var(--green-mid); }
         .scenario.active {
             background: rgba(17, 228, 122, 0.12);
-            border-color: rgba(17, 228, 122, 0.4);
+            border-color: rgba(1, 114, 103, 0.45);
         }
-        .scenario-name { font-size: 0.62rem; color: rgba(255, 255, 255, 0.4); line-height: 1.25; }
+        .scenario-name { font-size: 0.62rem; color: var(--dark); line-height: 1.25; }
         .scenario-val {
             font-family: 'Bricolage Grotesque', sans-serif;
             font-weight: 700;
             font-size: 0.98rem;
-            color: #fff;
+            color: var(--dark);
             margin-top: 3px;
         }
-        #scenMoyen { color: var(--soleil); }
+        #scenMoyen { color: #C8860B; }
         #scenCrise { color: var(--corail); }
 
-        /* compactage des composants existants pour tenir sans scroll */
-        #cell-eco .hero-wrap { padding: 12px 12px 10px; margin-bottom: 8px; }
-        #cell-eco .hero-num { font-size: 2.1rem; }
-        #cell-eco .chart-wrap { margin: 0; }
-        .r-cell .bloc, .r-cell .auto-section { margin: 0; padding: 0; border: none; }
-        .r-cell .eco-rows { margin-top: 0 !important; }
+        /* jauge de dimensionnement compacte dans la tuile */
+        .col-card .auto-section { margin: 0; }
 
         .facture-pct {
             font-family: 'Bricolage Grotesque', sans-serif;
@@ -1709,31 +1924,62 @@
             color: var(--soleil);
             line-height: 1.1;
         }
-        .impact-prod-lbl { font-size: 0.72rem; color: rgba(255, 255, 255, 0.5); }
+        .impact-prod-lbl { font-size: 0.72rem; color: var(--muted); }
         .impact-foyers {
             margin-top: 8px;
             font-size: 0.86rem;
             font-weight: 600;
-            color: #fff;
+            color: var(--dark);
         }
         .impact-perte {
             margin-top: 6px;
             font-size: 0.78rem;
             font-weight: 600;
-            color: var(--corail);
+            color: #C0392B;
+            background: rgba(217, 83, 79, 0.12);
+            border-radius: 8px;
+            padding: 8px 10px;
         }
-        .impact-perte.impact-perte-pos { color: var(--neo); }
-
-        #cta-strip {
-            flex: 0 0 52px;
-            background: var(--surface);
+        .impact-perte.impact-perte-pos {
+            color: var(--respire);
+            background: rgba(17, 228, 122, 0.10);
+        }
+        #impact-co2-block .divider {
+            border: 0;
             border-top: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            margin: 12px 0 0;
         }
+        .impact-co2-hd {
+            margin-top: 10px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            color: var(--muted);
+        }
+        #impact-co2-block .co2-card { margin-top: 8px; }
 
-        #cta-strip .cta-btn { width: 60%; margin: 0; }
+
+        #inputs-header {
+            flex: 0 0 auto;
+            background: var(--surface);
+            border-top: 2px solid var(--dark);
+            padding: 16px var(--page-x) 0;
+            text-align: center;
+        }
+        #inputs-header h2 {
+            margin: 0;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: var(--dark);
+        }
+        #inputs-header p {
+            margin: 4px 0 0;
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+        .phase-wizard #inputs-header { display: none; }
 
         #inputs-section {
             flex: 1 0 auto;
@@ -1795,8 +2041,7 @@
         body:not(.phase-gate) #leadGate { display: none !important; }
 
         /* phase-wizard : on cache résultats + CTA, #inputs-section devient l'assistant */
-        .phase-wizard #top-section,
-        .phase-wizard #cta-strip { display: none; }
+        .phase-wizard #top-section { display: none; }
 
         .phase-wizard #inputs-section {
             display: block;
@@ -1871,6 +2116,76 @@
             from { opacity: 0; transform: translateY(-16px); }
             to   { opacity: 1; transform: translateY(0); }
         }
+
+        /* ═══════════ MOBILE — layout one-page empilé (≤ 760px) ═══════════ */
+        @media (max-width: 760px) {
+            /* le « no-scroll » desktop devient une page qui défile ; pas de débordement latéral */
+            html, body { overflow-x: hidden; }
+
+            /* les 3 colonnes de résultats s'empilent, hauteur au contenu */
+            #top-section {
+                grid-template-columns: 1fr;
+                min-height: 0;
+            }
+
+            /* zone de saisie : conso + prod l'une sous l'autre */
+            #inputs-section {
+                grid-template-columns: 1fr;
+            }
+
+            /* ── Sous-tuiles à libellé long → 1 colonne pleine largeur ──
+               En 2 colonnes sur écran étroit, des mots insécables comme
+               « Autoconsommation » dépassaient / se coupaient. Empilées, plus de souci. */
+            .dim-stats,
+            #battSelector {
+                grid-template-columns: 1fr;
+            }
+
+            /* ── Anti-débordement : pistes de grille compressibles (minmax 0)
+               1fr = minmax(auto,1fr) et peut déborder si le contenu est large.
+               minmax(0,1fr) garde le même nb de colonnes mais autorise la compression.
+               OK ici car les libellés sont multi-mots → ils passent à la ligne. */
+            .metrics {
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            }
+            .tile-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            /* grilles de tuiles trop denses : max 3 colonnes */
+            .tile-grid.cols-4,
+            .tile-grid.cols-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            #proj-scenarios { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+            /* ligne facture + revente/pilotage : on empile les deux blocs */
+            .eco-row2 {
+                flex-direction: column;
+            }
+
+            /* ── Graphes : ratio fixe pour éviter la déformation ──
+               proj-chart utilise preserveAspectRatio="none" → le SVG (et son texte)
+               se déforme si le conteneur n'a pas le ratio du viewBox (520×200).
+               On fige le ratio du conteneur au lieu de le laisser étiré par le flex. */
+            #cell-graph .proj-chart {
+                flex: 0 0 auto;
+                aspect-ratio: 520 / 200;
+                min-height: 0;
+            }
+            /* schéma dimensionnement : ratio du viewBox (320×168), non écrasé par le flex */
+            .dim-schema {
+                flex: 0 0 auto;
+                aspect-ratio: 320 / 168;
+                min-height: 0;
+            }
+            .dim-schema svg { max-height: none; }
+            /* mini-graphe mensuel : hauteur dérivée de la largeur (sinon texte compressé) */
+            #monthChart { height: auto; aspect-ratio: 340 / 105; }
+        }
+
+        /* ═══════════ MOBILE étroit — ajustements fins (≤ 430px) ═══════════ */
+        @media (max-width: 430px) {
+            /* scénarios d'inflation : 3 boutons trop serrés → empilés */
+            #proj-scenarios {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 
@@ -1881,17 +2196,16 @@
         <small>Simulateur v4.3 — moteur trois seaux</small>
     </header>
 
-    <!-- DEBUG — bouton magique pour bypasser le lead gate (à retirer en prod) -->
-    <button type="button" id="debugBypass" title="Bypass le lead gate (debug interne)">🪄 Skip gate
-        (debug)</button>
-
     <div class="hero">
         <h1>Simulateur d'<em>autoconsommation</em><br />et économies</h1>
         <p>Modèle saisonnier heure par heure — DPE, isolation, appareils spécifiques.</p>
     </div>
 
     <!-- ═══════════ LAYOUT ONE-PAGE — Tests DA ═══════════ -->
-    <div id="titre-bar">Revolty — votre simulation d'autoconsommation</div>
+    <div id="titre-bar">Votre simulation de batterie Revolty</div>
+
+    <!-- Bandeau d'accueil résultats — cadre la lecture (notamment dimensionnement auto) -->
+    <div id="intro-banner"><span id="introBannerText">—</span></div>
 
     <!-- Lead gate (proto — aucune logique backend) — plein écran -->
     <div class="lead-gate" id="leadGate">
@@ -1900,11 +2214,8 @@
             <h3>Découvrez vos économies</h3>
             <p>Entrez vos coordonnées pour afficher vos résultats personnalisés</p>
             <form id="leadGateForm">
-                <input type="email" id="leadEmail" placeholder="Email *" required />
                 <input type="text" id="leadFirstname" placeholder="Prénom *" required />
-                <input type="text" id="leadZip" placeholder="Code postal *" pattern="[0-9]{5}" maxlength="5"
-                    required />
-                <input type="tel" id="leadPhone" placeholder="Téléphone (optionnel — pour être rappelé)" />
+                <input type="email" id="leadEmail" placeholder="Email *" required />
                 <label class="lead-gate-consent">
                     <input type="checkbox" id="leadConsent" required />
                     <span>J'accepte d'être recontacté(e) par Revolty au sujet de ma simulation.</span>
@@ -1918,121 +2229,177 @@
 
     <!-- ─── TOP SECTION ─── -->
     <div id="top-section">
-        <div id="left-panel">
 
-            <!-- BATTERIE -->
-            <div class="card">
-                <div class="card-title"><span class="ico">🔋</span> Capacité de batterie</div>
-                <div class="field">
-                    <span class="field-label">Quelle capacité vous intéresse ?</span>
-                    <div class="objectif-selector">
-                        <button class="objectif-btn" data-batt="0"><span class="obj-icon">🔌</span><span
-                                class="obj-label">Sans</span><span class="obj-pct">Référence</span></button>
-                        <button class="objectif-btn" data-batt="5"><span class="obj-icon">⚡</span><span
-                                class="obj-label">5 kWh</span><span class="obj-pct">Revolty 5</span></button>
-                        <button class="objectif-btn active-confort" data-batt="10"><span class="obj-icon">⚡⚡</span><span
-                                class="obj-label">10 kWh</span><span class="obj-pct">Revolty 10</span></button>
-                        <button class="objectif-btn" data-batt="15"><span class="obj-icon">⚡⚡⚡</span><span
-                                class="obj-label">15 kWh</span><span class="obj-pct">Revolty 15</span></button>
-                    </div>
+        <!-- ══ COLONNE 1 — DIMENSIONNEMENT ══ -->
+        <div class="col-card" id="col-dim">
+            <div class="col-card-hd">Dimensionnement</div>
+
+            <!-- Choix de la capacité batterie : un seul bloc -->
+            <div class="batt-choice">
+                <div class="sub-hd">Votre modèle Revolty</div>
+                <div class="objectif-selector" id="battSelector">
+                    <button class="objectif-btn" data-batt="0"><span class="obj-icon">🔌</span><span
+                            class="obj-label">Sans</span><span class="obj-pct">batterie</span></button>
+                    <button class="objectif-btn" data-batt="5"><span class="obj-icon">⚡</span><span
+                            class="obj-label">5 kWh</span><span class="obj-pct">Revolty 5</span></button>
+                    <button class="objectif-btn active-confort" data-batt="10"><span class="obj-icon">⚡⚡</span><span
+                            class="obj-label">10 kWh</span><span class="obj-pct">Revolty 10</span></button>
+                    <button class="objectif-btn" data-batt="15"><span class="obj-icon">⚡⚡⚡</span><span
+                            class="obj-label">15 kWh</span><span class="obj-pct">Revolty 15</span></button>
                 </div>
+            </div>
+
+            <!-- Schéma : maison + panneaux + batterie, flèches vers production & capacité -->
+            <div class="dim-schema">
+                <svg viewBox="0 0 320 168" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="arrSun" markerWidth="8" markerHeight="8" refX="6" refY="3.6" orient="auto">
+                            <path d="M0,0 L7.5,3.6 L0,7.2 Z" fill="#C8860B" />
+                        </marker>
+                        <marker id="arrNeo" markerWidth="8" markerHeight="8" refX="6" refY="3.6" orient="auto">
+                            <path d="M0,0 L7.5,3.6 L0,7.2 Z" fill="#017267" />
+                        </marker>
+                    </defs>
+                    <!-- soleil -->
+                    <g stroke="#FFD145" stroke-width="2" stroke-linecap="round">
+                        <line x1="32" y1="6" x2="32" y2="14" />
+                        <line x1="32" y1="46" x2="32" y2="54" />
+                        <line x1="8" y1="30" x2="16" y2="30" />
+                        <line x1="48" y1="30" x2="56" y2="30" />
+                        <line x1="15" y1="13" x2="20" y2="18" />
+                        <line x1="44" y1="42" x2="49" y2="47" />
+                        <line x1="49" y1="13" x2="44" y2="18" />
+                        <line x1="20" y1="42" x2="15" y2="47" />
+                    </g>
+                    <circle cx="32" cy="30" r="11" fill="#FFD145" />
+                    <!-- maison -->
+                    <polygon points="36,92 78,56 120,92" fill="rgba(13,26,20,0.05)"
+                        stroke="rgba(13,26,20,0.55)" stroke-width="1.6" stroke-linejoin="round" />
+                    <rect x="46" y="92" width="64" height="49" rx="2" fill="rgba(13,26,20,0.04)"
+                        stroke="rgba(13,26,20,0.55)" stroke-width="1.6" />
+                    <rect x="70" y="117" width="15" height="24" rx="1" fill="rgba(13,26,20,0.20)" />
+                    <!-- panneaux PV sur le toit -->
+                    <g transform="translate(47,87) rotate(-40.6)">
+                        <rect x="2" y="-14" width="8" height="11" rx="1" fill="#FFD145" stroke="#c9a435"
+                            stroke-width="0.7" />
+                        <rect x="12" y="-14" width="8" height="11" rx="1" fill="#FFD145" stroke="#c9a435"
+                            stroke-width="0.7" />
+                        <rect x="22" y="-14" width="8" height="11" rx="1" fill="#FFD145" stroke="#c9a435"
+                            stroke-width="0.7" />
+                    </g>
+                    <!-- batterie attenante à la maison -->
+                    <rect x="119" y="100" width="12" height="4" rx="1" fill="#017267" />
+                    <rect x="110" y="104" width="30" height="37" rx="4" fill="rgba(17,228,122,0.10)"
+                        stroke="#017267" stroke-width="1.7" />
+                    <rect id="schemaBattFill" x="114" y="118" width="22" height="20" rx="2"
+                        fill="rgba(1,114,103,0.40)" />
+                    <text x="125" y="127" font-size="13" text-anchor="middle">⚡</text>
+                    <!-- flèche panneaux → production -->
+                    <path d="M84,52 C 124,22 158,30 188,42" fill="none" stroke="#C8860B" stroke-width="2.3"
+                        stroke-linecap="round" marker-end="url(#arrSun)" />
+                    <!-- flèche batterie → capacité -->
+                    <path d="M141,120 C 164,133 174,123 188,114" fill="none" stroke="#017267" stroke-width="2.3"
+                        stroke-linecap="round" marker-end="url(#arrNeo)" />
+                    <!-- puissance installée (au-dessus) puis production annuelle -->
+                    <text x="196" y="18" font-size="7" fill="#0D1A14"
+                        font-family="DM Sans,sans-serif">PUISSANCE INSTALLÉE</text>
+                    <text id="schemaKwcVal" x="195" y="35" font-size="15" font-weight="700" fill="#C8860B"
+                        font-family="Bricolage Grotesque,sans-serif">—</text>
+                    <text x="196" y="53" font-size="7" fill="#0D1A14"
+                        font-family="DM Sans,sans-serif">PRODUCTION / AN</text>
+                    <text id="outProdAnnuelle" x="195" y="70" font-size="15" font-weight="700" fill="#C8860B"
+                        font-family="Bricolage Grotesque,sans-serif">—</text>
+                    <text id="outProdLbl" x="196" y="80" font-size="7" fill="#0D1A14"
+                        font-family="DM Sans,sans-serif"></text>
+                    <!-- valeur capacité batterie -->
+                    <text x="196" y="107" font-size="7.5" fill="#0D1A14"
+                        font-family="DM Sans,sans-serif">CAPACITÉ BATTERIE</text>
+                    <text id="schemaBattVal" x="195" y="127" font-size="15" font-weight="700" fill="#017267"
+                        font-family="Bricolage Grotesque,sans-serif">10 kWh</text>
+                    <!-- consommation annuelle, sous la maison -->
+                    <text x="78" y="151" font-size="7" fill="#0D1A14" text-anchor="middle"
+                        font-family="DM Sans,sans-serif">CONSOMMATION / AN</text>
+                    <text id="schemaConsoVal" x="78" y="163" font-size="12" font-weight="700" fill="#0D1A14"
+                        text-anchor="middle" font-family="Bricolage Grotesque,sans-serif">—</text>
+                </svg>
             </div>
 
             <!-- Autoconsommation / Autoproduction -->
-            <div id="ac-ap-row">
-                <div class="r-cell">
-                    <div class="metric">
-                        <div class="val" id="outAutoConso">—</div>
-                        <div class="lbl">Autoconsommation</div>
-                    </div>
+            <div class="dim-stats">
+                <div class="dim-stat">
+                    <span class="dim-stat-lbl">Autoconsommation</span>
+                    <span class="dim-stat-val" id="outAutoConso">—</span>
                 </div>
-                <div class="r-cell">
-                    <div class="metric">
-                        <div class="val" id="outAutoProd">—</div>
-                        <div class="lbl">Autoproduction</div>
-                    </div>
+                <div class="dim-stat">
+                    <span class="dim-stat-lbl">Autoproduction</span>
+                    <span class="dim-stat-val" id="outAutoProd">—</span>
                 </div>
             </div>
 
-            <!-- Dimensionnement -->
-            <div class="r-cell">
-                <div class="auto-section">
-                    <div class="auto-header"><span>Dimensionnement <span class="dim-badge" id="resDimBadge"></span></span>
-                    </div>
-                    <div class="bar-track" id="resDimBarTrack">
-                        <div class="bar-fill" id="resSurplusBar" style="width:68%"></div>
-                    </div>
+            <!-- Jauge de dimensionnement -->
+            <div class="auto-section">
+                <div class="dim-jauge-hd">
+                    <span class="sub-hd">Dimensionnement</span>
+                    <span class="dim-badge" id="resDimBadge"></span>
                 </div>
-                <div id="resSurplusMsg" class="surplus-msg hidden"></div>
+                <div class="bar-track" id="resDimBarTrack">
+                    <div class="bar-fill" id="resSurplusBar" style="width:68%"></div>
+                </div>
             </div>
-
+            <div id="resSurplusMsg" class="surplus-msg hidden" style="display:none"></div>
         </div>
 
-        <div id="right-panel">
+        <!-- ══ COLONNE 2 — ÉCONOMIES ══ -->
+        <div class="col-card" id="col-eco">
+            <div class="col-card-hd">Économies</div>
 
-            <!-- col1 row1 — Économies (€ / an) -->
-            <div class="r-cell" id="cell-eco">
-                <div class="metric">
+            <div class="eco-top-row">
+                <div class="eco-hero">
+                    <div class="sub-hd">Économies par an</div>
                     <div class="val" id="outEcoTotal">—</div>
-                    <div class="lbl">Économies par an</div>
                 </div>
-            </div>
-
-            <!-- col2 row1 — Bonus avec batterie -->
-            <div class="r-cell" id="cell-bonus-batt">
-                <div class="metric">
+                <div class="eco-side-box" id="cell-bonus-batt">
+                    <div class="sub-hd">Dont</div>
                     <div class="val" id="ecoBatterie">—</div>
-                    <div class="lbl">grâce à la batterie</div>
+                    <div class="eco-side-note">grâce à la batterie</div>
                 </div>
             </div>
 
-            <!-- col3 -->
-            <div id="col3">
-                <div class="r-cell" id="cell-revente">
-                    <div class="metric">
+            <div class="eco-row2">
+                <div class="col-metric" id="cell-eco-facture">
+                    <div class="sub-hd">Réduction sur facture</div>
+                    <div class="val" id="outPctReduc">—</div>
+                </div>
+                <div class="eco-rp-pair">
+                    <div class="col-metric" id="cell-revente">
+                        <div class="sub-hd">Revente <span class="info-i" data-info="revente">i</span></div>
                         <div class="val" id="outRevente">—</div>
-                        <div class="lbl" id="gainsAnnexesLbl">Gains revente &amp; pilotage</div>
                     </div>
-                </div>
-                <div class="r-cell" id="cell-eco-facture">
-                    <div class="metric">
-                        <div class="val" id="outPctReduc">—</div>
-                        <div class="lbl">Réduction sur facture</div>
-                    </div>
-                </div>
-                <div class="r-cell" id="cell-impact">
-                    <div class="r-cell-hd">Impact</div>
-                    <div class="impact-prod">
-                        <span class="impact-prod-val" id="outProdAnnuelle">—</span>
-                        <span class="impact-prod-lbl" id="outProdLbl">Production annuelle</span>
-                    </div>
-                    <div class="impact-foyers" id="outFoyersEquiv">—</div>
-                    <div class="impact-perte" id="outPerteSansBatt">—</div>
-                    <div class="co2-card" id="outCo2BattRow" style="display:none">
-                        <div class="co2-icon">♻</div>
-                        <div>
-                            <div class="co2-val" id="outCo2Batt">—</div>
-                            <div class="co2-lbl" id="outCo2BattLbl">vs batterie neuve</div>
-                        </div>
+                    <div class="col-metric" id="cell-pilotage">
+                        <div class="sub-hd">Pilotage <span class="info-i" data-info="pilotage">i</span></div>
+                        <div class="val" id="outPilotage">—</div>
                     </div>
                 </div>
             </div>
 
-            <!-- col1+2 row2 — Graphe 10–20 ans -->
-            <div class="r-cell" id="cell-graph">
-                <div class="r-cell-hd">Projection dans le temps</div>
+            <!-- Graphe projection sur 20 ans -->
+            <div class="proj-block" id="cell-graph">
+                <div class="sub-hd">Projection sur 20 ans</div>
                 <div class="proj-total" id="projTotal">—</div>
                 <div class="proj-chart" id="projChartWrap"></div>
                 <div class="proj-legend">
-                    <span><span class="pleg-sq" style="background:#11E47A"></span>Autoconso directe</span>
-                    <span><span class="pleg-sq" style="background:#017267"></span>Bonus batterie</span>
+                    <span><span class="pleg-sq" style="background:#11E47A"></span>Panneaux solaires</span>
+                    <span id="projLegBatt" style="display:none"><span class="pleg-sq"
+                            style="background:#017267"></span>Bonus batterie</span>
                     <span id="projLegendPilot" style="display:none"><span class="pleg-sq"
                             style="background:#9B6DFF"></span>Pilotage HP/HC</span>
-                    <span><span class="pleg-sq" style="background:rgba(255,209,69,0.65)"></span>Surplus revendu</span>
+                    <span id="projLegSurplus" style="display:none"><span class="pleg-sq"
+                            style="background:rgba(255,209,69,0.65)"></span>Surplus revendu</span>
                 </div>
+                <div class="subsub-hd">Scénarios</div>
                 <div id="proj-scenarios">
                     <button type="button" class="scenario active" data-esc="0.04">
-                        <div class="scenario-name">EDF · prix élec +4 %/an</div>
+                        <div class="scenario-name">Croissance prévue EDF · +4 %/an</div>
                         <div class="scenario-val" id="scenEdf">—</div>
                     </button>
                     <button type="button" class="scenario" data-esc="0.07">
@@ -2045,14 +2412,38 @@
                     </button>
                 </div>
             </div>
+        </div>
 
+        <!-- ══ COLONNE 3 — IMPACT (+ CTA sous la colonne) ══ -->
+        <div class="impact-col-wrap">
+            <div class="col-card" id="col-impact">
+                <div class="col-card-hd">Impact</div>
+                <div class="impact-body">
+                    <div class="impact-sect">
+                        <div class="sub-hd">Gaspillage solaire</div>
+                        <div class="impact-perte" id="outPerteSansBatt">—</div>
+                    </div>
+                    <div class="impact-sect" id="impact-co2-block" style="display:none">
+                        <div class="sub-hd">Empreinte carbone</div>
+                        <div class="co2-card" id="outCo2BattRow">
+                            <div class="co2-icon">♻</div>
+                            <div>
+                                <div class="co2-val" id="outCo2Batt">—</div>
+                                <div class="co2-lbl" id="outCo2BattLbl">vs batterie neuve</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a href="https://revolty.fr/reserver-ma-batterie" class="cta-btn" id="impact-cta"
+                target="_blank">Réserver ma batterie Revolty →</a>
         </div>
     </div>
 
-    <!-- ─── CTA STRIP ─── -->
-    <div id="cta-strip">
-        <a href="https://revolty.fr/reserver-ma-batterie" class="cta-btn" target="_blank">Réserver ma batterie
-            Revolty →</a>
+    <!-- ─── SÉPARATEUR RÉSULTATS / SAISIE ─── -->
+    <div id="inputs-header">
+        <h2>Modifier mes déclarations</h2>
+        <p>Ajustez les champs ci-dessous : vos résultats se recalculent automatiquement.</p>
     </div>
 
     <!-- ─── INPUTS SECTION ─── -->
@@ -2095,7 +2486,7 @@
                     <div class="field" id="fld-surface">
                         <span class="field-label">Surface du logement</span>
                         <div class="slider-row">
-                            <input type="range" id="surface" min="30" max="250" step="10" value="140" />
+                            <input type="range" id="surface" min="30" max="250" step="5" value="140" />
                             <span class="slider-val"><span id="surfaceVal">140</span> m²</span>
                         </div>
                     </div>
@@ -2108,17 +2499,19 @@
                             <button type="button" class="tile-btn" data-group="heat" data-val="pompe"><span
                                     class="tile-icon">🌡️</span><span class="tile-label">Pompe à chaleur</span></button>
                             <button type="button" class="tile-btn" data-group="heat" data-val="elec"><span
-                                    class="tile-icon">🔌</span><span class="tile-label">Résistance élec</span></button>
+                                    class="tile-icon">🔌</span><span class="tile-label">Résistance électrique</span></button>
                         </div>
                     </div>
 
                     <div class="field" id="fld-presence">
-                        <span class="field-label">Présence</span>
+                        <span class="field-label">Présence dans le logement en journée</span>
                         <div class="tile-grid cols-2">
                             <button type="button" class="tile-btn active" data-group="journee" data-val="maison"><span
-                                    class="tile-icon">🏠</span><span class="tile-label">À la maison</span></button>
+                                    class="tile-icon">🏠</span><span class="tile-label">Souvent présent</span><span
+                                    class="tile-sub">5 j/sem. et +</span></button>
                             <button type="button" class="tile-btn" data-group="journee" data-val="exterieur"><span
-                                    class="tile-icon">🏢</span><span class="tile-label">À l'extérieur</span></button>
+                                    class="tile-icon">🏢</span><span class="tile-label">Souvent absent</span><span
+                                    class="tile-sub">moins de 5 j/sem.</span></button>
                         </div>
                     </div>
 
@@ -2172,7 +2565,7 @@
                             <button type="button" class="tile-btn" data-group="heat" data-val="pompe"><span
                                     class="tile-icon">🌡️</span><span class="tile-label">Pompe à chaleur</span></button>
                             <button type="button" class="tile-btn" data-group="heat" data-val="elec"><span
-                                    class="tile-icon">🔌</span><span class="tile-label">Résistance élec</span></button>
+                                    class="tile-icon">🔌</span><span class="tile-label">Résistance électrique</span></button>
                         </div>
                         <p class="dpe-hint">Détermine la saisonnalité (pic hiver) appliquée à votre conso.</p>
                     </div>
@@ -2190,10 +2583,10 @@
                             class="tile-sub">Résistance</span></button>
                     <button type="button" class="tile-btn" data-appliance="ecs-thermo"><span
                             class="tile-icon">♨️</span><span class="tile-label">Chauffe-eau</span><span
-                            class="tile-sub">Thermo</span></button>
+                            class="tile-sub">Thermodynamique</span></button>
                     <button type="button" class="tile-btn active" data-appliance="ve"><span
-                            class="tile-icon">🚗</span><span class="tile-label">Véhicule</span><span
-                            class="tile-sub">électrique</span></button>
+                            class="tile-icon">🚗</span><span class="tile-label">Véhicule électrique</span><span
+                            class="tile-sub">&nbsp;</span></button>
                     <button type="button" class="tile-btn" data-appliance="piscine"><span
                             class="tile-icon">🏊</span><span class="tile-label">Piscine</span><span
                             class="tile-sub">&nbsp;</span></button>
@@ -2222,17 +2615,19 @@
                     <span class="field-label">Puissance installée</span>
                     <div class="tile-grid cols-2" style="margin-bottom:8px">
                         <button type="button" class="tile-btn active" data-group="hasPv" data-val="oui"><span
-                                class="tile-icon">☀️</span><span class="tile-label">J'ai des PV</span></button>
+                                class="tile-icon">☀️</span><span class="tile-label">J'ai des PV</span><span
+                                class="tile-sub">PV = panneaux photovoltaïques</span></button>
                         <button type="button" class="tile-btn" data-group="hasPv" data-val="non"><span
-                                class="tile-icon">🏠</span><span class="tile-label">Je n'ai pas de PV</span><span
-                                class="tile-sub">dimensionnement auto</span></button>
+                                class="tile-icon">🏠</span><span class="tile-label">Pas encore de PV</span><span
+                                class="tile-sub">on simule une installation</span></button>
                     </div>
                     <div class="optional-input-row" id="kwcField">
                         <input type="number" id="kwcInput" min="0" max="20" step="0.1" value="6" />
                         <span class="unit">kWc</span>
                     </div>
-                    <div id="kwcHelper" style="font-size:0.68rem;color:var(--muted);margin-top:5px">
-                        ex : 6 kWc ≈ 15 panneaux 400 Wc
+                    <div id="kwcHelper"
+                        style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:0.64rem;letter-spacing:0.03em;color:var(--dark);margin-top:6px">
+                        Ex : 6 kWc ≈ 15 panneaux 400 Wc
                     </div>
                     <div id="kwcTriWarn" style="display:none;font-size:0.68rem;color:#ffb454;margin-top:5px">
                         ⚠️ Au-delà de 9 kWc, installation triphasée requise
@@ -2247,8 +2642,8 @@
                         <button type="button" class="tile-btn active" data-group="contrat" data-val="base"><span
                                 class="tile-icon">💡</span><span class="tile-label">Tarif Base</span></button>
                         <button type="button" class="tile-btn" data-group="contrat" data-val="hphc"><span
-                                class="tile-icon">⏰</span><span class="tile-label">HP / HC</span><span class="tile-sub"
-                                style="color:var(--violet);font-weight:600">+ pilotage intelligent</span></button>
+                                class="tile-icon">⏰</span><span class="tile-label">Heures Pleines / Heures
+                                Creuses</span></button>
                         <button type="button" class="tile-btn" data-group="contrat" data-val="flex"><span
                                 class="tile-icon">📈</span><span class="tile-label">Flex horaire</span><span
                                 class="tile-sub" style="color:var(--violet);font-weight:600">+
@@ -2296,6 +2691,8 @@
                         Modifiable.</div>
                 </div>
 
+                <div class="divider" id="rachat-divider"></div>
+
                 <div class="field" id="fld-rachat">
                     <span class="field-label">Tarif de rachat du surplus</span>
                     <div class="optional-input-row">
@@ -2304,7 +2701,7 @@
                         <span class="unit">€ / kWh</span>
                     </div>
                     <div style="font-size:0.68rem;color:var(--muted);margin-top:5px">
-                        0 si pas de contrat de revente · EDF OA actuel ≈ 0,04 €/kWh
+                        0 si pas de contrat de revente · EDF Obligation d'Achat actuel ≈ 0,04 €/kWh
                     </div>
                 </div>
 
@@ -2435,8 +2832,9 @@
             ENL/SDES 2020.
             Saisonnalité fort hiver.
             <br><br><strong>Seau 3 — Appareils spécifiques</strong> : ECS (profil 23h mesuré, Panel Elecdom), VE
-            (même profil nocturne), piscine (8h–18h mai–sept), clim (14h–18h juin–août, modulée par
-            zone climatique RT2012 H1/H2/H3 — 130 kWh nord → 580 kWh Méditerranée). Addition pure — pas de
+            (même profil nocturne), piscine (8h–18h mai–sept), clim (14h–18h juin–août, modèle
+            surface × intensité kWh/m² par zone RT2012 — ancrage ADEME 2,3 kWh/m², ~1 kWh/m² nord
+            → ~4 kWh/m² Méditerranée, +35% si chauffage PAC réversible). Addition pure — pas de
             double-comptage avec RES1 corrigé.
             <h4>Simulation batterie</h4>
             SOC propagé heure par heure, 3 passes de convergence vers régime permanent. Rendement aller-retour
@@ -2444,7 +2842,7 @@
             <h4>Sources</h4>
             PVGIS v5.3 JRC (productible par département, profils horaires TMY, 96 préfectures), Enedis Open Data
             (profils RES1), Panel Elecdom ADEME 2021 (seaux 1 et 3), Open DPE ADEME post-juillet 2021 (seau 2),
-            EDF OA S06 T1 2026 (rachat 0,04 €/kWh).
+            EDF Obligation d'Achat S06 T1 2026 (rachat 0,04 €/kWh).
         </div>
 
         <!-- projSection : projChartWrap + projTotal déplacés dans #cell-graph -->
@@ -2477,9 +2875,6 @@
             <div class="proj-sub" style="margin-top:8px">Cumul net (économies − CAPEX). Inflation élec +4 %/an. Le
                 point violet marque le break-even.</div>
         </div>
-
-        <p class="disclaimer">Estimation indicative basée sur des données statistiques nationales. Un devis précis
-            nécessite une visite technique.</p>
     </div>
 
     <!-- ── DEBUG ──────────────────────────────────────────────────────────────── -->
@@ -2521,6 +2916,38 @@
                     style="display:block;overflow:visible;"></svg>
                 <div class="dbg-xaxis" id="dbgXAxis"></div>
             </div>
+        </div>
+    </div>
+
+    <!-- ─── MENTIONS LÉGALES — bandeau bas de page, visible en phase résultats ─── -->
+    <div class="disclaimer">
+        <p>Cette simulation est une estimation indicative, calculée à partir de données statistiques
+            nationales et des informations que vous avez saisies. Elle ne constitue ni un devis, ni une
+            étude de dimensionnement, ni un conseil personnalisé.</p>
+    </div>
+
+    <!-- ─── MODALE — hypothèse de dimensionnement PV (mode « Pas encore de PV ») ─── -->
+    <div id="pvNoticeOverlay" class="pv-notice-overlay">
+        <div class="pv-notice-card">
+            <div class="pv-notice-icon">☀️</div>
+            <h3>À propos du dimensionnement solaire</h3>
+            <p>Nous vous proposons un dimensionnement solaire calculé à partir de votre profil de
+                consommation. Il s'agit d'une <strong>hypothèse de travail</strong> destinée à illustrer
+                le potentiel d'une batterie Revolty. Ce n'est ni un devis, ni une étude de
+                dimensionnement adaptée à votre logement.</p>
+            <p><strong>Revolty ne commercialise pas de panneaux photovoltaïques. Pour tout projet solaire,
+                rapprochez-vous d'un installateur photovoltaïque professionnel certifié RGE.</strong></p>
+            <button type="button" id="pvNoticeOk">J'ai compris</button>
+        </div>
+    </div>
+
+    <!-- ─── MODALE INFO — explications Revente / Pilotage ─── -->
+    <div id="infoModalOverlay" class="pv-notice-overlay">
+        <div class="pv-notice-card">
+            <div class="pv-notice-icon">ℹ️</div>
+            <h3 id="infoModalTitle">—</h3>
+            <p id="infoModalText">—</p>
+            <button type="button" id="infoModalOk">J'ai compris</button>
         </div>
     </div>
 
@@ -4029,6 +4456,7 @@
             // Tarif de rachat du surplus — saisi librement par l'utilisateur (0 par défaut)
             const ELEC_ESCALATION = 0.04; // +4% / an — hypothèse EDF long terme
             let projEscalation = ELEC_ESCALATION; // taux courant du graphe projection (scénario cliquable)
+            let _animateProj = false; // n'anime les barres que sur changement batterie / scénario
             const HORIZON = 20; // durée contrat OA en années
             const BATT_EFF = 0.92;   // round-trip LFP (0.96 × 0.96)
             const SOC_INIT = 0.30;   // SOC initial pour la convergence en régime permanent (30%)
@@ -4504,7 +4932,13 @@
             const KWH_ECS = { joule: 1670, thermo: 752 }; // kWh/an, foyer moyen (2,24p)
             const KWH_VE = 2500;   // kWh/an — ADEME, usage moyen VE France
             const KWH_PISCI = 1690;   // kWh/an — Panel Elecdom ADEME 2021, fig 13-3 (moyenne 5 piscines, plage 250–4 100)
-            const KWH_CLIM = 304;    // kWh/an — Panel Elecdom ADEME 2021, split fixe national (fallback)
+            // Intensité clim — kWh/m²/an. Ancrage : ADEME Panel Usages Électrodomestiques
+            // 2021 = 2,3 kWh/m² (moyenne nationale, split fixe). Déclinaison par zone
+            // calibrée sur la moyenne Sud-Est ADEME (482 kWh/an) : H1 usage d'appoint
+            // occasionnel ~1 kWh/m², H2 ≈ moyenne nationale, H3 Méditerranée ~4 kWh/m².
+            // Modèle surface × intensité : un studio reste à ~30 kWh, une maison de
+            // 140 m² en H3 monte à ~560 kWh, ce qu'un forfait par zone ne capte pas.
+            const CLIM_KWH_M2_DEFAULT = 2.3;  // fallback département inconnu — moyenne nationale ADEME
 
             // Zones climatiques RT2012 par département — arrêté du 26 octobre 2010
             // H1 (~55% pop) : climat tempéré (Nord, Est, IdF, Centre, montagne)
@@ -4540,17 +4974,16 @@
                 '2A': 'H3', '2B': 'H3'
             };
 
-            // Conso clim annuelle par zone (kWh/an, foyer équipé) — calibré pour
-            // préserver l'ancrage Panel Elecdom 304 kWh national pondéré par taux
-            // d'équipement régional (~20% H1, ~30% H2, ~50% H3).
-            // Sources : EDF Solutions Solaires (482 kWh moyenne Sud-Est),
-            //           ADEME État de l'art climatisation 2018 (DJU clim base 26°C),
-            //           Panel Elecdom ADEME 2021 (ancrage national).
-            const KWH_CLIM_ZONE = {
-                H1a: 120, H1b: 140, H1c: 130,
-                H2a: 200, H2b: 250, H2c: 280, H2d: 280,
-                H3: 580
+            // Intensité clim par zone climatique — kWh/m²/an (cf. CLIM_KWH_M2_DEFAULT).
+            const CLIM_KWH_M2 = {
+                H1a: 0.9, H1b: 1.1, H1c: 1.0,
+                H2a: 1.7, H2b: 2.1, H2c: 2.4, H2d: 2.4,
+                H3: 4.0
             };
+            // PAC air-air réversible utilisée en rafraîchissement : usage plus intensif
+            // qu'un split d'appoint (froid seul 500–1200 kWh/an vs ~300, sources métier).
+            // Majoration appliquée quand le chauffage est une PAC (réversible présumée).
+            const CLIM_PAC_FACTOR = 1.35;
 
             // Saisonnalité ECS — Source : CSV ADEME elecdom-courbes-horaires
             // Ratios mesurés : hiver(déc-fév)/moy = 1.201, été(jun-août)/moy = 0.730
@@ -4703,7 +5136,10 @@
                 const kwh_ve = state.ve ? KWH_VE : 0;
                 const kwh_pisci = state.piscine ? KWH_PISCI : 0;
                 const climZone = ZONE_CLIM[state.dept];
-                const kwh_clim = state.clim ? (climZone ? KWH_CLIM_ZONE[climZone] : KWH_CLIM) : 0;
+                // Modèle surface × intensité kWh/m² × zone, +35% si chauffage PAC (réversible).
+                const climIntensite = climZone ? CLIM_KWH_M2[climZone] : CLIM_KWH_M2_DEFAULT;
+                const climPac = state.heat === 'pompe' ? CLIM_PAC_FACTOR : 1;
+                const kwh_clim = state.clim ? Math.round(state.surface * climIntensite * climPac) : 0;
 
                 // Mode manuel : conso totale saisie, ventilation selon type de chauffage
                 // Parts chauffage issues des moyennes ADEME pour foyers électriques
@@ -5132,9 +5568,11 @@
                 sec.style.display = '';
 
                 const showSoh = false; // courbe SoH retirée de la projection
-                const showPilot = ecoPilot > 0;
-                const legPilot = document.getElementById('projLegendPilot');
-                if (legPilot) legPilot.style.display = showPilot ? '' : 'none';
+                // Légende dynamique : chaque entrée n'apparaît que si sa série existe dans le graphe
+                const _toggleLeg = (id, on) => { const e = document.getElementById(id); if (e) e.style.display = on ? '' : 'none'; };
+                _toggleLeg('projLegBatt', ecoBatterie > 0);
+                _toggleLeg('projLegendPilot', ecoPilot > 0);
+                _toggleLeg('projLegSurplus', ecoRevente > 0);
 
                 // Build yearly data — autoconso & pilotage HP/HC grow with elec price, surplus stays fixed
                 const years = [];
@@ -5183,8 +5621,8 @@
                 for (let i = 0; i <= nTicks; i++) {
                     const val = Math.round(maxVal * i / nTicks);
                     const yy = scY(val);
-                    svg += `<line x1="${PAD_L}" y1="${yy}" x2="${W - PAD_R}" y2="${yy}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
-                    svg += `<text x="${PAD_L - 4}" y="${yy + 3}" text-anchor="end" font-size="8" fill="rgba(255,255,255,0.25)" font-family="DM Sans,sans-serif">${val}€</text>`;
+                    svg += `<line x1="${PAD_L}" y1="${yy}" x2="${W - PAD_R}" y2="${yy}" stroke="rgba(0,0,0,0.07)" stroke-width="1"/>`;
+                    svg += `<text x="${PAD_L - 4}" y="${yy + 3}" text-anchor="end" font-size="8" fill="#0D1A14" font-family="DM Sans,sans-serif">${val}€</text>`;
                 }
 
                 // Bars
@@ -5192,19 +5630,21 @@
                     const yr = years[i];
                     const x = PAD_L + i * barGap + 1;
                     let top = PAD_T + chartH;
+                    // animation (escalier) seulement après un changement batterie / scénario
+                    const _ba = _animateProj ? `class="proj-bar" style="animation-delay:${(i * 0.03).toFixed(2)}s"` : '';
 
                     // Surplus (bottom)
-                    if (yr.s > 0) { const bh = Math.max(1, Math.round((yr.s / maxVal) * chartH)); top -= bh; svg += `<rect x="${x}" y="${top}" width="${barW}" height="${bh}" fill="rgba(255,209,69,0.6)" rx="1"/>`; }
+                    if (yr.s > 0) { const bh = Math.max(1, Math.round((yr.s / maxVal) * chartH)); top -= bh; svg += `<rect ${_ba} x="${x}" y="${top}" width="${barW}" height="${bh}" fill="rgba(255,209,69,0.6)" rx="1"/>`; }
                     // Pilotage HP/HC (violet)
-                    if (yr.p > 0) { const bh = Math.max(1, Math.round((yr.p / maxVal) * chartH)); top -= bh; svg += `<rect x="${x}" y="${top}" width="${barW}" height="${bh}" fill="#9B6DFF" rx="1"/>`; }
+                    if (yr.p > 0) { const bh = Math.max(1, Math.round((yr.p / maxVal) * chartH)); top -= bh; svg += `<rect ${_ba} x="${x}" y="${top}" width="${barW}" height="${bh}" fill="#9B6DFF" rx="1"/>`; }
                     // Batterie
-                    if (yr.b > 0) { const bh = Math.max(1, Math.round((yr.b / maxVal) * chartH)); top -= bh; svg += `<rect x="${x}" y="${top}" width="${barW}" height="${bh}" fill="#017267" rx="1"/>`; }
+                    if (yr.b > 0) { const bh = Math.max(1, Math.round((yr.b / maxVal) * chartH)); top -= bh; svg += `<rect ${_ba} x="${x}" y="${top}" width="${barW}" height="${bh}" fill="#017267" rx="1"/>`; }
                     // Directe (top)
-                    if (yr.d > 0) { const bh = Math.max(1, Math.round((yr.d / maxVal) * chartH)); top -= bh; svg += `<rect x="${x}" y="${top}" width="${barW}" height="${bh}" fill="#11E47A" rx="1"/>`; }
+                    if (yr.d > 0) { const bh = Math.max(1, Math.round((yr.d / maxVal) * chartH)); top -= bh; svg += `<rect ${_ba} x="${x}" y="${top}" width="${barW}" height="${bh}" fill="#11E47A" rx="1"/>`; }
 
-                    // X label every 5 years + year 1
-                    if (yr.y === 1 || yr.y % 5 === 0) {
-                        svg += `<text x="${x + barW / 2}" y="${H - 4}" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.3)" font-family="DM Sans,sans-serif">${yr.y}</text>`;
+                    // X labels : an 1, 10, 20 uniquement
+                    if (yr.y === 1 || yr.y === 10 || yr.y === 20) {
+                        svg += `<text x="${x + barW / 2}" y="${H - 4}" text-anchor="middle" font-size="8" fill="#0D1A14" font-family="DM Sans,sans-serif">${yr.y === 1 ? '1 an' : yr.y + ' ans'}</text>`;
                     }
                 }
 
@@ -5227,38 +5667,18 @@
 
                 svg += '</svg>';
                 document.getElementById('projChartWrap').innerHTML = svg;
+                _animateProj = false; // consommé : pas de réanimation aux recalculs suivants
             }
 
-            // ─── Sweep dimensionnement : trouve le kWc dont la PV brute couvre ~28% de la conso annuelle ──
-            // Couverture = PV_autoconsommée / conso_annuelle, calculée SANS batterie ni pilotage : la batterie
-            // augmenterait artificiellement la couverture (surplus stocké → autoconsommé), ce qui fausserait
-            // le dimensionnement. On veut le kWc qui satisfait la cible PV brute, indépendamment du kWh de batt.
-            const COVERAGE_TARGET = 0.28;
-            function sweepOptimalKwc() {
-                const kwhs = computeKwhs();
-                if (!kwhs.total) return 6;
-                const deptProd = PROD_ANNUEL[state.dept];
-                const productible = deptProd ? (deptProd[state.incl]?.[state.orient] || 1100) : 1100;
-                // Sweep dimensionnement : independant du tarif (autoProdRate ne depend que des kWh).
-                // En mode flex on utilise le TRV Base pour eviter de cumuler 12*2 sims flex inutiles.
-                const sweepContrat = state.contrat === 'flex' ? 'base' : state.contrat;
-                const userTarifs = sweepContrat === 'hphc'
-                    ? {
-                        hp: parseFloat(document.getElementById('tarifHP').value) || TARIFS.hphc.hp,
-                        hc: parseFloat(document.getElementById('tarifHC').value) || TARIFS.hphc.hc
-                    }
-                    : { kwh: parseFloat(document.getElementById('tarifBase').value) || TARIFS.base.kwh };
-                const tarifH = buildTarifHoraire(sweepContrat, userTarifs);
-                let best = 1, bestDiff = Infinity;
-                for (let k = 1; k <= 12; k += 0.5) {
-                    const prod = k * productible * (1 - state.ombrage);
-                    // battKwh=0 + pilot=false : couverture brute, indépendante du choix de batterie
-                    const r = simMensuelle(prod, kwhs, 0, tarifH, false);
-                    const coverage = r.autoProdRate / 100;
-                    const diff = Math.abs(coverage - COVERAGE_TARGET);
-                    if (diff < bestDiff) { bestDiff = diff; best = k; }
-                }
-                return Math.round(best * 2) / 2;
+            // ─── Tranche PV hypothèse (mode « Pas de PV ») ──────────────────────────────
+            // Revolty ne vend pas le PV : on ne « dimensionne » pas, on pose une hypothèse
+            // de travail ronde indexée sur la conso (règle HTW ~1 kWc / 1000 kWh) pour que
+            // la batterie ait du surplus crédible à valoriser. 3 tranches : 3 / 6 / 9 kWc.
+            function trancheKwc() {
+                const total = computeKwhs().total || 0;
+                if (total < 4500) return 3;
+                if (total <= 7500) return 6;
+                return 9;
             }
 
             // ─── Payback batterie (économies totales = compute(batt) − compute(0)) ─────
@@ -5352,11 +5772,12 @@
                 // Mode "Pas de PV" : on re-dimensionne à chaque calcul pour suivre les évolutions
                 // de conso (foyer, appareils, dept…). Le sweep ignore la batterie volontairement.
                 if (!state.hasPv) {
-                    const opt = sweepOptimalKwc();
-                    state.kwc = opt;
+                    const kwc = trancheKwc();
+                    state.kwc = kwc;
                     const inp = document.getElementById('kwcInput');
-                    if (inp && parseFloat(inp.value) !== opt) inp.value = opt.toFixed(1);
-                    document.getElementById('kwcHelper').textContent = `Dimensionnement proposé pour ~28 % de couverture : ${opt.toFixed(1).replace('.', ',')} kWc`;
+                    if (inp && parseFloat(inp.value) !== kwc) inp.value = kwc.toFixed(1);
+                    document.getElementById('kwcHelper').textContent =
+                        `Hypothèse PV indexée sur votre consommation : ${kwc} kWc`;
                     if (typeof updateKwcWarn === 'function') updateKwcWarn();
                 }
                 const kwc = state.kwc || 0;
@@ -5398,9 +5819,23 @@
                     ecoBaseRefAnnuelle = refBatt.ecoDirecte + refBatt.ecoBatterie + refBatt.ecoRevente;
                 }
 
-                // ── Highlight batterie « OPTIMALE » ─────────────────────────────────────
-                // Optimale = celle dont |ratio − 1| est minimal parmi les trois tailles.
-                // Indépendant du choix utilisateur — pas de boucle de rétroaction.
+                const auto = resBatt.autoRate;
+                const autoBase = resBase.autoRate;
+                const delta = auto - autoBase;
+                const conso = resBatt.consoAnnuelle;
+
+                // ── Bloc 1 — L'essentiel ──────────────────────────────────────────────
+                const ecoCoutHC = resBatt.ecoCoutHC || 0;
+                const ecoTotal = resBatt.ecoDirecte + resBatt.ecoBatterie + resBatt.ecoRevente - ecoCoutHC;
+                const ecoTotalNoPilot = resBattNoPilot.ecoDirecte + resBattNoPilot.ecoBatterie + resBattNoPilot.ecoRevente;
+                const ecoTotalBase = resBase.ecoDirecte + resBase.ecoBatterie + resBase.ecoRevente;
+                const fmt = v => v > 0 ? '+\u00a0' + v.toLocaleString('fr-FR') + '\u00a0€' : '—';
+
+                // ── Highlight batterie « OPTIMALE » — calée sur le surplus ──────────────
+                // Optimale = celle dont le ratio capacité/surplus journalier est le plus
+                // proche de 1 — même méthode physique que le diagnostic ci-dessous, donc
+                // jamais de contradiction. Surplus mesuré sans batterie (resBase) →
+                // indépendant du choix utilisateur, pas de boucle de rétroaction.
                 const surplusJourBrut = resBase.kWhSurplus / 365;
                 let optimalBatt = null;
                 if (surplusJourBrut > 0.1) {
@@ -5414,18 +5849,6 @@
                     const b = parseInt(btn.dataset.batt);
                     btn.classList.toggle('optimal-batt', optimalBatt !== null && b === optimalBatt);
                 });
-
-                const auto = resBatt.autoRate;
-                const autoBase = resBase.autoRate;
-                const delta = auto - autoBase;
-                const conso = resBatt.consoAnnuelle;
-
-                // ── Bloc 1 — L'essentiel ──────────────────────────────────────────────
-                const ecoCoutHC = resBatt.ecoCoutHC || 0;
-                const ecoTotal = resBatt.ecoDirecte + resBatt.ecoBatterie + resBatt.ecoRevente - ecoCoutHC;
-                const ecoTotalNoPilot = resBattNoPilot.ecoDirecte + resBattNoPilot.ecoBatterie + resBattNoPilot.ecoRevente;
-                const ecoTotalBase = resBase.ecoDirecte + resBase.ecoBatterie + resBase.ecoRevente;
-                const fmt = v => v > 0 ? '+\u00a0' + v.toLocaleString('fr-FR') + '\u00a0€' : '—';
 
                 // Affichage : fourchette p10-p90 si flex, sinon valeur unique
                 if (isFlex && resBattLow && resBattHigh) {
@@ -5486,7 +5909,7 @@
                 if (pilotRow) pilotRow.style.display = pilotActive ? 'flex' : 'none';
                 document.getElementById('ecoDirecte').textContent = fmt(resBatt.ecoDirecte);
                 document.getElementById('ecoBatterie').textContent = (state.batt > 0 && bonusBattSolarEur > 0)
-                    ? 'dont ' + Math.round(bonusBattSolarEur).toLocaleString('fr-FR') + ' €'
+                    ? Math.round(bonusBattSolarEur).toLocaleString('fr-FR') + ' €'
                     : '—';
                 document.getElementById('ecoPilot').textContent = fmt(bonusPilotEur);
                 document.getElementById('ecoRevente').textContent = fmt(resBatt.ecoRevente);
@@ -5530,41 +5953,61 @@
                     dim = 'ok'; dimLabel = 'Bien dimensionnée'; dimClass = 'dim-badge dim-ok';
                     msgText = '✅ La batterie est bien calibrée pour absorber votre surplus solaire.'; msgClass = 'surplus-msg ok';
                 } else {
-                    dim = 'sur'; dimLabel = 'Prête pour la suite'; dimClass = 'dim-badge dim-sur';
+                    dim = 'sur'; dimLabel = 'Surdimensionnée'; dimClass = 'dim-badge dim-sur';
                     msgText = '🚀 La batterie a plus de capacité que votre production ne génère de surplus. Ajoutez des panneaux pour en exploiter tout le potentiel.'; msgClass = 'surplus-msg sur';
                 }
                 document.getElementById('resSurplusBar').style.width = (state.batt === 0 ? 0 : Math.min(100, Math.round(Math.min(ratio, 1) * 100))) + '%';
                 document.getElementById('resDimBarTrack').style.display = dim === 'max' ? 'none' : '';
                 document.getElementById('resDimBadge').textContent = dimLabel;
                 document.getElementById('resDimBadge').className = dimClass;
+                // barre de la même couleur que l'état
+                const _DIM_BAR = { sous: '#C0392B', ok: '#017267', sur: '#1A6B8A', max: '#6A3FB5' };
+                document.getElementById('resSurplusBar').style.background =
+                    _DIM_BAR[dim] || 'linear-gradient(90deg, var(--respire), var(--neo))';
                 document.getElementById('resSurplusMsg').textContent = msgText;
                 document.getElementById('resSurplusMsg').className = msgClass;
 
                 renderChart(resBatt.monthly);
 
-                // ── Bloc 2 — Projection (revente + surplus kWh) ───────────────────────
-                // Gains annexes = revente surplus + pilotage HP/HC. Fallback si aucun des deux.
-                const gainsAnnexes = resBatt.ecoRevente + bonusPilotEur;
-                if (gainsAnnexes > 0) {
-                    document.getElementById('outRevente').textContent = Math.round(gainsAnnexes).toLocaleString('fr-FR') + ' €';
-                    document.getElementById('gainsAnnexesLbl').textContent = 'Gains revente & pilotage';
-                } else {
-                    document.getElementById('outRevente').textContent = resBatt.kWhSurplus.toLocaleString('fr-FR') + ' kWh';
-                    document.getElementById('gainsAnnexesLbl').textContent = 'Surplus injecté au réseau';
-                }
+                // ── Bloc 2 — Revente & Pilotage (tuiles distinctes, tiret si rien) ────
+                const _rev = resBatt.ecoRevente;
+                const _pil = bonusPilotEur;
+                document.getElementById('outRevente').textContent =
+                    _rev > 0 ? Math.round(_rev).toLocaleString('fr-FR') + ' €' : '—';
+                document.getElementById('outPilotage').textContent =
+                    _pil > 0 ? Math.round(_pil).toLocaleString('fr-FR') + ' €' : '—';
                 document.getElementById('outSurplusKwh').textContent = resBatt.kWhSurplus > 0 ? resBatt.kWhSurplus.toLocaleString('fr-FR') + ' kWh' : '—';
 
                 // ── Bloc 3 — Impact ───────────────────────────────────────────────────
                 document.getElementById('outProdAnnuelle').textContent = prodAnnuelle.toLocaleString('fr-FR') + ' kWh';
-                document.getElementById('outProdLbl').innerHTML = 'Production' + (state.ombrage > 0 ? ' <span class="estimated-lbl">-' + Math.round(state.ombrage * 100) + '% ombrage</span>' : ' annuelle');
+                document.getElementById('outProdLbl').textContent = state.ombrage > 0 ? '−' + Math.round(state.ombrage * 100) + ' % ombrage' : '';
                 document.getElementById('outKwc').textContent = kwc.toFixed(1).replace('.', ',') + ' kWc';
 
-                // Équivalence grand public : production PV ÷ conso d'une maison moyenne FR
-                const foyersEquiv = prodAnnuelle / FOYER_MOYEN_KWH;
-                document.getElementById('outFoyersEquiv').textContent = prodAnnuelle > 0
-                    ? 'soit ' + foyersEquiv.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
-                        + (foyersEquiv >= 2 ? ' foyers alimentés' : ' foyer alimenté')
-                    : '—';
+                // Schéma dimensionnement : niveau de remplissage + valeur de la batterie + kWc
+                const _battFill = document.getElementById('schemaBattFill');
+                if (_battFill) {
+                    const _h = 30 * Math.min(1, state.batt / 15);
+                    _battFill.setAttribute('height', _h.toFixed(1));
+                    _battFill.setAttribute('y', (138 - _h).toFixed(1));
+                }
+                const _battVal = document.getElementById('schemaBattVal');
+                if (_battVal) _battVal.textContent = state.batt > 0 ? state.batt + ' kWh' : 'Sans';
+                const _kwcVal = document.getElementById('schemaKwcVal');
+                if (_kwcVal) _kwcVal.textContent = kwc.toFixed(1).replace('.', ',') + ' kWc';
+                const _consoVal = document.getElementById('schemaConsoVal');
+                if (_consoVal) _consoVal.textContent = Math.round(conso).toLocaleString('fr-FR') + ' kWh';
+
+                // Bandeau d'accueil : rappelle que les résultats portent sur une installation simulée
+                const _introEl = document.getElementById('introBannerText');
+                if (_introEl) {
+                    const _kwcTxt = kwc.toFixed(1).replace('.', ',') + ' kWc';
+                    _introEl.innerHTML = state.hasPv
+                        ? 'Simulation basée sur <strong>votre installation de ' + _kwcTxt + '</strong>'
+                            + (state.batt > 0 ? ' avec une batterie Revolty de ' + state.batt + ' kWh.' : '.')
+                        : 'Vous n\'avez pas encore de panneaux : on simule un <strong>dimensionnement solaire de '
+                            + _kwcTxt + '</strong> adapté à votre profil, pour vous donner un ordre de grandeur'
+                            + (state.batt > 0 ? ', avec une batterie Revolty de ' + state.batt + ' kWh.' : '.');
+                }
 
                 // Gaspillage solaire — message selon présence batterie
                 const perteSansBatt = Math.max(0, 100 - resBase.autoConsoRate);
@@ -5576,22 +6019,22 @@
                     const perteAvecBatt = Math.max(0, 100 - resBatt.autoConsoRate);
                     const facteur = perteAvecBatt > 0 ? perteSansBatt / perteAvecBatt : 0;
                     _perteEl.textContent = facteur >= 1.1
-                        ? '🔋 La batterie divise le gaspillage solaire par ' + facteur.toLocaleString('fr-FR', { maximumFractionDigits: 1 })
-                        : '🔋 ' + perteAvecBatt + ' % de la production injectée au réseau';
+                        ? 'La batterie divise le gaspillage solaire par ' + facteur.toLocaleString('fr-FR', { maximumFractionDigits: 1 })
+                        : perteAvecBatt + ' % de la production injectée au réseau';
                     _perteEl.classList.add('impact-perte-pos');
                 } else {
                     _perteEl.textContent = '⚠ ' + perteSansBatt + ' % de la production perdue sans batterie';
                     _perteEl.classList.remove('impact-perte-pos');
                 }
 
-                const co2Row = document.getElementById('outCo2BattRow');
+                const co2Block = document.getElementById('impact-co2-block');
                 if (state.batt > 0) {
-                    co2Row.style.display = 'flex';
+                    co2Block.style.display = 'block';
                     const co2Kg = Math.round(state.batt * CO2_BATT_NEUVE);
                     document.getElementById('outCo2Batt').textContent = co2Kg.toLocaleString('fr-FR') + ' kg CO₂ évités';
-                    document.getElementById('outCo2BattLbl').textContent = 'vs batterie neuve · Revolty reconditionnée ' + state.batt + ' kWh';
+                    document.getElementById('outCo2BattLbl').textContent = 'batterie Revolty reconditionnée ' + state.batt + ' kWh vs neuve, sans lien avec la production solaire';
                 } else {
-                    co2Row.style.display = 'none';
+                    co2Block.style.display = 'none';
                 }
 
                 // ── Outputs objet (debug) ─────────────────────────────────────────────
@@ -6067,7 +6510,8 @@
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.objectif-btn').forEach(b => b.className = 'objectif-btn');
                     state.batt = parseInt(btn.dataset.batt);
-                    btn.classList.add(['active-sans', 'active-essentiel', 'active-confort', 'active-autonomie'][[0, 5, 10, 15].indexOf(state.batt)] || 'active-confort');
+                    btn.classList.add(state.batt === 0 ? 'active-sans' : 'active-confort');
+                    _animateProj = true;
                     compute();
                 });
             });
@@ -6094,7 +6538,12 @@
                     else if (g === 'hasPv') {
                         state.hasPv = (v === 'oui');
                         if (state.hasPv) {
-                            document.getElementById('kwcHelper').textContent = 'ex : 6 kWc ≈ 15 panneaux 400 Wc';
+                            document.getElementById('kwcHelper').textContent = 'Ex : 6 kWc ≈ 15 panneaux 400 Wc';
+                            document.getElementById('kwcInput').value = '';
+                        } else if (!_pvNoticeShown) {
+                            // Mode « Pas de PV » : on prévient que le kWc est une hypothèse, pas une reco
+                            _pvNoticeShown = true;
+                            document.getElementById('pvNoticeOverlay').classList.add('show');
                         }
                         // Sinon : compute() recalcule le dimensionnement et met à jour le helper
                     }
@@ -6175,7 +6624,7 @@
             // Sliders
             document.getElementById('surface').addEventListener('input', function () {
                 state.surface = parseInt(this.value);
-                document.getElementById('surfaceVal').textContent = this.value;
+                document.getElementById('surfaceVal').textContent = parseInt(this.value) >= 250 ? '250+' : this.value;
                 debouncedCompute();
             });
             document.getElementById('kwcInput').addEventListener('input', function () {
@@ -6259,6 +6708,7 @@
             const _leadForm = document.getElementById('leadGateForm');
             const WIZARD_ZONES = ['zone-conso', 'zone-prod'];
             let _wizStep = 0;
+            let _pvNoticeShown = false; // modale hypothèse PV affichée une seule fois
 
             function _showWizardStep(i) {
                 _wizStep = Math.max(0, Math.min(WIZARD_ZONES.length - 1, i));
@@ -6312,7 +6762,8 @@
                 } else {
                     units = [
                         { els: ['fld-consomode'], done: true },
-                        { els: ['fld-persons', 'fld-surface'], done: has('.tile-btn[data-group="persons"].active') },
+                        { els: ['fld-persons'], done: has('.tile-btn[data-group="persons"].active') },
+                        { els: ['fld-surface'], done: true },
                         { els: ['fld-heat-e'], done: has('#estimFields .tile-btn[data-group="heat"].active') },
                         { els: ['fld-presence'], done: has('.tile-btn[data-group="journee"].active') },
                         { els: ['card-appareils'], done: true },
@@ -6341,7 +6792,7 @@
 
             // ── RÉVÉLATION PROGRESSIVE — étape Production du wizard ────────────────
             const _PROD_REVEAL_IDS = ['fld-dept', 'fld-puissance', 'prod-divider', 'fld-contrat',
-                'block-tarif-flex', 'block-tarif-base', 'block-tarifs-custom', 'fld-rachat'];
+                'block-tarif-flex', 'block-tarif-base', 'block-tarifs-custom', 'rachat-divider', 'fld-rachat'];
 
             function _updateProdReveal() {
                 if (!document.body.classList.contains('phase-wizard')) return;
@@ -6355,7 +6806,7 @@
                     { els: ['fld-dept'], done: deptDone },
                     { els: ['fld-puissance'], done: has('.tile-btn[data-group="hasPv"].active') },
                     { els: ['prod-divider', 'fld-contrat'], done: has('.tile-btn[data-group="contrat"].active') },
-                    { els: ['block-tarif-flex', 'block-tarif-base', 'block-tarifs-custom', 'fld-rachat'], done: true },
+                    { els: ['block-tarif-flex', 'block-tarif-base', 'block-tarifs-custom', 'rachat-divider', 'fld-rachat'], done: true },
                 ];
                 let reveal = true;
                 units.forEach(u => {
@@ -6468,27 +6919,70 @@
             });
             _showWizardStep(0);
 
-            _leadForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const payload = {
-                    email: document.getElementById('leadEmail').value.trim(),
-                    firstname: document.getElementById('leadFirstname').value.trim(),
-                    zip: document.getElementById('leadZip').value.trim(),
-                    phone: document.getElementById('leadPhone').value.trim(),
-                };
-                console.log('[proto lead gate] données fictives soumises', payload);
-                _enterApp();
+            // Modale hypothèse PV : « J'ai compris » referme le bandeau bloquant
+            document.getElementById('pvNoticeOk').addEventListener('click', () => {
+                document.getElementById('pvNoticeOverlay').classList.remove('show');
             });
 
-            // DEBUG — saute le wizard + le lead gate (à retirer en prod)
-            const _debugBypass = document.getElementById('debugBypass');
-            if (_debugBypass) {
-                _debugBypass.addEventListener('click', () => {
-                    console.log('[debug] bypass wizard + lead gate');
-                    _enterApp();
-                    _debugBypass.style.display = 'none';
+            // Modale info Revente / Pilotage (point « i » des tuiles)
+            const _INFO_TEXTS = {
+                revente: {
+                    t: 'La revente de surplus',
+                    p: 'L\'électricité solaire que vous produisez mais ne consommez pas est injectée sur le réseau et rachetée par votre fournisseur. Ce revenu dépend du tarif de rachat de votre contrat (ex : EDF Obligation d\'Achat ≈ 0,04 €/kWh).'
+                },
+                pilotage: {
+                    t: 'Le pilotage heures pleines / heures creuses',
+                    p: 'Avec un contrat Heures Pleines / Heures Creuses, la batterie se recharge automatiquement sur le réseau pendant les heures creuses (électricité moins chère) pour être déchargée en heures pleines. Cet arbitrage sur le tarif réduit votre facture.'
+                }
+            };
+            document.querySelectorAll('.info-i').forEach(el => {
+                el.addEventListener('click', () => {
+                    const info = _INFO_TEXTS[el.dataset.info];
+                    if (!info) return;
+                    document.getElementById('infoModalTitle').textContent = info.t;
+                    document.getElementById('infoModalText').textContent = info.p;
+                    document.getElementById('infoModalOverlay').classList.add('show');
                 });
-            }
+            });
+            document.getElementById('infoModalOk').addEventListener('click', () => {
+                document.getElementById('infoModalOverlay').classList.remove('show');
+            });
+
+            // Endpoint Apps Script (Google Sheet) — remplacer XXXXX par l'URL de
+            // déploiement « /exec ». Tant que le placeholder est là, l'envoi est OFF.
+            const LEAD_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwYeqhGnLqk-NnwbVDjPxwMLS0cLozZZmU-LSurUaE1tsTK_zTV0Ksv21imD0nywMWOVQ/exec';
+
+            _leadForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                // Snapshot des inputs saisis jusqu'ici (wizard → gate). Le `state`
+                // est à jour : _enterGate() a déjà recalculé. On ajoute les tarifs,
+                // qui ne vivent que dans le DOM. Capture unique : après _enterApp(),
+                // l'utilisateur édite librement l'app sans que ça remonte.
+                const numOrNull = id => {
+                    const v = parseFloat(document.getElementById(id).value);
+                    return isNaN(v) ? null : v;
+                };
+                const lead = {
+                    firstname: document.getElementById('leadFirstname').value.trim(),
+                    email: document.getElementById('leadEmail').value.trim(),
+                    submittedAt: new Date().toISOString(),
+                    inputs: {
+                        ...state,
+                        tarifBase: numOrNull('tarifBase'),
+                        tarifHP: numOrNull('tarifHP'),
+                        tarifHC: numOrNull('tarifHC'),
+                    },
+                };
+                window.__revoltyLead = lead;
+                console.log('[lead gate] lead capturé', lead);
+                // Envoi fire-and-forget vers le Google Sheet : ne bloque pas l'UI.
+                // no-cors + body string = requête simple (pas de préflight CORS).
+                if (LEAD_SHEET_URL.indexOf('XXXXX') === -1) {
+                    fetch(LEAD_SHEET_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(lead) })
+                        .catch(err => console.warn('[lead gate] envoi échoué', err));
+                }
+                _enterApp();
+            });
 
             // ── MODE PUBLIC / PRIVÉ ──────────────────────────────────────────────────
             // Privé par défaut (usage interne). Pour activer le mode public (champs
@@ -6613,6 +7107,7 @@
                     projEscalation = parseFloat(btn.dataset.esc);
                     document.querySelectorAll('#proj-scenarios .scenario')
                         .forEach(b => b.classList.toggle('active', b === btn));
+                    _animateProj = true;
                     compute();
                 });
             });

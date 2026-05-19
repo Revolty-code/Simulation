@@ -1502,6 +1502,7 @@
             // Tarif de rachat du surplus — saisi librement par l'utilisateur (0 par défaut)
             const ELEC_ESCALATION = 0.04; // +4% / an — hypothèse EDF long terme
             let projEscalation = ELEC_ESCALATION; // taux courant du graphe projection (scénario cliquable)
+            let _animateProj = false; // n'anime les barres que sur changement batterie / scénario
             const HORIZON = 20; // durée contrat OA en années
             const BATT_EFF = 0.92;   // round-trip LFP (0.96 × 0.96)
             const SOC_INIT = 0.30;   // SOC initial pour la convergence en régime permanent (30%)
@@ -1977,7 +1978,13 @@
             const KWH_ECS = { joule: 1670, thermo: 752 }; // kWh/an, foyer moyen (2,24p)
             const KWH_VE = 2500;   // kWh/an — ADEME, usage moyen VE France
             const KWH_PISCI = 1690;   // kWh/an — Panel Elecdom ADEME 2021, fig 13-3 (moyenne 5 piscines, plage 250–4 100)
-            const KWH_CLIM = 304;    // kWh/an — Panel Elecdom ADEME 2021, split fixe national (fallback)
+            // Intensité clim — kWh/m²/an. Ancrage : ADEME Panel Usages Électrodomestiques
+            // 2021 = 2,3 kWh/m² (moyenne nationale, split fixe). Déclinaison par zone
+            // calibrée sur la moyenne Sud-Est ADEME (482 kWh/an) : H1 usage d'appoint
+            // occasionnel ~1 kWh/m², H2 ≈ moyenne nationale, H3 Méditerranée ~4 kWh/m².
+            // Modèle surface × intensité : un studio reste à ~30 kWh, une maison de
+            // 140 m² en H3 monte à ~560 kWh, ce qu'un forfait par zone ne capte pas.
+            const CLIM_KWH_M2_DEFAULT = 2.3;  // fallback département inconnu — moyenne nationale ADEME
 
             // Zones climatiques RT2012 par département — arrêté du 26 octobre 2010
             // H1 (~55% pop) : climat tempéré (Nord, Est, IdF, Centre, montagne)
@@ -2013,17 +2020,16 @@
                 '2A': 'H3', '2B': 'H3'
             };
 
-            // Conso clim annuelle par zone (kWh/an, foyer équipé) — calibré pour
-            // préserver l'ancrage Panel Elecdom 304 kWh national pondéré par taux
-            // d'équipement régional (~20% H1, ~30% H2, ~50% H3).
-            // Sources : EDF Solutions Solaires (482 kWh moyenne Sud-Est),
-            //           ADEME État de l'art climatisation 2018 (DJU clim base 26°C),
-            //           Panel Elecdom ADEME 2021 (ancrage national).
-            const KWH_CLIM_ZONE = {
-                H1a: 120, H1b: 140, H1c: 130,
-                H2a: 200, H2b: 250, H2c: 280, H2d: 280,
-                H3: 580
+            // Intensité clim par zone climatique — kWh/m²/an (cf. CLIM_KWH_M2_DEFAULT).
+            const CLIM_KWH_M2 = {
+                H1a: 0.9, H1b: 1.1, H1c: 1.0,
+                H2a: 1.7, H2b: 2.1, H2c: 2.4, H2d: 2.4,
+                H3: 4.0
             };
+            // PAC air-air réversible utilisée en rafraîchissement : usage plus intensif
+            // qu'un split d'appoint (froid seul 500–1200 kWh/an vs ~300, sources métier).
+            // Majoration appliquée quand le chauffage est une PAC (réversible présumée).
+            const CLIM_PAC_FACTOR = 1.35;
 
             // Saisonnalité ECS — Source : CSV ADEME elecdom-courbes-horaires
             // Ratios mesurés : hiver(déc-fév)/moy = 1.201, été(jun-août)/moy = 0.730
@@ -2176,7 +2182,10 @@
                 const kwh_ve = state.ve ? KWH_VE : 0;
                 const kwh_pisci = state.piscine ? KWH_PISCI : 0;
                 const climZone = ZONE_CLIM[state.dept];
-                const kwh_clim = state.clim ? (climZone ? KWH_CLIM_ZONE[climZone] : KWH_CLIM) : 0;
+                // Modèle surface × intensité kWh/m² × zone, +35% si chauffage PAC (réversible).
+                const climIntensite = climZone ? CLIM_KWH_M2[climZone] : CLIM_KWH_M2_DEFAULT;
+                const climPac = state.heat === 'pompe' ? CLIM_PAC_FACTOR : 1;
+                const kwh_clim = state.clim ? Math.round(state.surface * climIntensite * climPac) : 0;
 
                 // Mode manuel : conso totale saisie, ventilation selon type de chauffage
                 // Parts chauffage issues des moyennes ADEME pour foyers électriques
@@ -2605,9 +2614,11 @@
                 sec.style.display = '';
 
                 const showSoh = false; // courbe SoH retirée de la projection
-                const showPilot = ecoPilot > 0;
-                const legPilot = document.getElementById('projLegendPilot');
-                if (legPilot) legPilot.style.display = showPilot ? '' : 'none';
+                // Légende dynamique : chaque entrée n'apparaît que si sa série existe dans le graphe
+                const _toggleLeg = (id, on) => { const e = document.getElementById(id); if (e) e.style.display = on ? '' : 'none'; };
+                _toggleLeg('projLegBatt', ecoBatterie > 0);
+                _toggleLeg('projLegendPilot', ecoPilot > 0);
+                _toggleLeg('projLegSurplus', ecoRevente > 0);
 
                 // Build yearly data — autoconso & pilotage HP/HC grow with elec price, surplus stays fixed
                 const years = [];
@@ -2656,8 +2667,8 @@
                 for (let i = 0; i <= nTicks; i++) {
                     const val = Math.round(maxVal * i / nTicks);
                     const yy = scY(val);
-                    svg += `<line x1="${PAD_L}" y1="${yy}" x2="${W - PAD_R}" y2="${yy}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
-                    svg += `<text x="${PAD_L - 4}" y="${yy + 3}" text-anchor="end" font-size="8" fill="rgba(255,255,255,0.25)" font-family="DM Sans,sans-serif">${val}€</text>`;
+                    svg += `<line x1="${PAD_L}" y1="${yy}" x2="${W - PAD_R}" y2="${yy}" stroke="rgba(0,0,0,0.07)" stroke-width="1"/>`;
+                    svg += `<text x="${PAD_L - 4}" y="${yy + 3}" text-anchor="end" font-size="8" fill="#0D1A14" font-family="DM Sans,sans-serif">${val}€</text>`;
                 }
 
                 // Bars
@@ -2665,19 +2676,21 @@
                     const yr = years[i];
                     const x = PAD_L + i * barGap + 1;
                     let top = PAD_T + chartH;
+                    // animation (escalier) seulement après un changement batterie / scénario
+                    const _ba = _animateProj ? `class="proj-bar" style="animation-delay:${(i * 0.03).toFixed(2)}s"` : '';
 
                     // Surplus (bottom)
-                    if (yr.s > 0) { const bh = Math.max(1, Math.round((yr.s / maxVal) * chartH)); top -= bh; svg += `<rect x="${x}" y="${top}" width="${barW}" height="${bh}" fill="rgba(255,209,69,0.6)" rx="1"/>`; }
+                    if (yr.s > 0) { const bh = Math.max(1, Math.round((yr.s / maxVal) * chartH)); top -= bh; svg += `<rect ${_ba} x="${x}" y="${top}" width="${barW}" height="${bh}" fill="rgba(255,209,69,0.6)" rx="1"/>`; }
                     // Pilotage HP/HC (violet)
-                    if (yr.p > 0) { const bh = Math.max(1, Math.round((yr.p / maxVal) * chartH)); top -= bh; svg += `<rect x="${x}" y="${top}" width="${barW}" height="${bh}" fill="#9B6DFF" rx="1"/>`; }
+                    if (yr.p > 0) { const bh = Math.max(1, Math.round((yr.p / maxVal) * chartH)); top -= bh; svg += `<rect ${_ba} x="${x}" y="${top}" width="${barW}" height="${bh}" fill="#9B6DFF" rx="1"/>`; }
                     // Batterie
-                    if (yr.b > 0) { const bh = Math.max(1, Math.round((yr.b / maxVal) * chartH)); top -= bh; svg += `<rect x="${x}" y="${top}" width="${barW}" height="${bh}" fill="#017267" rx="1"/>`; }
+                    if (yr.b > 0) { const bh = Math.max(1, Math.round((yr.b / maxVal) * chartH)); top -= bh; svg += `<rect ${_ba} x="${x}" y="${top}" width="${barW}" height="${bh}" fill="#017267" rx="1"/>`; }
                     // Directe (top)
-                    if (yr.d > 0) { const bh = Math.max(1, Math.round((yr.d / maxVal) * chartH)); top -= bh; svg += `<rect x="${x}" y="${top}" width="${barW}" height="${bh}" fill="#11E47A" rx="1"/>`; }
+                    if (yr.d > 0) { const bh = Math.max(1, Math.round((yr.d / maxVal) * chartH)); top -= bh; svg += `<rect ${_ba} x="${x}" y="${top}" width="${barW}" height="${bh}" fill="#11E47A" rx="1"/>`; }
 
-                    // X label every 5 years + year 1
-                    if (yr.y === 1 || yr.y % 5 === 0) {
-                        svg += `<text x="${x + barW / 2}" y="${H - 4}" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.3)" font-family="DM Sans,sans-serif">${yr.y}</text>`;
+                    // X labels : an 1, 10, 20 uniquement
+                    if (yr.y === 1 || yr.y === 10 || yr.y === 20) {
+                        svg += `<text x="${x + barW / 2}" y="${H - 4}" text-anchor="middle" font-size="8" fill="#0D1A14" font-family="DM Sans,sans-serif">${yr.y === 1 ? '1 an' : yr.y + ' ans'}</text>`;
                     }
                 }
 
@@ -2700,38 +2713,18 @@
 
                 svg += '</svg>';
                 document.getElementById('projChartWrap').innerHTML = svg;
+                _animateProj = false; // consommé : pas de réanimation aux recalculs suivants
             }
 
-            // ─── Sweep dimensionnement : trouve le kWc dont la PV brute couvre ~28% de la conso annuelle ──
-            // Couverture = PV_autoconsommée / conso_annuelle, calculée SANS batterie ni pilotage : la batterie
-            // augmenterait artificiellement la couverture (surplus stocké → autoconsommé), ce qui fausserait
-            // le dimensionnement. On veut le kWc qui satisfait la cible PV brute, indépendamment du kWh de batt.
-            const COVERAGE_TARGET = 0.28;
-            function sweepOptimalKwc() {
-                const kwhs = computeKwhs();
-                if (!kwhs.total) return 6;
-                const deptProd = PROD_ANNUEL[state.dept];
-                const productible = deptProd ? (deptProd[state.incl]?.[state.orient] || 1100) : 1100;
-                // Sweep dimensionnement : independant du tarif (autoProdRate ne depend que des kWh).
-                // En mode flex on utilise le TRV Base pour eviter de cumuler 12*2 sims flex inutiles.
-                const sweepContrat = state.contrat === 'flex' ? 'base' : state.contrat;
-                const userTarifs = sweepContrat === 'hphc'
-                    ? {
-                        hp: parseFloat(document.getElementById('tarifHP').value) || TARIFS.hphc.hp,
-                        hc: parseFloat(document.getElementById('tarifHC').value) || TARIFS.hphc.hc
-                    }
-                    : { kwh: parseFloat(document.getElementById('tarifBase').value) || TARIFS.base.kwh };
-                const tarifH = buildTarifHoraire(sweepContrat, userTarifs);
-                let best = 1, bestDiff = Infinity;
-                for (let k = 1; k <= 12; k += 0.5) {
-                    const prod = k * productible * (1 - state.ombrage);
-                    // battKwh=0 + pilot=false : couverture brute, indépendante du choix de batterie
-                    const r = simMensuelle(prod, kwhs, 0, tarifH, false);
-                    const coverage = r.autoProdRate / 100;
-                    const diff = Math.abs(coverage - COVERAGE_TARGET);
-                    if (diff < bestDiff) { bestDiff = diff; best = k; }
-                }
-                return Math.round(best * 2) / 2;
+            // ─── Tranche PV hypothèse (mode « Pas de PV ») ──────────────────────────────
+            // Revolty ne vend pas le PV : on ne « dimensionne » pas, on pose une hypothèse
+            // de travail ronde indexée sur la conso (règle HTW ~1 kWc / 1000 kWh) pour que
+            // la batterie ait du surplus crédible à valoriser. 3 tranches : 3 / 6 / 9 kWc.
+            function trancheKwc() {
+                const total = computeKwhs().total || 0;
+                if (total < 4500) return 3;
+                if (total <= 7500) return 6;
+                return 9;
             }
 
             // ─── Payback batterie (économies totales = compute(batt) − compute(0)) ─────
@@ -2825,11 +2818,12 @@
                 // Mode "Pas de PV" : on re-dimensionne à chaque calcul pour suivre les évolutions
                 // de conso (foyer, appareils, dept…). Le sweep ignore la batterie volontairement.
                 if (!state.hasPv) {
-                    const opt = sweepOptimalKwc();
-                    state.kwc = opt;
+                    const kwc = trancheKwc();
+                    state.kwc = kwc;
                     const inp = document.getElementById('kwcInput');
-                    if (inp && parseFloat(inp.value) !== opt) inp.value = opt.toFixed(1);
-                    document.getElementById('kwcHelper').textContent = `Dimensionnement proposé pour ~28 % de couverture : ${opt.toFixed(1).replace('.', ',')} kWc`;
+                    if (inp && parseFloat(inp.value) !== kwc) inp.value = kwc.toFixed(1);
+                    document.getElementById('kwcHelper').textContent =
+                        `Hypothèse PV indexée sur votre consommation : ${kwc} kWc`;
                     if (typeof updateKwcWarn === 'function') updateKwcWarn();
                 }
                 const kwc = state.kwc || 0;
@@ -2871,9 +2865,23 @@
                     ecoBaseRefAnnuelle = refBatt.ecoDirecte + refBatt.ecoBatterie + refBatt.ecoRevente;
                 }
 
-                // ── Highlight batterie « OPTIMALE » ─────────────────────────────────────
-                // Optimale = celle dont |ratio − 1| est minimal parmi les trois tailles.
-                // Indépendant du choix utilisateur — pas de boucle de rétroaction.
+                const auto = resBatt.autoRate;
+                const autoBase = resBase.autoRate;
+                const delta = auto - autoBase;
+                const conso = resBatt.consoAnnuelle;
+
+                // ── Bloc 1 — L'essentiel ──────────────────────────────────────────────
+                const ecoCoutHC = resBatt.ecoCoutHC || 0;
+                const ecoTotal = resBatt.ecoDirecte + resBatt.ecoBatterie + resBatt.ecoRevente - ecoCoutHC;
+                const ecoTotalNoPilot = resBattNoPilot.ecoDirecte + resBattNoPilot.ecoBatterie + resBattNoPilot.ecoRevente;
+                const ecoTotalBase = resBase.ecoDirecte + resBase.ecoBatterie + resBase.ecoRevente;
+                const fmt = v => v > 0 ? '+\u00a0' + v.toLocaleString('fr-FR') + '\u00a0€' : '—';
+
+                // ── Highlight batterie « OPTIMALE » — calée sur le surplus ──────────────
+                // Optimale = celle dont le ratio capacité/surplus journalier est le plus
+                // proche de 1 — même méthode physique que le diagnostic ci-dessous, donc
+                // jamais de contradiction. Surplus mesuré sans batterie (resBase) →
+                // indépendant du choix utilisateur, pas de boucle de rétroaction.
                 const surplusJourBrut = resBase.kWhSurplus / 365;
                 let optimalBatt = null;
                 if (surplusJourBrut > 0.1) {
@@ -2887,18 +2895,6 @@
                     const b = parseInt(btn.dataset.batt);
                     btn.classList.toggle('optimal-batt', optimalBatt !== null && b === optimalBatt);
                 });
-
-                const auto = resBatt.autoRate;
-                const autoBase = resBase.autoRate;
-                const delta = auto - autoBase;
-                const conso = resBatt.consoAnnuelle;
-
-                // ── Bloc 1 — L'essentiel ──────────────────────────────────────────────
-                const ecoCoutHC = resBatt.ecoCoutHC || 0;
-                const ecoTotal = resBatt.ecoDirecte + resBatt.ecoBatterie + resBatt.ecoRevente - ecoCoutHC;
-                const ecoTotalNoPilot = resBattNoPilot.ecoDirecte + resBattNoPilot.ecoBatterie + resBattNoPilot.ecoRevente;
-                const ecoTotalBase = resBase.ecoDirecte + resBase.ecoBatterie + resBase.ecoRevente;
-                const fmt = v => v > 0 ? '+\u00a0' + v.toLocaleString('fr-FR') + '\u00a0€' : '—';
 
                 // Affichage : fourchette p10-p90 si flex, sinon valeur unique
                 if (isFlex && resBattLow && resBattHigh) {
@@ -2959,7 +2955,7 @@
                 if (pilotRow) pilotRow.style.display = pilotActive ? 'flex' : 'none';
                 document.getElementById('ecoDirecte').textContent = fmt(resBatt.ecoDirecte);
                 document.getElementById('ecoBatterie').textContent = (state.batt > 0 && bonusBattSolarEur > 0)
-                    ? 'dont ' + Math.round(bonusBattSolarEur).toLocaleString('fr-FR') + ' €'
+                    ? Math.round(bonusBattSolarEur).toLocaleString('fr-FR') + ' €'
                     : '—';
                 document.getElementById('ecoPilot').textContent = fmt(bonusPilotEur);
                 document.getElementById('ecoRevente').textContent = fmt(resBatt.ecoRevente);
@@ -3003,41 +2999,61 @@
                     dim = 'ok'; dimLabel = 'Bien dimensionnée'; dimClass = 'dim-badge dim-ok';
                     msgText = '✅ La batterie est bien calibrée pour absorber votre surplus solaire.'; msgClass = 'surplus-msg ok';
                 } else {
-                    dim = 'sur'; dimLabel = 'Prête pour la suite'; dimClass = 'dim-badge dim-sur';
+                    dim = 'sur'; dimLabel = 'Surdimensionnée'; dimClass = 'dim-badge dim-sur';
                     msgText = '🚀 La batterie a plus de capacité que votre production ne génère de surplus. Ajoutez des panneaux pour en exploiter tout le potentiel.'; msgClass = 'surplus-msg sur';
                 }
                 document.getElementById('resSurplusBar').style.width = (state.batt === 0 ? 0 : Math.min(100, Math.round(Math.min(ratio, 1) * 100))) + '%';
                 document.getElementById('resDimBarTrack').style.display = dim === 'max' ? 'none' : '';
                 document.getElementById('resDimBadge').textContent = dimLabel;
                 document.getElementById('resDimBadge').className = dimClass;
+                // barre de la même couleur que l'état
+                const _DIM_BAR = { sous: '#C0392B', ok: '#017267', sur: '#1A6B8A', max: '#6A3FB5' };
+                document.getElementById('resSurplusBar').style.background =
+                    _DIM_BAR[dim] || 'linear-gradient(90deg, var(--respire), var(--neo))';
                 document.getElementById('resSurplusMsg').textContent = msgText;
                 document.getElementById('resSurplusMsg').className = msgClass;
 
                 renderChart(resBatt.monthly);
 
-                // ── Bloc 2 — Projection (revente + surplus kWh) ───────────────────────
-                // Gains annexes = revente surplus + pilotage HP/HC. Fallback si aucun des deux.
-                const gainsAnnexes = resBatt.ecoRevente + bonusPilotEur;
-                if (gainsAnnexes > 0) {
-                    document.getElementById('outRevente').textContent = Math.round(gainsAnnexes).toLocaleString('fr-FR') + ' €';
-                    document.getElementById('gainsAnnexesLbl').textContent = 'Gains revente & pilotage';
-                } else {
-                    document.getElementById('outRevente').textContent = resBatt.kWhSurplus.toLocaleString('fr-FR') + ' kWh';
-                    document.getElementById('gainsAnnexesLbl').textContent = 'Surplus injecté au réseau';
-                }
+                // ── Bloc 2 — Revente & Pilotage (tuiles distinctes, tiret si rien) ────
+                const _rev = resBatt.ecoRevente;
+                const _pil = bonusPilotEur;
+                document.getElementById('outRevente').textContent =
+                    _rev > 0 ? Math.round(_rev).toLocaleString('fr-FR') + ' €' : '—';
+                document.getElementById('outPilotage').textContent =
+                    _pil > 0 ? Math.round(_pil).toLocaleString('fr-FR') + ' €' : '—';
                 document.getElementById('outSurplusKwh').textContent = resBatt.kWhSurplus > 0 ? resBatt.kWhSurplus.toLocaleString('fr-FR') + ' kWh' : '—';
 
                 // ── Bloc 3 — Impact ───────────────────────────────────────────────────
                 document.getElementById('outProdAnnuelle').textContent = prodAnnuelle.toLocaleString('fr-FR') + ' kWh';
-                document.getElementById('outProdLbl').innerHTML = 'Production' + (state.ombrage > 0 ? ' <span class="estimated-lbl">-' + Math.round(state.ombrage * 100) + '% ombrage</span>' : ' annuelle');
+                document.getElementById('outProdLbl').textContent = state.ombrage > 0 ? '−' + Math.round(state.ombrage * 100) + ' % ombrage' : '';
                 document.getElementById('outKwc').textContent = kwc.toFixed(1).replace('.', ',') + ' kWc';
 
-                // Équivalence grand public : production PV ÷ conso d'une maison moyenne FR
-                const foyersEquiv = prodAnnuelle / FOYER_MOYEN_KWH;
-                document.getElementById('outFoyersEquiv').textContent = prodAnnuelle > 0
-                    ? 'soit ' + foyersEquiv.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
-                        + (foyersEquiv >= 2 ? ' foyers alimentés' : ' foyer alimenté')
-                    : '—';
+                // Schéma dimensionnement : niveau de remplissage + valeur de la batterie + kWc
+                const _battFill = document.getElementById('schemaBattFill');
+                if (_battFill) {
+                    const _h = 30 * Math.min(1, state.batt / 15);
+                    _battFill.setAttribute('height', _h.toFixed(1));
+                    _battFill.setAttribute('y', (138 - _h).toFixed(1));
+                }
+                const _battVal = document.getElementById('schemaBattVal');
+                if (_battVal) _battVal.textContent = state.batt > 0 ? state.batt + ' kWh' : 'Sans';
+                const _kwcVal = document.getElementById('schemaKwcVal');
+                if (_kwcVal) _kwcVal.textContent = kwc.toFixed(1).replace('.', ',') + ' kWc';
+                const _consoVal = document.getElementById('schemaConsoVal');
+                if (_consoVal) _consoVal.textContent = Math.round(conso).toLocaleString('fr-FR') + ' kWh';
+
+                // Bandeau d'accueil : rappelle que les résultats portent sur une installation simulée
+                const _introEl = document.getElementById('introBannerText');
+                if (_introEl) {
+                    const _kwcTxt = kwc.toFixed(1).replace('.', ',') + ' kWc';
+                    _introEl.innerHTML = state.hasPv
+                        ? 'Simulation basée sur <strong>votre installation de ' + _kwcTxt + '</strong>'
+                            + (state.batt > 0 ? ' avec une batterie Revolty de ' + state.batt + ' kWh.' : '.')
+                        : 'Vous n\'avez pas encore de panneaux : on simule un <strong>dimensionnement solaire de '
+                            + _kwcTxt + '</strong> adapté à votre profil, pour vous donner un ordre de grandeur'
+                            + (state.batt > 0 ? ', avec une batterie Revolty de ' + state.batt + ' kWh.' : '.');
+                }
 
                 // Gaspillage solaire — message selon présence batterie
                 const perteSansBatt = Math.max(0, 100 - resBase.autoConsoRate);
@@ -3049,22 +3065,22 @@
                     const perteAvecBatt = Math.max(0, 100 - resBatt.autoConsoRate);
                     const facteur = perteAvecBatt > 0 ? perteSansBatt / perteAvecBatt : 0;
                     _perteEl.textContent = facteur >= 1.1
-                        ? '🔋 La batterie divise le gaspillage solaire par ' + facteur.toLocaleString('fr-FR', { maximumFractionDigits: 1 })
-                        : '🔋 ' + perteAvecBatt + ' % de la production injectée au réseau';
+                        ? 'La batterie divise le gaspillage solaire par ' + facteur.toLocaleString('fr-FR', { maximumFractionDigits: 1 })
+                        : perteAvecBatt + ' % de la production injectée au réseau';
                     _perteEl.classList.add('impact-perte-pos');
                 } else {
                     _perteEl.textContent = '⚠ ' + perteSansBatt + ' % de la production perdue sans batterie';
                     _perteEl.classList.remove('impact-perte-pos');
                 }
 
-                const co2Row = document.getElementById('outCo2BattRow');
+                const co2Block = document.getElementById('impact-co2-block');
                 if (state.batt > 0) {
-                    co2Row.style.display = 'flex';
+                    co2Block.style.display = 'block';
                     const co2Kg = Math.round(state.batt * CO2_BATT_NEUVE);
                     document.getElementById('outCo2Batt').textContent = co2Kg.toLocaleString('fr-FR') + ' kg CO₂ évités';
-                    document.getElementById('outCo2BattLbl').textContent = 'vs batterie neuve · Revolty reconditionnée ' + state.batt + ' kWh';
+                    document.getElementById('outCo2BattLbl').textContent = 'batterie Revolty reconditionnée ' + state.batt + ' kWh vs neuve, sans lien avec la production solaire';
                 } else {
-                    co2Row.style.display = 'none';
+                    co2Block.style.display = 'none';
                 }
 
                 // ── Outputs objet (debug) ─────────────────────────────────────────────
@@ -3540,7 +3556,8 @@
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.objectif-btn').forEach(b => b.className = 'objectif-btn');
                     state.batt = parseInt(btn.dataset.batt);
-                    btn.classList.add(['active-sans', 'active-essentiel', 'active-confort', 'active-autonomie'][[0, 5, 10, 15].indexOf(state.batt)] || 'active-confort');
+                    btn.classList.add(state.batt === 0 ? 'active-sans' : 'active-confort');
+                    _animateProj = true;
                     compute();
                 });
             });
@@ -3567,7 +3584,12 @@
                     else if (g === 'hasPv') {
                         state.hasPv = (v === 'oui');
                         if (state.hasPv) {
-                            document.getElementById('kwcHelper').textContent = 'ex : 6 kWc ≈ 15 panneaux 400 Wc';
+                            document.getElementById('kwcHelper').textContent = 'Ex : 6 kWc ≈ 15 panneaux 400 Wc';
+                            document.getElementById('kwcInput').value = '';
+                        } else if (!_pvNoticeShown) {
+                            // Mode « Pas de PV » : on prévient que le kWc est une hypothèse, pas une reco
+                            _pvNoticeShown = true;
+                            document.getElementById('pvNoticeOverlay').classList.add('show');
                         }
                         // Sinon : compute() recalcule le dimensionnement et met à jour le helper
                     }
@@ -3648,7 +3670,7 @@
             // Sliders
             document.getElementById('surface').addEventListener('input', function () {
                 state.surface = parseInt(this.value);
-                document.getElementById('surfaceVal').textContent = this.value;
+                document.getElementById('surfaceVal').textContent = parseInt(this.value) >= 250 ? '250+' : this.value;
                 debouncedCompute();
             });
             document.getElementById('kwcInput').addEventListener('input', function () {
@@ -3732,6 +3754,7 @@
             const _leadForm = document.getElementById('leadGateForm');
             const WIZARD_ZONES = ['zone-conso', 'zone-prod'];
             let _wizStep = 0;
+            let _pvNoticeShown = false; // modale hypothèse PV affichée une seule fois
 
             function _showWizardStep(i) {
                 _wizStep = Math.max(0, Math.min(WIZARD_ZONES.length - 1, i));
@@ -3785,7 +3808,8 @@
                 } else {
                     units = [
                         { els: ['fld-consomode'], done: true },
-                        { els: ['fld-persons', 'fld-surface'], done: has('.tile-btn[data-group="persons"].active') },
+                        { els: ['fld-persons'], done: has('.tile-btn[data-group="persons"].active') },
+                        { els: ['fld-surface'], done: true },
                         { els: ['fld-heat-e'], done: has('#estimFields .tile-btn[data-group="heat"].active') },
                         { els: ['fld-presence'], done: has('.tile-btn[data-group="journee"].active') },
                         { els: ['card-appareils'], done: true },
@@ -3814,7 +3838,7 @@
 
             // ── RÉVÉLATION PROGRESSIVE — étape Production du wizard ────────────────
             const _PROD_REVEAL_IDS = ['fld-dept', 'fld-puissance', 'prod-divider', 'fld-contrat',
-                'block-tarif-flex', 'block-tarif-base', 'block-tarifs-custom', 'fld-rachat'];
+                'block-tarif-flex', 'block-tarif-base', 'block-tarifs-custom', 'rachat-divider', 'fld-rachat'];
 
             function _updateProdReveal() {
                 if (!document.body.classList.contains('phase-wizard')) return;
@@ -3828,7 +3852,7 @@
                     { els: ['fld-dept'], done: deptDone },
                     { els: ['fld-puissance'], done: has('.tile-btn[data-group="hasPv"].active') },
                     { els: ['prod-divider', 'fld-contrat'], done: has('.tile-btn[data-group="contrat"].active') },
-                    { els: ['block-tarif-flex', 'block-tarif-base', 'block-tarifs-custom', 'fld-rachat'], done: true },
+                    { els: ['block-tarif-flex', 'block-tarif-base', 'block-tarifs-custom', 'rachat-divider', 'fld-rachat'], done: true },
                 ];
                 let reveal = true;
                 units.forEach(u => {
@@ -3941,27 +3965,70 @@
             });
             _showWizardStep(0);
 
-            _leadForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const payload = {
-                    email: document.getElementById('leadEmail').value.trim(),
-                    firstname: document.getElementById('leadFirstname').value.trim(),
-                    zip: document.getElementById('leadZip').value.trim(),
-                    phone: document.getElementById('leadPhone').value.trim(),
-                };
-                console.log('[proto lead gate] données fictives soumises', payload);
-                _enterApp();
+            // Modale hypothèse PV : « J'ai compris » referme le bandeau bloquant
+            document.getElementById('pvNoticeOk').addEventListener('click', () => {
+                document.getElementById('pvNoticeOverlay').classList.remove('show');
             });
 
-            // DEBUG — saute le wizard + le lead gate (à retirer en prod)
-            const _debugBypass = document.getElementById('debugBypass');
-            if (_debugBypass) {
-                _debugBypass.addEventListener('click', () => {
-                    console.log('[debug] bypass wizard + lead gate');
-                    _enterApp();
-                    _debugBypass.style.display = 'none';
+            // Modale info Revente / Pilotage (point « i » des tuiles)
+            const _INFO_TEXTS = {
+                revente: {
+                    t: 'La revente de surplus',
+                    p: 'L\'électricité solaire que vous produisez mais ne consommez pas est injectée sur le réseau et rachetée par votre fournisseur. Ce revenu dépend du tarif de rachat de votre contrat (ex : EDF Obligation d\'Achat ≈ 0,04 €/kWh).'
+                },
+                pilotage: {
+                    t: 'Le pilotage heures pleines / heures creuses',
+                    p: 'Avec un contrat Heures Pleines / Heures Creuses, la batterie se recharge automatiquement sur le réseau pendant les heures creuses (électricité moins chère) pour être déchargée en heures pleines. Cet arbitrage sur le tarif réduit votre facture.'
+                }
+            };
+            document.querySelectorAll('.info-i').forEach(el => {
+                el.addEventListener('click', () => {
+                    const info = _INFO_TEXTS[el.dataset.info];
+                    if (!info) return;
+                    document.getElementById('infoModalTitle').textContent = info.t;
+                    document.getElementById('infoModalText').textContent = info.p;
+                    document.getElementById('infoModalOverlay').classList.add('show');
                 });
-            }
+            });
+            document.getElementById('infoModalOk').addEventListener('click', () => {
+                document.getElementById('infoModalOverlay').classList.remove('show');
+            });
+
+            // Endpoint Apps Script (Google Sheet) — remplacer XXXXX par l'URL de
+            // déploiement « /exec ». Tant que le placeholder est là, l'envoi est OFF.
+            const LEAD_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwYeqhGnLqk-NnwbVDjPxwMLS0cLozZZmU-LSurUaE1tsTK_zTV0Ksv21imD0nywMWOVQ/exec';
+
+            _leadForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                // Snapshot des inputs saisis jusqu'ici (wizard → gate). Le `state`
+                // est à jour : _enterGate() a déjà recalculé. On ajoute les tarifs,
+                // qui ne vivent que dans le DOM. Capture unique : après _enterApp(),
+                // l'utilisateur édite librement l'app sans que ça remonte.
+                const numOrNull = id => {
+                    const v = parseFloat(document.getElementById(id).value);
+                    return isNaN(v) ? null : v;
+                };
+                const lead = {
+                    firstname: document.getElementById('leadFirstname').value.trim(),
+                    email: document.getElementById('leadEmail').value.trim(),
+                    submittedAt: new Date().toISOString(),
+                    inputs: {
+                        ...state,
+                        tarifBase: numOrNull('tarifBase'),
+                        tarifHP: numOrNull('tarifHP'),
+                        tarifHC: numOrNull('tarifHC'),
+                    },
+                };
+                window.__revoltyLead = lead;
+                console.log('[lead gate] lead capturé', lead);
+                // Envoi fire-and-forget vers le Google Sheet : ne bloque pas l'UI.
+                // no-cors + body string = requête simple (pas de préflight CORS).
+                if (LEAD_SHEET_URL.indexOf('XXXXX') === -1) {
+                    fetch(LEAD_SHEET_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(lead) })
+                        .catch(err => console.warn('[lead gate] envoi échoué', err));
+                }
+                _enterApp();
+            });
 
             // ── MODE PUBLIC / PRIVÉ ──────────────────────────────────────────────────
             // Privé par défaut (usage interne). Pour activer le mode public (champs
@@ -4086,6 +4153,7 @@
                     projEscalation = parseFloat(btn.dataset.esc);
                     document.querySelectorAll('#proj-scenarios .scenario')
                         .forEach(b => b.classList.toggle('active', b === btn));
+                    _animateProj = true;
                     compute();
                 });
             });
@@ -4096,4 +4164,3 @@
             // ── INIT
             compute();
         })();
-    

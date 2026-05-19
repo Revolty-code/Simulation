@@ -216,12 +216,12 @@
 
         .field-label {
             display: block;
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--dark);
             margin-bottom: 9px;
+            line-height: 1.2;
         }
 
         /* ── DPE SELECTOR ─────────────────────────────────────────────────────── */
@@ -700,13 +700,13 @@
             font-family: 'Bricolage Grotesque', sans-serif;
             font-size: 1.05rem;
             font-weight: 700;
-            color: var(--neo);
+            color: var(--respire);
             letter-spacing: -0.015em;
         }
 
         .co2-lbl {
             font-size: 0.72rem;
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--dark);
             margin-top: 2px;
             line-height: 1.3;
         }
@@ -817,7 +817,7 @@
             display: flex;
             justify-content: space-between;
             font-size: 0.78rem;
-            color: rgba(255, 255, 255, 0.45);
+            color: var(--muted);
             margin-bottom: 7px;
             align-items: center;
         }
@@ -833,28 +833,28 @@
         }
 
         .dim-sous {
-            background: rgba(220, 80, 80, 0.2);
-            color: #FF8585;
+            background: rgba(220, 80, 80, 0.15);
+            color: #C0392B;
         }
 
         .dim-ok {
-            background: rgba(17, 228, 122, 0.15);
-            color: var(--neo);
+            background: rgba(17, 228, 122, 0.18);
+            color: var(--respire);
         }
 
         .dim-sur {
-            background: rgba(26, 107, 138, 0.25);
-            color: #5BC4E8;
+            background: rgba(26, 107, 138, 0.18);
+            color: #1A6B8A;
         }
 
         .dim-max {
-            background: rgba(139, 92, 246, 0.22);
-            color: #B794F6;
+            background: rgba(139, 92, 246, 0.16);
+            color: #6A3FB5;
         }
 
         .bar-track {
             height: 7px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(13, 26, 20, 0.10);
             border-radius: 4px;
             overflow: hidden;
         }
@@ -869,31 +869,31 @@
         .surplus-msg {
             margin-top: 8px;
             font-size: 0.78rem;
-            color: rgba(255, 255, 255, 0.5);
-            background: rgba(255, 255, 255, 0.05);
+            color: var(--muted);
+            background: rgba(13, 26, 20, 0.03);
             border-radius: 8px;
             padding: 8px 12px;
             line-height: 1.45;
         }
 
         .surplus-msg.sous {
-            color: #FF9E9E;
-            background: rgba(220, 80, 80, 0.1);
+            color: #C0392B;
+            background: rgba(220, 80, 80, 0.10);
         }
 
         .surplus-msg.ok {
-            color: var(--neo);
-            background: rgba(17, 228, 122, 0.1);
+            color: var(--respire);
+            background: rgba(17, 228, 122, 0.12);
         }
 
         .surplus-msg.sur {
-            color: #5BC4E8;
+            color: #1A6B8A;
             background: rgba(26, 107, 138, 0.12);
         }
 
         .surplus-msg.max {
-            color: #B794F6;
-            background: rgba(139, 92, 246, 0.14);
+            color: #6A3FB5;
+            background: rgba(139, 92, 246, 0.12);
         }
 
         .cta-btn {
@@ -920,13 +920,70 @@
             box-shadow: 0 8px 24px rgba(17, 228, 122, 0.35);
         }
 
-        .disclaimer {
-            margin-top: 11px;
-            font-size: 0.68rem;
-            color: rgba(255, 255, 255, 0.2);
-            text-align: center;
-            line-height: 1.5;
+        /* Bandeau mentions légales : visible uniquement en phase résultats */
+        .disclaimer { display: none; }
+        .phase-app .disclaimer {
+            display: block;
+            margin: 24px clamp(16px, 6vw, 150px);
+            background: #f6f7f9;
+            border: 1px solid #D6E4DE;
+            border-radius: 10px;
+            padding: 14px 18px;
+            font-size: 0.74rem;
+            color: #5a6b64;
+            text-align: left;
+            line-height: 1.55;
         }
+        .disclaimer p { margin: 0; }
+
+        /* Modale hypothèse PV — bloquante, fermée par « J'ai compris » */
+        .pv-notice-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9500;
+            background: rgba(13, 26, 20, 0.55);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .pv-notice-overlay.show { display: flex; }
+        .pv-notice-card {
+            background: #f6f7f9;
+            border-radius: 16px;
+            padding: 26px 26px 24px;
+            max-width: 440px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+        .pv-notice-icon { font-size: 2.2rem; text-align: center; }
+        .pv-notice-card h3 {
+            margin: 8px 0 14px;
+            color: #0D1A14;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        .pv-notice-card p {
+            font-size: 0.85rem;
+            color: #5a6b64;
+            line-height: 1.55;
+            margin: 0 0 10px;
+        }
+        .pv-notice-card button {
+            display: block;
+            width: 100%;
+            margin-top: 14px;
+            background: #11E47A;
+            color: #0D1A14;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            border: none;
+            border-radius: 999px;
+            padding: 13px 32px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .pv-notice-card button:hover { background: #1af585; }
 
         .hidden {
             display: none;
@@ -998,14 +1055,14 @@
             font-family: 'Bricolage Grotesque', sans-serif;
             font-size: 1.6rem;
             font-weight: 800;
-            color: var(--neo);
+            color: var(--respire);
             letter-spacing: -0.025em;
             margin-bottom: 4px;
         }
 
         .proj-sub {
             font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.35);
+            color: var(--muted);
             margin-bottom: 14px;
         }
 
@@ -1023,7 +1080,7 @@
 
         .proj-legend span {
             font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--dark);
             display: flex;
             align-items: center;
             gap: 5px;
@@ -1448,35 +1505,6 @@
             line-height: 1.35;
         }
 
-        /* DEBUG — bouton magique pour bypasser le lead gate (à retirer en prod) */
-        #debugBypass {
-            position: fixed;
-            bottom: 16px;
-            right: 16px;
-            z-index: 9999;
-            padding: 10px 16px;
-            background: #8b5cf6;
-            color: #fff;
-            border: 2px dashed #fff;
-            border-radius: 999px;
-            font-family: 'Instrument Sans', sans-serif;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.45);
-            transition: transform .15s, box-shadow .15s;
-            letter-spacing: 0.02em;
-        }
-
-        #debugBypass:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 28px rgba(139, 92, 246, 0.55);
-        }
-
-        #debugBypass:active {
-            transform: translateY(0);
-        }
-
         .profile-bar {
             background: #0D1A14;
             padding: 14px 24px;
@@ -1541,7 +1569,7 @@
             background: var(--surface);
         }
 
-        header, .hero, #debugPanel, .disclaimer { display: none !important; }
+        header, .hero, #debugPanel { display: none !important; }
 
         #titre-bar {
             flex: 0 0 44px;
@@ -1559,25 +1587,80 @@
 
         #profileBar { position: fixed; top: 7px; right: 12px; z-index: 9100; margin: 0; }
 
+        #intro-banner {
+            flex: 0 0 auto;
+            background: var(--tile);
+            border-bottom: 1px solid var(--border);
+            color: var(--dark);
+            padding: 9px var(--page-x);
+            font-size: 0.82rem;
+            line-height: 1.4;
+            text-align: center;
+        }
+        #intro-banner strong { font-weight: 800; }
+        .phase-wizard #intro-banner { display: none; }
+
         #top-section {
             flex: 0 0 auto;
             min-height: 56vh;
             display: grid;
-            grid-template-columns: 37% 63%;
-            grid-template-rows: 1fr;
+            grid-template-columns: 1.05fr 1.4fr 0.8fr;
             gap: 10px;
             padding: 12px var(--page-x);
         }
 
-        #left-panel { display: flex; flex-direction: column; gap: 8px; }
-        #left-panel .card { margin: 0; flex: 1; background: var(--tile); }
-        #ac-ap-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-
-        #right-panel {
-            display: grid;
-            grid-template-columns: 3fr 3fr 2fr;
-            grid-template-rows: auto 1fr;
+        /* Chaque colonne = une seule tuile claire, avec son titre. */
+        .col-card {
+            background: var(--tile);
+            color: var(--dark);
+            border-radius: 14px;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow: hidden;
+        }
+        .col-card-hd {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--dark);
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        /* colonne Dimensionnement : fond vert melon d'eau */
+        #col-dim { background: var(--melon); }
+        /* sous-titre de bloc : même police que les titres de colonne, plus petit */
+        .sub-hd {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--dark);
+            margin-bottom: 3px;
+            line-height: 1.2;
+        }
+        /* bloc unique de choix de batterie */
+        .batt-choice {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 10px 12px 12px;
+        }
+        /* en-tête de la jauge de dimensionnement : sous-titre + badge alignés */
+        .dim-jauge-hd {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
             gap: 8px;
+        }
+        /* note en taille normale sous une valeur (ex : « grâce à la batterie ») */
+        .eco-side-note {
+            font-size: 0.74rem;
+            color: var(--dark);
+            margin-top: 3px;
+            line-height: 1.2;
         }
 
         .r-cell {
@@ -1595,50 +1678,186 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.09em;
-            color: rgba(255, 255, 255, 0.30);
+            color: var(--muted);
             margin-bottom: 8px;
             flex-shrink: 0;
         }
 
-        #cell-eco { grid-column: 1; grid-row: 1; }
-        #cell-bonus-batt { grid-column: 2; grid-row: 1; }
-        #cell-graph { grid-column: 1 / span 2; grid-row: 2; }
-        #col3 { grid-column: 3; grid-row: 1 / span 2; display: flex; flex-direction: column; gap: 8px; }
-
-        /* Tuiles métriques : hauteur liée au texte (pas de vide noir).
-           Tampons qui comblent le trou pour aligner les bas : #cell-graph et #cell-impact. */
-        #cell-eco, #cell-bonus-batt { align-self: start; }
-        #cell-revente, #cell-eco-facture { flex: 0 0 auto; }
-        #cell-impact { flex: 1; }
-
-        /* cellules « métrique simple » : contenu centré (style autoconso/autoprod) */
-        #cell-eco, #cell-bonus-batt, #cell-eco-facture, #cell-revente {
+        /* ─── Colonne Dimensionnement ─── */
+        #battSelector { margin-top: 2px; }
+        .dim-schema {
+            flex: 1;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 8px;
         }
-        #cell-eco .metric, #cell-bonus-batt .metric { width: 100%; }
-
-        /* hiérarchie : Économies = résultat principal, mis en avant en vert */
-        #cell-eco .metric {
-            background: rgba(17, 228, 122, 0.07);
-            border-color: rgba(17, 228, 122, 0.18);
+        .dim-schema svg { width: 100%; height: 100%; max-height: 210px; }
+        .dim-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .dim-stat {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 9px 6px;
+            text-align: center;
         }
-        #cell-eco .val {
-            color: var(--neo);
+        .dim-stat-val {
+            display: block;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 1.35rem;
+            color: var(--dark);
+            letter-spacing: -0.02em;
+        }
+        .dim-stat-lbl {
+            display: block;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 0.7rem;
+            color: var(--dark);
+            margin-bottom: 2px;
         }
 
-        /* taille de chiffre homogène sur toutes les tuiles output */
-        .r-cell .metric .val { font-size: 1.6rem; }
+        /* ─── Colonne Économies ─── */
+        .eco-hero {
+            background: rgba(17, 228, 122, 0.12);
+            border: 1px solid rgba(1, 114, 103, 0.30);
+            border-radius: 11px;
+            padding: 14px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .eco-hero .val {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: 2rem;
+            color: var(--respire);
+            letter-spacing: -0.02em;
+            line-height: 1.05;
+        }
+        .eco-hero .lbl {
+            font-size: 0.74rem;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+        /* Ligne haute : Économies/an (2/3) + Réduction facture (1/3) */
+        .eco-top-row { display: flex; gap: 8px; flex-shrink: 0; }
+        .eco-top-row .eco-hero { flex: 2; }
+        .eco-side-box {
+            flex: 1;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 14px 8px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .eco-side-box .val {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--respire);
+            letter-spacing: -0.02em;
+        }
+        .eco-side-box .lbl {
+            font-size: 0.71rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
 
-        /* gains chiffrés positifs en vert ; pilotage HP/HC en violet (charte) */
-        #cell-bonus-batt .val,
-        #cell-revente .val,
-        #cell-eco-facture .val { color: var(--neo); }
-        #cell-revente #ecoPilot { color: var(--violet); }
+        .col-metric {
+            text-align: center;
+            padding: 9px 0;
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        /* facture (50 %) + paire revente/pilotage (50 %, eux-mêmes 50/50) */
+        .eco-row2 { display: flex; gap: 10px; flex-shrink: 0; }
+        .eco-row2 > .col-metric { flex: 1; }
+        .eco-rp-pair { flex: 1; display: flex; gap: 10px; }
+        .eco-rp-pair > .col-metric { flex: 1; border-top: 1px solid var(--border); }
+        /* petit point d'info cliquable */
+        .info-i {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--border);
+            color: var(--dark);
+            font-size: 0.58rem;
+            font-weight: 700;
+            font-style: normal;
+            cursor: pointer;
+            vertical-align: middle;
+            transition: background 0.15s;
+        }
+        .info-i:hover { background: var(--muted); color: #fff; }
+        /* sous-sous-titre (ex : Scénarios) */
+        .subsub-hd {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--dark);
+            margin-top: 8px;
+        }
+        .col-metric .val {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 1.45rem;
+            color: var(--respire);
+            letter-spacing: -0.02em;
+        }
+        .col-metric .lbl {
+            font-size: 0.71rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
 
-        /* graphe projection : remplit la hauteur disponible (tuile tampon) */
+        /* graphe projection : remplit la hauteur disponible */
+        .proj-block {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 150px;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+        }
         #cell-graph .proj-chart { flex: 1; min-height: 0; margin: 0; }
         #cell-graph .proj-chart svg { width: 100%; height: 100%; display: block; }
+        /* barres de projection : montée en escalier depuis l'axe des abscisses */
+        @keyframes projBarIn {
+            from { transform: scaleY(0); }
+            to { transform: scaleY(1); }
+        }
+        .proj-bar {
+            transform-box: view-box;
+            transform-origin: 0 176px;
+            animation: projBarIn 0.25s ease-out backwards;
+        }
+
+        /* ─── Colonne Impact (+ CTA sous la colonne, aligné au bas des autres colonnes) ─── */
+        .impact-col-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 0;
+        }
+        #col-impact { flex: 1; }
+        #col-impact .impact-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 14px;
+        }
+        .impact-sect { display: flex; flex-direction: column; }
+        #impact-cta { flex-shrink: 0; margin: 0; }
 
         /* scénarios d'inflation du prix de l'élec sous le graphe */
         #proj-scenarios {
@@ -1649,8 +1868,8 @@
             flex-shrink: 0;
         }
         .scenario {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: var(--surface);
+            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 7px 9px;
             text-align: left;
@@ -1659,28 +1878,24 @@
             cursor: pointer;
             transition: background .15s, border-color .15s;
         }
-        .scenario:hover { background: rgba(255, 255, 255, 0.09); }
+        .scenario:hover { border-color: var(--green-mid); }
         .scenario.active {
             background: rgba(17, 228, 122, 0.12);
-            border-color: rgba(17, 228, 122, 0.4);
+            border-color: rgba(1, 114, 103, 0.45);
         }
-        .scenario-name { font-size: 0.62rem; color: rgba(255, 255, 255, 0.4); line-height: 1.25; }
+        .scenario-name { font-size: 0.62rem; color: var(--dark); line-height: 1.25; }
         .scenario-val {
             font-family: 'Bricolage Grotesque', sans-serif;
             font-weight: 700;
             font-size: 0.98rem;
-            color: #fff;
+            color: var(--dark);
             margin-top: 3px;
         }
-        #scenMoyen { color: var(--soleil); }
+        #scenMoyen { color: #C8860B; }
         #scenCrise { color: var(--corail); }
 
-        /* compactage des composants existants pour tenir sans scroll */
-        #cell-eco .hero-wrap { padding: 12px 12px 10px; margin-bottom: 8px; }
-        #cell-eco .hero-num { font-size: 2.1rem; }
-        #cell-eco .chart-wrap { margin: 0; }
-        .r-cell .bloc, .r-cell .auto-section { margin: 0; padding: 0; border: none; }
-        .r-cell .eco-rows { margin-top: 0 !important; }
+        /* jauge de dimensionnement compacte dans la tuile */
+        .col-card .auto-section { margin: 0; }
 
         .facture-pct {
             font-family: 'Bricolage Grotesque', sans-serif;
@@ -1698,31 +1913,62 @@
             color: var(--soleil);
             line-height: 1.1;
         }
-        .impact-prod-lbl { font-size: 0.72rem; color: rgba(255, 255, 255, 0.5); }
+        .impact-prod-lbl { font-size: 0.72rem; color: var(--muted); }
         .impact-foyers {
             margin-top: 8px;
             font-size: 0.86rem;
             font-weight: 600;
-            color: #fff;
+            color: var(--dark);
         }
         .impact-perte {
             margin-top: 6px;
             font-size: 0.78rem;
             font-weight: 600;
-            color: var(--corail);
+            color: #C0392B;
+            background: rgba(217, 83, 79, 0.12);
+            border-radius: 8px;
+            padding: 8px 10px;
         }
-        .impact-perte.impact-perte-pos { color: var(--neo); }
-
-        #cta-strip {
-            flex: 0 0 52px;
-            background: var(--surface);
+        .impact-perte.impact-perte-pos {
+            color: var(--respire);
+            background: rgba(17, 228, 122, 0.10);
+        }
+        #impact-co2-block .divider {
+            border: 0;
             border-top: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            margin: 12px 0 0;
         }
+        .impact-co2-hd {
+            margin-top: 10px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            color: var(--muted);
+        }
+        #impact-co2-block .co2-card { margin-top: 8px; }
 
-        #cta-strip .cta-btn { width: 60%; margin: 0; }
+
+        #inputs-header {
+            flex: 0 0 auto;
+            background: var(--surface);
+            border-top: 2px solid var(--dark);
+            padding: 16px var(--page-x) 0;
+            text-align: center;
+        }
+        #inputs-header h2 {
+            margin: 0;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: var(--dark);
+        }
+        #inputs-header p {
+            margin: 4px 0 0;
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+        .phase-wizard #inputs-header { display: none; }
 
         #inputs-section {
             flex: 1 0 auto;
@@ -1784,8 +2030,7 @@
         body:not(.phase-gate) #leadGate { display: none !important; }
 
         /* phase-wizard : on cache résultats + CTA, #inputs-section devient l'assistant */
-        .phase-wizard #top-section,
-        .phase-wizard #cta-strip { display: none; }
+        .phase-wizard #top-section { display: none; }
 
         .phase-wizard #inputs-section {
             display: block;
@@ -1860,4 +2105,73 @@
             from { opacity: 0; transform: translateY(-16px); }
             to   { opacity: 1; transform: translateY(0); }
         }
-    
+
+        /* ═══════════ MOBILE — layout one-page empilé (≤ 760px) ═══════════ */
+        @media (max-width: 760px) {
+            /* le « no-scroll » desktop devient une page qui défile ; pas de débordement latéral */
+            html, body { overflow-x: hidden; }
+
+            /* les 3 colonnes de résultats s'empilent, hauteur au contenu */
+            #top-section {
+                grid-template-columns: 1fr;
+                min-height: 0;
+            }
+
+            /* zone de saisie : conso + prod l'une sous l'autre */
+            #inputs-section {
+                grid-template-columns: 1fr;
+            }
+
+            /* ── Sous-tuiles à libellé long → 1 colonne pleine largeur ──
+               En 2 colonnes sur écran étroit, des mots insécables comme
+               « Autoconsommation » dépassaient / se coupaient. Empilées, plus de souci. */
+            .dim-stats,
+            #battSelector {
+                grid-template-columns: 1fr;
+            }
+
+            /* ── Anti-débordement : pistes de grille compressibles (minmax 0)
+               1fr = minmax(auto,1fr) et peut déborder si le contenu est large.
+               minmax(0,1fr) garde le même nb de colonnes mais autorise la compression.
+               OK ici car les libellés sont multi-mots → ils passent à la ligne. */
+            .metrics {
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            }
+            .tile-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            /* grilles de tuiles trop denses : max 3 colonnes */
+            .tile-grid.cols-4,
+            .tile-grid.cols-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            #proj-scenarios { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+            /* ligne facture + revente/pilotage : on empile les deux blocs */
+            .eco-row2 {
+                flex-direction: column;
+            }
+
+            /* ── Graphes : ratio fixe pour éviter la déformation ──
+               proj-chart utilise preserveAspectRatio="none" → le SVG (et son texte)
+               se déforme si le conteneur n'a pas le ratio du viewBox (520×200).
+               On fige le ratio du conteneur au lieu de le laisser étiré par le flex. */
+            #cell-graph .proj-chart {
+                flex: 0 0 auto;
+                aspect-ratio: 520 / 200;
+                min-height: 0;
+            }
+            /* schéma dimensionnement : ratio du viewBox (320×168), non écrasé par le flex */
+            .dim-schema {
+                flex: 0 0 auto;
+                aspect-ratio: 320 / 168;
+                min-height: 0;
+            }
+            .dim-schema svg { max-height: none; }
+            /* mini-graphe mensuel : hauteur dérivée de la largeur (sinon texte compressé) */
+            #monthChart { height: auto; aspect-ratio: 340 / 105; }
+        }
+
+        /* ═══════════ MOBILE étroit — ajustements fins (≤ 430px) ═══════════ */
+        @media (max-width: 430px) {
+            /* scénarios d'inflation : 3 boutons trop serrés → empilés */
+            #proj-scenarios {
+                grid-template-columns: 1fr;
+            }
+        }
