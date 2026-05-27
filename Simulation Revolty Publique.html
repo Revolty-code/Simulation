@@ -2856,11 +2856,11 @@
             <!-- Autoconsommation / Autoproduction -->
             <div class="dim-stats">
                 <div class="dim-stat">
-                    <span class="dim-stat-lbl">Autoconsommation</span>
+                    <span class="dim-stat-lbl">Autoconsommation <span class="info-i" data-info="autoconso" aria-label="Info autoconsommation"><svg viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><circle cx="5" cy="2.2" r="0.9"/><rect x="4.25" y="3.9" width="1.5" height="4.2" rx="0.5"/></svg></span></span>
                     <span class="dim-stat-val" id="outAutoConso">—</span>
                 </div>
                 <div class="dim-stat">
-                    <span class="dim-stat-lbl">Autoproduction</span>
+                    <span class="dim-stat-lbl">Autoproduction <span class="info-i" data-info="autoprod" aria-label="Info autoproduction"><svg viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><circle cx="5" cy="2.2" r="0.9"/><rect x="4.25" y="3.9" width="1.5" height="4.2" rx="0.5"/></svg></span></span>
                     <span class="dim-stat-val" id="outAutoProd">—</span>
                 </div>
             </div>
@@ -7566,6 +7566,14 @@
                 pilotage: {
                     t: 'Le pilotage heures pleines / heures creuses',
                     p: 'Avec un contrat Heures Pleines / Heures Creuses, la batterie se recharge automatiquement sur le réseau pendant les heures creuses (électricité moins chère) pour être déchargée en heures pleines. Cet arbitrage sur le tarif réduit votre facture.'
+                },
+                autoconso: {
+                    t: 'Le taux d\'autoconsommation',
+                    p: 'Part de votre production solaire que vous consommez chez vous (directement ou via la batterie), plutôt que de l\'injecter sur le réseau. Plus ce taux est élevé, mieux vous valorisez chaque kWh produit. Une batterie le fait grimper en stockant le surplus du jour pour la soirée.'
+                },
+                autoprod: {
+                    t: 'Le taux d\'autoproduction',
+                    p: 'Part de votre consommation électrique couverte par votre production solaire, plutôt que par le réseau. Plus ce taux est élevé, moins vous dépendez du fournisseur. Il dépend de la taille de l\'installation, de votre profil de consommation, et de la batterie qui décale le solaire vers les heures sans soleil.'
                 }
             };
             document.querySelectorAll('.info-i').forEach(el => {

@@ -4019,6 +4019,14 @@
         pilotage: {
             t: 'Le pilotage heures pleines / heures creuses',
             p: 'Avec un contrat Heures Pleines / Heures Creuses, la batterie se recharge automatiquement sur le réseau pendant les heures creuses (électricité moins chère) pour être déchargée en heures pleines. Cet arbitrage sur le tarif réduit votre facture.'
+        },
+        autoconso: {
+            t: 'Le taux d\'autoconsommation',
+            p: 'Part de votre production solaire que vous consommez chez vous (directement ou via la batterie), plutôt que de l\'injecter sur le réseau. Plus ce taux est élevé, mieux vous valorisez chaque kWh produit. Une batterie le fait grimper en stockant le surplus du jour pour la soirée.'
+        },
+        autoprod: {
+            t: 'Le taux d\'autoproduction',
+            p: 'Part de votre consommation électrique couverte par votre production solaire, plutôt que par le réseau. Plus ce taux est élevé, moins vous dépendez du fournisseur. Il dépend de la taille de l\'installation, de votre profil de consommation, et de la batterie qui décale le solaire vers les heures sans soleil.'
         }
     };
     document.querySelectorAll('.info-i').forEach(el => {
