@@ -26,125 +26,106 @@
     <!-- ═══════════ LAYOUT ONE-PAGE — Tests DA ═══════════ -->
     <div id="titre-bar">Votre simulation de batterie Revolty</div>
 
-    <!-- Bandeau d'accueil résultats — cadre la lecture (notamment dimensionnement auto) -->
-    <div id="intro-banner"><span id="introBannerText">—</span></div>
+    <!-- Bandeau d'accueil résultats — mentions légales / cadre de lecture -->
+    <div id="intro-banner"><span id="introBannerText">Cette simulation est une estimation indicative, calculée à partir de données statistiques nationales et des informations que vous avez saisies. Elle ne constitue ni un devis, ni une étude de dimensionnement, ni un conseil personnalisé.</span></div>
 
-    <!-- Lead gate (proto — aucune logique backend) — plein écran -->
+    <!-- Lead popup — pop-up fermable, affichée après l'entrée dans l'app -->
     <div class="lead-gate" id="leadGate">
         <div class="lead-gate-card">
-            <div class="lead-gate-icon">🔓</div>
-            <h3>Découvrez vos économies</h3>
-            <p>Entrez vos coordonnées pour afficher vos résultats personnalisés</p>
-            <form id="leadGateForm">
-                <input type="text" id="leadFirstname" placeholder="Prénom *" required />
-                <input type="email" id="leadEmail" placeholder="Email *" required />
-                <label class="lead-gate-consent">
-                    <input type="checkbox" id="leadConsent" required />
-                    <span>J'accepte d'être recontacté(e) par Revolty au sujet de ma simulation.</span>
-                </label>
-                <button type="submit">Voir mes résultats →</button>
-                <p class="lead-gate-legal">Données traitées par Revolty à des fins commerciales. Consentement
-                    révocable à tout moment.</p>
-            </form>
+            <button type="button" class="lead-gate-close" id="leadGateClose" aria-label="Fermer">×</button>
+
+            <!-- État initial : capture email -->
+            <div id="leadGateInitial">
+                <div class="lead-gate-icon">✉️</div>
+                <h3>Déjà intéressé&nbsp;?</h3>
+                <p>Laissez-nous votre email pour être recontacté(e) au sujet de votre projet.</p>
+                <form id="leadGateForm">
+                    <input type="email" id="leadEmail" placeholder="Votre email" required />
+                    <button type="submit">Être recontacté(e)</button>
+                    <p class="lead-gate-legal">Données traitées par Revolty à des fins commerciales. Consentement
+                        révocable à tout moment.</p>
+                </form>
+            </div>
+
+            <!-- État succès : remerciement + CTA secondaire vers la réservation -->
+            <div id="leadGateSuccess" style="display:none">
+                <div class="lead-gate-icon lead-gate-icon-ok">✓</div>
+                <h3>Merci&nbsp;!</h3>
+                <p>Un conseiller Revolty vous recontactera bientôt. Pour aller plus vite, vous pouvez
+                    <strong>réserver votre batterie</strong> dès maintenant&nbsp;:</p>
+                <a href="https://revolty.fr/reserver-ma-batterie" class="cta-btn cta-eco" target="_blank">
+                    <span class="cta-action">Réserver votre batterie <span class="cta-arrow">→</span></span>
+                </a>
+                <p class="cta-reassure">Gratuit · Sans engagement</p>
+            </div>
         </div>
+    </div>
+
+    <!-- ─── Onglets résultats (visibles uniquement ≤ 800px) ─── -->
+    <div id="results-tabs" role="tablist" aria-label="Vue des résultats">
+        <button type="button" class="results-tab active" data-tab="eco" role="tab" aria-selected="true">Économies</button>
+        <button type="button" class="results-tab" data-tab="details" role="tab" aria-selected="false">Détails</button>
     </div>
 
     <!-- ─── TOP SECTION ─── -->
     <div id="top-section">
 
-        <!-- ══ COLONNE 1 — DIMENSIONNEMENT ══ -->
+        <!-- ══ COLONNE 1 — VOTRE INSTALLATION ══ -->
         <div class="col-card" id="col-dim">
-            <div class="col-card-hd">Dimensionnement</div>
+            <div class="col-card-hd">Votre installation</div>
 
-            <!-- Choix de la capacité batterie : un seul bloc -->
+            <!-- Choix de la capacité batterie : segmented control compact -->
             <div class="batt-choice">
-                <div class="sub-hd">Votre modèle Revolty</div>
+                <div class="sub-hd batt-choice-hd">Votre batterie Revolty</div>
                 <div class="objectif-selector" id="battSelector">
-                    <button class="objectif-btn" data-batt="0"><span class="obj-icon">🔌</span><span
-                            class="obj-label">Sans</span><span class="obj-pct">batterie</span></button>
-                    <button class="objectif-btn" data-batt="5"><span class="obj-icon">⚡</span><span
-                            class="obj-label">5 kWh</span><span class="obj-pct">Revolty 5</span></button>
-                    <button class="objectif-btn active-confort" data-batt="10"><span class="obj-icon">⚡⚡</span><span
-                            class="obj-label">10 kWh</span><span class="obj-pct">Revolty 10</span></button>
-                    <button class="objectif-btn" data-batt="15"><span class="obj-icon">⚡⚡⚡</span><span
-                            class="obj-label">15 kWh</span><span class="obj-pct">Revolty 15</span></button>
+                    <button class="objectif-btn" data-batt="0">
+                        <span class="obj-label">Sans</span>
+                        <span class="obj-sub">batterie</span>
+                    </button>
+                    <button class="objectif-btn" data-batt="5">
+                        <span class="obj-label">5 kWh</span>
+                        <span class="obj-sub">Revolty 5</span>
+                    </button>
+                    <button class="objectif-btn active-confort" data-batt="10">
+                        <span class="obj-label">10 kWh</span>
+                        <span class="obj-sub">Revolty 10</span>
+                    </button>
+                    <button class="objectif-btn" data-batt="15">
+                        <span class="obj-label">15 kWh</span>
+                        <span class="obj-sub">Revolty 15</span>
+                    </button>
+                </div>
+                <!-- Feedback de dimensionnement, contextuel au choix ci-dessus -->
+                <div class="dim-feedback" id="dimFeedback">
+                    <span class="dim-dot" id="dimFeedbackDot"></span>
+                    <div class="dim-feedback-txt">
+                        <span class="dim-feedback-status" id="resDimBadge"></span>
+                        <span class="dim-feedback-msg" id="resSurplusMsg"></span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Schéma : maison + panneaux + batterie, flèches vers production & capacité -->
-            <div class="dim-schema">
-                <svg viewBox="0 0 320 168" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <marker id="arrSun" markerWidth="8" markerHeight="8" refX="6" refY="3.6" orient="auto">
-                            <path d="M0,0 L7.5,3.6 L0,7.2 Z" fill="#C8860B" />
-                        </marker>
-                        <marker id="arrNeo" markerWidth="8" markerHeight="8" refX="6" refY="3.6" orient="auto">
-                            <path d="M0,0 L7.5,3.6 L0,7.2 Z" fill="#017267" />
-                        </marker>
-                    </defs>
-                    <!-- soleil -->
-                    <g stroke="#FFD145" stroke-width="2" stroke-linecap="round">
-                        <line x1="32" y1="6" x2="32" y2="14" />
-                        <line x1="32" y1="46" x2="32" y2="54" />
-                        <line x1="8" y1="30" x2="16" y2="30" />
-                        <line x1="48" y1="30" x2="56" y2="30" />
-                        <line x1="15" y1="13" x2="20" y2="18" />
-                        <line x1="44" y1="42" x2="49" y2="47" />
-                        <line x1="49" y1="13" x2="44" y2="18" />
-                        <line x1="20" y1="42" x2="15" y2="47" />
-                    </g>
-                    <circle cx="32" cy="30" r="11" fill="#FFD145" />
-                    <!-- maison -->
-                    <polygon points="36,92 78,56 120,92" fill="rgba(13,26,20,0.05)"
-                        stroke="rgba(13,26,20,0.55)" stroke-width="1.6" stroke-linejoin="round" />
-                    <rect x="46" y="92" width="64" height="49" rx="2" fill="rgba(13,26,20,0.04)"
-                        stroke="rgba(13,26,20,0.55)" stroke-width="1.6" />
-                    <rect x="70" y="117" width="15" height="24" rx="1" fill="rgba(13,26,20,0.20)" />
-                    <!-- panneaux PV sur le toit -->
-                    <g transform="translate(47,87) rotate(-40.6)">
-                        <rect x="2" y="-14" width="8" height="11" rx="1" fill="#FFD145" stroke="#c9a435"
-                            stroke-width="0.7" />
-                        <rect x="12" y="-14" width="8" height="11" rx="1" fill="#FFD145" stroke="#c9a435"
-                            stroke-width="0.7" />
-                        <rect x="22" y="-14" width="8" height="11" rx="1" fill="#FFD145" stroke="#c9a435"
-                            stroke-width="0.7" />
-                    </g>
-                    <!-- batterie attenante à la maison -->
-                    <rect x="119" y="100" width="12" height="4" rx="1" fill="#017267" />
-                    <rect x="110" y="104" width="30" height="37" rx="4" fill="rgba(17,228,122,0.10)"
-                        stroke="#017267" stroke-width="1.7" />
-                    <rect id="schemaBattFill" x="114" y="118" width="22" height="20" rx="2"
-                        fill="rgba(1,114,103,0.40)" />
-                    <text x="125" y="127" font-size="13" text-anchor="middle">⚡</text>
-                    <!-- flèche panneaux → production -->
-                    <path d="M84,52 C 124,22 158,30 188,42" fill="none" stroke="#C8860B" stroke-width="2.3"
-                        stroke-linecap="round" marker-end="url(#arrSun)" />
-                    <!-- flèche batterie → capacité -->
-                    <path d="M141,120 C 164,133 174,123 188,114" fill="none" stroke="#017267" stroke-width="2.3"
-                        stroke-linecap="round" marker-end="url(#arrNeo)" />
-                    <!-- puissance installée (au-dessus) puis production annuelle -->
-                    <text x="196" y="18" font-size="7" fill="#0D1A14"
-                        font-family="DM Sans,sans-serif">PUISSANCE INSTALLÉE</text>
-                    <text id="schemaKwcVal" x="195" y="35" font-size="15" font-weight="700" fill="#C8860B"
-                        font-family="Bricolage Grotesque,sans-serif">—</text>
-                    <text x="196" y="53" font-size="7" fill="#0D1A14"
-                        font-family="DM Sans,sans-serif">PRODUCTION / AN</text>
-                    <text id="outProdAnnuelle" x="195" y="70" font-size="15" font-weight="700" fill="#C8860B"
-                        font-family="Bricolage Grotesque,sans-serif">—</text>
-                    <text id="outProdLbl" x="196" y="80" font-size="7" fill="#0D1A14"
-                        font-family="DM Sans,sans-serif"></text>
-                    <!-- valeur capacité batterie -->
-                    <text x="196" y="107" font-size="7.5" fill="#0D1A14"
-                        font-family="DM Sans,sans-serif">CAPACITÉ BATTERIE</text>
-                    <text id="schemaBattVal" x="195" y="127" font-size="15" font-weight="700" fill="#017267"
-                        font-family="Bricolage Grotesque,sans-serif">10 kWh</text>
-                    <!-- consommation annuelle, sous la maison -->
-                    <text x="78" y="151" font-size="7" fill="#0D1A14" text-anchor="middle"
-                        font-family="DM Sans,sans-serif">CONSOMMATION / AN</text>
-                    <text id="schemaConsoVal" x="78" y="163" font-size="12" font-weight="700" fill="#0D1A14"
-                        text-anchor="middle" font-family="Bricolage Grotesque,sans-serif">—</text>
-                </svg>
+            <!-- Illustration : maison + panneaux + batterie (Canva, fond transparent) -->
+            <div class="install-illu">
+                <img src="https://cdn.jsdelivr.net/gh/Revolty-code/Simulation@main/pics/Installation.svg" alt="Installation solaire avec batterie" />
             </div>
+            <!-- 2 valeurs clés sous l'illustration : Solaire (prod + puissance) · Consommation.
+                 La capacité batterie est déjà dans le segmented control au-dessus → non répétée ici. -->
+            <div class="install-stats">
+                <div class="install-stat install-stat--solar">
+                    <span class="install-val" id="outProdAnnuelle">—</span>
+                    <span class="install-lbl">Production solaire / an</span>
+                    <span class="install-sub"><span id="schemaKwcVal">—</span> installés</span>
+                </div>
+                <div class="install-stat install-stat--home">
+                    <span class="install-val" id="schemaConsoVal">—</span>
+                    <span class="install-lbl">Consommation / an</span>
+                </div>
+            </div>
+            <!-- Compat JS : schemaBattVal est mis à jour mais désormais invisible (info redondante avec le sélecteur) -->
+            <span id="schemaBattVal" hidden>—</span>
+            <!-- Compatibilité : ancien id outProdLbl conservé (info ombrage) -->
+            <div id="outProdLbl" class="install-prod-sub"></div>
 
             <!-- Autoconsommation / Autoproduction -->
             <div class="dim-stats">
@@ -157,18 +138,9 @@
                     <span class="dim-stat-val" id="outAutoProd">—</span>
                 </div>
             </div>
-
-            <!-- Jauge de dimensionnement -->
-            <div class="auto-section">
-                <div class="dim-jauge-hd">
-                    <span class="sub-hd">Dimensionnement</span>
-                    <span class="dim-badge" id="resDimBadge"></span>
-                </div>
-                <div class="bar-track" id="resDimBarTrack">
-                    <div class="bar-fill" id="resSurplusBar" style="width:68%"></div>
-                </div>
-            </div>
-            <div id="resSurplusMsg" class="surplus-msg hidden" style="display:none"></div>
+            <!-- élément caché requis par le JS (ancien fill de la jauge horizontale) -->
+            <div id="resSurplusBar" style="display:none"></div>
+            <div id="resDimBarTrack" style="display:none"></div>
         </div>
 
         <!-- ══ COLONNE 2 — ÉCONOMIES ══ -->
@@ -187,22 +159,25 @@
                 </div>
             </div>
 
-            <div class="eco-row2">
-                <div class="col-metric" id="cell-eco-facture">
-                    <div class="sub-hd">Réduction sur facture</div>
-                    <div class="val" id="outPctReduc">—</div>
-                </div>
+            <!-- CTA principal : combine le % réduction et l'appel à l'action -->
+            <a href="https://revolty.fr/reserver-ma-batterie" class="cta-btn cta-eco" id="impact-cta" target="_blank">
+                <span class="cta-stat">Vous réduisez <strong id="outPctReduc">—</strong> votre facture</span>
+                <span class="cta-action">Réservez votre batterie <span class="cta-arrow">→</span></span>
+            </a>
+            <p class="cta-reassure">Gratuit · Sans engagement</p>
+            <details class="eco-details">
+                <summary>Voir le détail (revente + pilotage HP/HC)</summary>
                 <div class="eco-rp-pair">
                     <div class="col-metric" id="cell-revente">
-                        <div class="sub-hd">Revente <span class="info-i" data-info="revente">i</span></div>
+                        <div class="sub-hd">Revente <span class="info-i" data-info="revente" aria-label="Info revente"><svg viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><circle cx="5" cy="2.2" r="0.9"/><rect x="4.25" y="3.9" width="1.5" height="4.2" rx="0.5"/></svg></span></div>
                         <div class="val" id="outRevente">—</div>
                     </div>
                     <div class="col-metric" id="cell-pilotage">
-                        <div class="sub-hd">Pilotage <span class="info-i" data-info="pilotage">i</span></div>
+                        <div class="sub-hd">Pilotage <span class="info-i" data-info="pilotage" aria-label="Info pilotage"><svg viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><circle cx="5" cy="2.2" r="0.9"/><rect x="4.25" y="3.9" width="1.5" height="4.2" rx="0.5"/></svg></span></div>
                         <div class="val" id="outPilotage">—</div>
                     </div>
                 </div>
-            </div>
+            </details>
 
             <!-- Graphe projection sur 20 ans -->
             <div class="proj-block" id="cell-graph">
@@ -218,15 +193,10 @@
                     <span id="projLegSurplus" style="display:none"><span class="pleg-sq"
                             style="background:rgba(255,209,69,0.65)"></span>Surplus revendu</span>
                 </div>
-                <div class="subsub-hd">Scénarios</div>
                 <div id="proj-scenarios">
                     <button type="button" class="scenario active" data-esc="0.04">
-                        <div class="scenario-name">Croissance prévue EDF · +4 %/an</div>
+                        <div class="scenario-name">EDF · +4 %/an</div>
                         <div class="scenario-val" id="scenEdf">—</div>
-                    </button>
-                    <button type="button" class="scenario" data-esc="0.07">
-                        <div class="scenario-name">Tendanciel · +7 %/an</div>
-                        <div class="scenario-val" id="scenMoyen">—</div>
                     </button>
                     <button type="button" class="scenario" data-esc="0.10">
                         <div class="scenario-name">Crise énergétique · +10 %/an</div>
@@ -238,29 +208,103 @@
 
         <!-- ══ COLONNE 3 — IMPACT (+ CTA sous la colonne) ══ -->
         <div class="impact-col-wrap">
+            <div class="col-card" id="col-roi" style="display:none">
+                <div class="col-card-hd">Rentabilité</div>
+                <div class="impact-body">
+                    <div class="impact-sect">
+                        <div class="impact-roi-val" id="outRoiRange">—</div>
+                        <div class="impact-roi-note">Estimation pour une utilisation normale de la batterie.</div>
+                    </div>
+                </div>
+            </div>
             <div class="col-card" id="col-impact">
                 <div class="col-card-hd">Impact</div>
                 <div class="impact-body">
-                    <div class="impact-sect">
-                        <div class="sub-hd">Gaspillage solaire</div>
-                        <div class="impact-perte" id="outPerteSansBatt">—</div>
+                    <!-- 1. CO₂ évité grâce à l'autoconsommation solaire (sur 20 ans) -->
+                    <div class="impact-card" id="impact-card-co2">
+                        <svg class="impact-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M12 22 V14"/>
+                            <path d="M8 14 Q 4 14 4 10 Q 4 5 9 5 Q 11 2 12 2 Q 13 2 15 5 Q 20 5 20 10 Q 20 14 16 14 Z"/>
+                        </svg>
+                        <div class="impact-card-body">
+                            <div class="impact-val" id="outCo2Evite">—</div>
+                            <div class="impact-lbl">de CO₂ évités sur 20 ans</div>
+                        </div>
                     </div>
-                    <div class="impact-sect" id="impact-co2-block" style="display:none">
-                        <div class="sub-hd">Empreinte carbone</div>
-                        <div class="co2-card" id="outCo2BattRow">
-                            <div class="co2-icon">♻</div>
-                            <div>
-                                <div class="co2-val" id="outCo2Batt">—</div>
-                                <div class="co2-lbl" id="outCo2BattLbl">vs batterie neuve</div>
-                            </div>
+                    <!-- 2. Électricité propre consommée (sur 20 ans) -->
+                    <div class="impact-card" id="impact-card-kwh">
+                        <svg class="impact-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9"/>
+                            <polyline points="13 5 8 13 12 13 11 19 16 11 12 11 13 5"/>
+                        </svg>
+                        <div class="impact-card-body">
+                            <div class="impact-val" id="outKwhPropres">—</div>
+                            <div class="impact-lbl">d'électricité propre sur 20 ans</div>
+                        </div>
+                    </div>
+                    <!-- 3. Batterie reconditionnée Revolty (vs batterie neuve) — caché si pas de batterie -->
+                    <div class="impact-card" id="impact-card-recond" style="display:none">
+                        <svg class="impact-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M4 12 A 8 8 0 0 1 18 6.5"/>
+                            <polyline points="18 3 18 7 14 7"/>
+                            <path d="M20 12 A 8 8 0 0 1 6 17.5"/>
+                            <polyline points="6 21 6 17 10 17"/>
+                        </svg>
+                        <div class="impact-card-body">
+                            <div class="impact-val" id="outCo2Batt">—</div>
+                            <div class="impact-lbl">grâce à la batterie reconditionnée Revolty</div>
                         </div>
                     </div>
                 </div>
             </div>
-            <a href="https://revolty.fr/reserver-ma-batterie" class="cta-btn" id="impact-cta"
-                target="_blank">Réserver ma batterie Revolty →</a>
+
+            <!-- Carte contact : interlocuteur direct — hors tuile Impact, sibling dans impact-col-wrap -->
+            <div class="contact-card">
+                <div class="contact-hd">👋 Votre interlocuteur direct chez Revolty</div>
+                <div class="contact-identity">
+                    <img class="contact-photo" src="https://cdn.jsdelivr.net/gh/Revolty-code/Simulation@main/pics/Valentin.jpeg" alt="Valentin Heuzé" />
+                    <div class="contact-id-txt">
+                        <div class="contact-name">Valentin Heuzé</div>
+                        <div class="contact-title">Président &amp; Ingénieur</div>
+                    </div>
+                </div>
+                <p class="contact-bio">Valentin est là pour répondre à toutes vos questions techniques
+                    et commerciales, de la première prise de contact jusqu'à votre première installation.</p>
+                <div class="contact-links">
+                    <a href="mailto:valentin@revolty.fr" class="contact-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="5" width="18" height="14" rx="2"/>
+                            <polyline points="3 7 12 13 21 7"/>
+                        </svg>
+                        <span>valentin@revolty.fr</span>
+                    </a>
+                    <a href="tel:+33698257687" class="contact-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 4 h 4 l 2 5 l -2.5 1.5 a 11 11 0 0 0 5 5 l 1.5 -2.5 l 5 2 v 4 a 2 2 0 0 1 -2 2 A 16 16 0 0 1 3 6 a 2 2 0 0 1 2 -2 Z"/>
+                        </svg>
+                        <span>06 98 25 76 87</span>
+                    </a>
+                    <a href="https://www.linkedin.com/in/valentin-heuze" target="_blank" rel="noopener" class="contact-link">
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.95v5.66H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.61 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zm1.78 13.02H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45C23.2 24 24 23.23 24 22.28V1.72C24 .77 23.2 0 22.22 0z"/>
+                        </svg>
+                        <span>LinkedIn</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- ─── Sticky CTA mobile (≤ 800px) ─── -->
+    <a href="https://revolty.fr/reserver-ma-batterie" id="sticky-cta" target="_blank" aria-label="Réserver ma batterie Revolty">
+        <span class="sticky-cta-stat"><strong id="stickyEcoTxt">—</strong><span class="sticky-cta-unit"> d'éco/an</span></span>
+        <span class="sticky-cta-action">Réserver →</span>
+    </a>
 
     <!-- ─── SÉPARATEUR RÉSULTATS / SAISIE ─── -->
     <div id="inputs-header">
@@ -270,6 +314,15 @@
 
     <!-- ─── INPUTS SECTION ─── -->
     <div id="inputs-section">
+
+        <!-- ══ HERO WIZARD (visible uniquement en phase-wizard) ══ -->
+        <div id="wizard-hero">
+            <span class="wiz-badge"><span class="wiz-badge-dot"></span> Simulateur Revolty</span>
+            <h1 class="wiz-title">Combien votre batterie pourrait vous faire <em>économiser</em> ?</h1>
+            <p class="wiz-sub">Quelques questions sur votre foyer et votre installation. On vous dit combien
+                d'autoconsommation vous pouvez atteindre, combien vous gagnez chaque année, et quel modèle Revolty
+                s'adapte à votre cas.</p>
+        </div>
 
         <!-- ══ ZONE CONSO ══ -->
         <div id="zone-conso">
@@ -586,6 +639,12 @@
             <span id="wizProgress">Étape 1 / 2</span>
             <button type="button" id="wizNext">Suivant →</button>
         </div>
+        <div style="text-align:center;margin-top:8px">
+            <button type="button" id="wizSkip"
+                style="background:transparent;border:1px dashed rgba(13,26,20,0.25);color:rgba(13,26,20,0.55);font-size:0.72rem;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer">
+                ⏭ skip (debug)
+            </button>
+        </div>
 
     </div>
     <!-- /#inputs-section -->
@@ -741,13 +800,6 @@
         </div>
     </div>
 
-    <!-- ─── MENTIONS LÉGALES — bandeau bas de page, visible en phase résultats ─── -->
-    <div class="disclaimer">
-        <p>Cette simulation est une estimation indicative, calculée à partir de données statistiques
-            nationales et des informations que vous avez saisies. Elle ne constitue ni un devis, ni une
-            étude de dimensionnement, ni un conseil personnalisé.</p>
-    </div>
-
     <!-- ─── MODALE — hypothèse de dimensionnement PV (mode « Pas encore de PV ») ─── -->
     <div id="pvNoticeOverlay" class="pv-notice-overlay">
         <div class="pv-notice-card">
@@ -776,3 +828,4 @@
     <script src="https://cdn.jsdelivr.net/gh/Revolty-code/Simulation@main/dist/revolty-app.js"></script>
 </body>
 
+</html>
