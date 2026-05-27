@@ -3991,12 +3991,6 @@
     });
     _showWizardStep(0);
 
-    // Skip wizard (debug) : bypass validation, on saute direct à l'app
-    document.getElementById('wizSkip').addEventListener('click', () => {
-        _clearWizMsg();
-        _enterApp();
-    });
-
     // Onglets résultats (visibles ≤ 800px) : Économies par défaut, Détails en alternative
     document.querySelectorAll('.results-tab').forEach(tab => {
         tab.addEventListener('click', () => {
