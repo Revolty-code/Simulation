@@ -5,41 +5,88 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Revolty – Simulateur de dimensionnement v4.3</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet" />
     <style>
         :root {
-            /* — Charte Revolty — */
-            --neo: #11E47A;
-            /* Vert Neo — principal */
-            --respire: #017267;
-            /* Vert Respire — secondaire */
-            --soleil: #FFD145;
-            /* Soleil */
-            --corail: #F5817A;
-            /* Corail */
-            --melon: #E8FFF3;
-            /* Melon d'eau */
-            --violet: #9B6DFF;
-            /* Violet — pilotage HP/HC intelligent */
+            /* — Tokens revoltyweb (globals.css) — */
+            --primary: #017267;
+            --primary-light: #00A693;
+            --primary-dark: #015850;
+            --secondary: #1A2B2A;
+            --accent: #E8F5F3;
+            --bg-white: #FFFFFF;
+            --bg-light: #F8FAF9;
+            --text-heading: #1A2B2A;
+            --text-body: #4A5568;
+            --text-muted: #718096;
 
-            /* — Alias sémantiques — */
+            /* — Aliases legacy simulateur — */
+            --neo: #11E47A;
+            --respire: var(--primary);
+            --primary-tint: rgba(1, 114, 103, 0.10);
+            --primary-tint-strong: rgba(1, 114, 103, 0.15);
+            --soleil: #FFD145;
+            --corail: #F5817A;
+            --melon: var(--accent);
+            --violet: #9B6DFF;
+
+            --bg: var(--bg-white);
+            --surface: var(--bg-white);
+            --dark: var(--secondary);
+            --mid: var(--text-body);
+            --muted: var(--text-muted);
+            --border: #E5E7EB;
+            --tile: var(--bg-light);
+
+            /* — Alias legacy — */
             --sun: var(--soleil);
             --green: var(--respire);
-            --green-mid: #019b8a;
+            --green-mid: var(--primary-light);
             --green-light: var(--melon);
-            --bg: #F4F7F5;
-            --surface: #FFFFFF;
-            --dark: #0D1A14;
-            --mid: #3A4840;
-            --muted: #8A9E96;
-            --border: #D6E4DE;
-            --radius: 16px;
-            /* marge latérale dynamique : étroite sur mobile, large sur grand écran */
+
+            /* — Forme — */
+            --radius: 20px;
+            --radius-sm: 12px;
+            --radius-lg: 24px;
+            --radius-pill: 999px;
+
+            /* — Ombres alignées Tailwind (revoltyweb) — */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.10), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --shadow-primary: 0 10px 25px -5px rgba(1, 114, 103, 0.25);
+
+            /* — Easing courbes du site (framer-motion expo-out) — */
+            --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
             --page-x: clamp(16px, 6vw, 150px);
-            /* gris clair des tuiles d'inputs (fond de page blanc) */
-            --tile: #f6f7f9;
+        }
+
+        /* — Animations alignées sur AnimatedSection.tsx (40px, 0.6s, expo-out) — */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes float-up-down {
+            0%, 100% { transform: translateY(-6px); }
+            50% { transform: translateY(6px); }
+        }
+        @keyframes float-down-up {
+            0%, 100% { transform: translateY(6px); }
+            50% { transform: translateY(-6px); }
         }
 
         * {
@@ -49,89 +96,82 @@
         }
 
         body {
-            font-family: 'Instrument Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             background: var(--bg);
             color: var(--dark);
             min-height: 100vh;
         }
 
         header {
-            background: var(--dark);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             padding: 18px 40px;
             display: flex;
             align-items: center;
-            border-bottom: 1px solid rgba(17, 228, 122, 0.12);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .logo {
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-weight: 800;
             font-size: 1.45rem;
-            color: #fff;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
             letter-spacing: -0.02em;
         }
 
         .logo span {
-            color: var(--neo);
+            color: var(--primary);
+            -webkit-text-fill-color: var(--primary);
         }
 
         header small {
             margin-left: auto;
             font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.28);
+            color: var(--muted);
             letter-spacing: 0.02em;
         }
 
         .hero {
-            background: linear-gradient(135deg, #0a1f18 0%, var(--respire) 55%, #019b8a 100%);
-            padding: 56px 40px 48px;
+            background: var(--bg-light);
+            padding: 72px 40px 64px;
             position: relative;
             overflow: hidden;
+            animation: fadeIn 0.6s ease both;
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            width: 420px;
-            height: 420px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(17, 228, 122, 0.18) 0%, transparent 68%);
-            top: -130px;
-            right: -80px;
-        }
-
-        .hero::after {
-            content: '';
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 209, 69, 0.14) 0%, transparent 70%);
-            bottom: -60px;
-            left: 30%;
-        }
+        .hero::before, .hero::after { content: none; }
 
         .hero h1 {
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-size: clamp(1.9rem, 4vw, 2.8rem);
-            font-weight: 800;
-            color: #fff;
-            line-height: 1.1;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2rem, 4.2vw, 3rem);
+            font-weight: 700;
+            color: var(--secondary);
+            line-height: 1.08;
             letter-spacing: -0.025em;
             position: relative;
+            animation: fadeUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
         }
 
         .hero h1 em {
             font-style: normal;
-            color: var(--neo);
+            color: var(--primary);
         }
 
         .hero p {
-            color: rgba(255, 255, 255, 0.65);
-            margin-top: 12px;
-            font-size: 0.95rem;
+            color: var(--text-body);
+            margin-top: 16px;
+            font-size: 1.05rem;
+            line-height: 1.55;
             position: relative;
-            letter-spacing: 0.01em;
+            max-width: 60ch;
+            animation: fadeUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
         }
 
         .container {
@@ -161,10 +201,16 @@
         .card {
             background: var(--surface);
             border-radius: var(--radius);
-            padding: 28px;
+            padding: 32px;
             border: 1px solid var(--border);
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(1, 114, 103, 0.05);
+            box-shadow: var(--shadow-sm);
             margin-bottom: 20px;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+            animation: fadeUp 0.6s var(--ease-out) both;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-4px);
         }
 
         .card:last-child {
@@ -172,7 +218,7 @@
         }
 
         .card-title {
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 0.97rem;
             font-weight: 700;
             letter-spacing: -0.01em;
@@ -183,14 +229,21 @@
         }
 
         .card-title .ico {
-            width: 30px;
-            height: 30px;
-            background: var(--melon);
-            border-radius: 8px;
+            width: 40px;
+            height: 40px;
+            background: var(--primary-tint);
+            color: var(--primary);
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            font-size: 1.05rem;
+            flex-shrink: 0;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        .card:hover .card-title .ico {
+            background: var(--primary);
+            color: #fff;
         }
 
         .field {
@@ -227,7 +280,7 @@
 
         .field-label {
             display: block;
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 0.8rem;
             font-weight: 700;
             color: var(--dark);
@@ -247,7 +300,7 @@
             height: 40px;
             border-radius: 8px;
             border: 2px solid transparent;
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-weight: 700;
             font-size: 1rem;
             cursor: pointer;
@@ -312,7 +365,7 @@
         }
 
         .slider-val {
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 1.3rem;
             font-weight: 700;
             color: var(--respire);
@@ -324,8 +377,8 @@
         input[type="range"] {
             flex: 1;
             -webkit-appearance: none;
-            height: 5px;
-            border-radius: 3px;
+            height: 6px;
+            border-radius: var(--radius-pill);
             background: var(--border);
             outline: none;
             cursor: pointer;
@@ -333,30 +386,34 @@
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
-            background: var(--respire);
+            background: var(--primary);
             border: 3px solid #fff;
-            box-shadow: 0 2px 6px rgba(1, 114, 103, 0.3);
+            box-shadow: var(--shadow-primary);
+            transition: transform 0.15s;
         }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
 
         select {
             width: 100%;
             appearance: none;
-            background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%234A4A42' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 14px center;
+            background: var(--bg-light) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23475569' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 14px center;
             border: 1.5px solid var(--border);
-            border-radius: 10px;
-            padding: 11px 38px 11px 14px;
-            font-family: 'Instrument Sans', sans-serif;
-            font-size: 0.93rem;
-            color: var(--dark);
+            border-radius: 12px;
+            padding: 12px 38px 12px 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.94rem;
+            color: var(--secondary);
             cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
         }
 
         select:focus {
             outline: none;
-            border-color: var(--green-mid);
+            border-color: var(--primary);
+            background-color: var(--surface);
         }
 
         .optional-input-row {
@@ -369,23 +426,24 @@
         .optional-input-row input[type="number"] {
             flex: 1;
             border: 1.5px solid var(--border);
-            border-radius: 10px;
-            padding: 10px 14px;
-            font-family: 'Instrument Sans', sans-serif;
-            font-size: 0.93rem;
-            color: var(--dark);
-            background: var(--bg);
+            border-radius: 12px;
+            padding: 11px 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.94rem;
+            color: var(--secondary);
+            background: var(--bg-light);
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, background 0.2s;
         }
 
         .optional-input-row input[type="number"]:focus {
-            border-color: var(--green-mid);
+            border-color: var(--primary);
+            background: var(--surface);
         }
 
         .optional-input-row input[type="number"].has-value {
-            border-color: var(--green);
-            background: #F0FAF4;
+            border-color: var(--primary);
+            background: var(--primary-tint);
         }
 
         .optional-input-row .unit {
@@ -415,17 +473,19 @@
         }
 
         .objectif-btn {
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 14px 8px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px 8px;
             background: #fff;
             cursor: pointer;
             text-align: center;
-            transition: all 0.18s;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
         }
 
         .objectif-btn:hover {
-            border-color: var(--green-mid);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }
 
         .objectif-btn.active-sans {
@@ -474,10 +534,18 @@
             font-size: 1.4rem;
             display: block;
             margin-bottom: 5px;
+            color: var(--primary);
         }
+        .obj-icon svg {
+            width: 28px;
+            height: 28px;
+            display: block;
+            margin: 0 auto;
+        }
+        .objectif-btn.active-sans .obj-icon { color: #888; }
 
         .obj-label {
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 0.78rem;
             font-weight: 700;
             display: block;
@@ -512,28 +580,30 @@
         }
 
         .tile-btn {
-            border: 2px solid var(--border);
-            border-radius: 12px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
             padding: 12px 4px;
             background: #fff;
             cursor: pointer;
             text-align: center;
-            transition: all 0.18s;
+            transition: border-color 0.3s ease, background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4px;
-            min-height: 72px;
+            gap: 5px;
+            min-height: 76px;
         }
 
         .tile-btn:hover {
-            border-color: var(--green-mid);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-2px);
         }
 
         .tile-btn.active {
-            border-color: var(--respire);
-            background: var(--respire);
+            border-color: var(--primary);
+            background: var(--primary);
         }
 
         .tile-btn.active .tile-label,
@@ -545,10 +615,29 @@
         .tile-icon {
             font-size: 1.4rem;
             line-height: 1;
+            color: var(--primary);
         }
+        .tile-icon svg {
+            width: 22px;
+            height: 22px;
+            display: block;
+        }
+        .card-title .ico svg {
+            width: 22px;
+            height: 22px;
+        }
+        /* tailles SVG des autres slots d'icônes */
+        .lead-gate-icon { color: var(--primary); display: inline-flex; justify-content: center; }
+        .lead-gate-icon svg { width: 36px; height: 36px; }
+        .co2-icon svg { width: 22px; height: 22px; }
+        .pv-notice-icon { color: var(--primary); display: flex; justify-content: center; }
+        .pv-notice-icon svg { width: 40px; height: 40px; }
+        .eco-emoji { display: inline-flex; vertical-align: -3px; color: var(--primary); }
+        .eco-emoji svg { width: 16px; height: 16px; }
+        .dbg-title svg { width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
 
         .tile-label {
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 0.72rem;
             font-weight: 700;
             color: var(--dark);
@@ -563,29 +652,34 @@
 
         /* ── RESULT ───────────────────────────────────────────────────────────── */
         .result-card {
-            background: var(--dark);
+            background: var(--surface);
             border-radius: var(--radius);
-            padding: 28px;
-            color: #fff;
+            padding: 36px;
+            color: var(--text-body);
             position: sticky;
             top: 24px;
-            border: 1px solid rgba(17, 228, 122, 0.08);
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+            border: 1px solid var(--border);
+            animation: fadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
         }
 
         .result-eyebrow {
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: rgba(17, 228, 122, 0.5);
-            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--primary);
+            background: var(--primary-tint);
+            padding: 6px 14px;
+            border-radius: var(--radius-pill);
+            margin-bottom: 22px;
+            animation: fadeUp 0.6s var(--ease-out) 0.1s both;
         }
 
         .bloc {
-            margin-bottom: 22px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 24px;
+            padding-bottom: 22px;
+            border-bottom: 1px solid var(--border);
         }
 
         .bloc:last-of-type {
@@ -595,69 +689,61 @@
         }
 
         .bloc-label {
-            font-size: 0.67rem;
+            font-size: 0.68rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.09em;
-            color: rgba(255, 255, 255, 0.28);
+            color: var(--muted);
             margin-bottom: 16px;
         }
 
         .hero-wrap {
-            background: linear-gradient(135deg, rgba(17, 228, 122, 0.08) 0%, rgba(1, 114, 103, 0.12) 100%);
-            border-radius: 14px;
-            border: 1px solid rgba(17, 228, 122, 0.14);
-            padding: 24px 16px 20px;
-            margin-bottom: 16px;
+            background: transparent;
+            border-radius: 0;
+            border: none;
+            padding: 8px 0 20px;
+            margin-bottom: 20px;
             text-align: center;
-            position: relative;
-            overflow: hidden;
+            border-bottom: 1px solid var(--border);
         }
-
-        .hero-wrap::before {
-            content: '';
-            position: absolute;
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(17, 228, 122, 0.08) 0%, transparent 70%);
-            top: -40px;
-            right: -30px;
-            pointer-events: none;
-        }
+        .hero-wrap::before { content: none; }
 
         .hero-num {
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-size: 3.6rem;
-            font-weight: 800;
-            color: var(--neo);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 4rem;
+            font-weight: 600;
+            color: var(--secondary);
             line-height: 1;
-            letter-spacing: -0.03em;
+            letter-spacing: -0.035em;
         }
 
         .hero-sub {
-            font-size: 0.82rem;
-            color: rgba(255, 255, 255, 0.4);
-            margin-top: 4px;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 8px;
         }
 
         .pill-row {
             display: flex;
             justify-content: center;
             gap: 8px;
-            margin-top: 10px;
+            margin-top: 12px;
+            position: relative;
         }
 
         .pill {
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 3px 12px;
-            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            padding: 5px 14px;
+            border-radius: var(--radius-pill);
         }
 
         .pill-green {
-            background: rgba(17, 228, 122, 0.15);
-            color: var(--neo);
+            background: var(--primary-tint);
+            color: var(--primary);
         }
 
         .delta-row {
@@ -665,18 +751,19 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            margin-top: 12px;
-            font-size: 0.82rem;
+            margin-top: 14px;
+            font-size: 0.85rem;
+            position: relative;
         }
 
         .delta-lbl {
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--muted);
         }
 
         .delta-val {
             font-weight: 700;
-            color: var(--soleil);
-            font-family: 'Bricolage Grotesque', sans-serif;
+            color: var(--secondary);
+            font-family: 'Space Grotesk', sans-serif;
         }
 
         .methodo-toggle {
@@ -685,139 +772,144 @@
         }
 
         .co2-card {
-            background: rgba(17, 228, 122, 0.07);
-            border: 1px solid rgba(17, 228, 122, 0.15);
-            border-radius: 10px;
-            padding: 14px;
+            background: var(--accent);
+            border: 1px solid rgba(1, 114, 103, 0.12);
+            border-radius: 16px;
+            padding: 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-top: 12px;
+            gap: 14px;
+            margin-top: 14px;
         }
 
         .co2-icon {
-            width: 36px;
-            height: 36px;
-            background: rgba(17, 228, 122, 0.15);
-            border-radius: 8px;
+            width: 44px;
+            height: 44px;
+            background: var(--primary-tint);
+            color: var(--primary);
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             flex-shrink: 0;
         }
 
         .co2-val {
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-size: 1.05rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.08rem;
             font-weight: 700;
-            color: var(--respire);
+            color: var(--primary);
             letter-spacing: -0.015em;
         }
 
         .co2-lbl {
-            font-size: 0.72rem;
-            color: var(--dark);
+            font-size: 0.74rem;
+            color: var(--text-body);
             margin-top: 2px;
-            line-height: 1.3;
+            line-height: 1.35;
         }
 
         .metrics {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
         .metric {
-            background: rgba(255, 255, 255, 0.055);
-            border-radius: 10px;
-            padding: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: transparent;
+            border-radius: 14px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            transition: border-color 0.2s ease;
+        }
+        .metric:hover {
+            border-color: var(--secondary);
         }
 
         .metric .val {
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-size: 1.25rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
             font-weight: 700;
-            color: var(--melon);
+            color: var(--secondary);
             letter-spacing: -0.02em;
         }
 
         .metric .lbl {
-            font-size: 0.71rem;
-            color: rgba(255, 255, 255, 0.38);
+            font-size: 0.72rem;
+            color: var(--muted);
             margin-top: 4px;
             line-height: 1.3;
         }
 
         .highlight-metric {
-            background: rgba(255, 209, 69, 0.1) !important;
-            border: 1px solid rgba(255, 209, 69, 0.2) !important;
+            background: rgba(255, 209, 69, 0.10) !important;
+            border-color: rgba(255, 209, 69, 0.35) !important;
         }
 
         .highlight-metric .val {
-            color: var(--soleil) !important;
+            color: #B8800A !important;
         }
 
         .estimated-lbl {
-            font-size: 0.62rem;
-            color: rgba(255, 255, 255, 0.28);
+            font-size: 0.64rem;
+            color: var(--muted);
             font-style: italic;
             display: block;
         }
 
         .chart-wrap {
-            margin-bottom: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            padding-top: 16px;
+            margin-bottom: 22px;
+            border-top: 1px solid var(--border);
+            padding-top: 18px;
         }
 
         .chart-hdr {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .chart-lbl {
-            font-size: 0.68rem;
+            font-size: 0.7rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.07em;
-            color: rgba(255, 255, 255, 0.35);
+            color: var(--muted);
         }
 
         .chart-legend {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
         .cleg {
-            font-size: 0.65rem;
-            color: rgba(255, 255, 255, 0.38);
+            font-size: 0.68rem;
+            color: var(--text-body);
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
         }
 
         .cleg-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 2px;
+            width: 9px;
+            height: 9px;
+            border-radius: 3px;
             flex-shrink: 0;
         }
 
         .cleg-dot.auto {
-            background: var(--neo);
+            background: var(--primary);
         }
 
         .cleg-dot.grid {
-            background: rgba(255, 255, 255, 0.2);
+            background: var(--border);
         }
 
         .cleg-dot.prod {
-            background: rgba(255, 209, 69, 0.7);
+            background: var(--soleil);
         }
 
         .auto-section {
@@ -864,17 +956,18 @@
         }
 
         .bar-track {
-            height: 7px;
-            background: rgba(13, 26, 20, 0.10);
-            border-radius: 4px;
+            height: 8px;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-pill);
             overflow: hidden;
         }
 
         .bar-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--respire), var(--neo));
-            border-radius: 4px;
-            transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: var(--radius-pill);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .surplus-msg {
@@ -908,27 +1001,30 @@
         }
 
         .cta-btn {
-            display: block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             width: 100%;
-            padding: 14px;
-            background: var(--neo);
-            color: var(--dark);
+            padding: 16px 32px;
+            background: var(--primary);
+            color: #fff;
             border: none;
-            border-radius: 12px;
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 700;
-            font-size: 0.95rem;
-            letter-spacing: -0.01em;
+            border-radius: 16px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.98rem;
+            letter-spacing: -0.005em;
             cursor: pointer;
             text-align: center;
             text-decoration: none;
-            transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+            transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
         }
 
         .cta-btn:hover {
+            background: var(--primary-light);
+            box-shadow: var(--shadow-primary);
             transform: translateY(-2px);
-            background: #1af585;
-            box-shadow: 0 8px 24px rgba(17, 228, 122, 0.35);
         }
 
         /* Bandeau mentions légales : visible uniquement en phase résultats */
@@ -1021,7 +1117,7 @@
         .eco-row .eco-val {
             font-weight: 600;
             color: rgba(255, 255, 255, 0.85);
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 0.85rem;
             letter-spacing: -0.01em;
         }
@@ -1063,7 +1159,7 @@
         }
 
         .proj-total {
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 1.6rem;
             font-weight: 800;
             color: var(--respire);
@@ -1142,7 +1238,7 @@
         }
 
         .methodo-panel h4 {
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 0.75rem;
             font-weight: 700;
             color: rgba(255, 255, 255, 0.8);
@@ -1188,7 +1284,7 @@
             padding: 9px 12px;
             border: 1.5px solid var(--border);
             border-radius: 8px;
-            font-family: 'Instrument Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 0.9rem;
             color: var(--dark);
             background: var(--bg);
@@ -1218,7 +1314,7 @@
         }
 
         .dbg-title {
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 0.82rem;
             font-weight: 700;
             color: rgba(255, 255, 255, 0.5);
@@ -1245,7 +1341,7 @@
             border-radius: 6px;
             background: transparent;
             color: rgba(255, 255, 255, 0.35);
-            font-family: 'Instrument Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 0.75rem;
             cursor: pointer;
             transition: all 0.12s;
@@ -1274,7 +1370,7 @@
             border-radius: 6px;
             background: transparent;
             color: rgba(255, 255, 255, 0.35);
-            font-family: 'Instrument Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 0.75rem;
             cursor: pointer;
             transition: all 0.12s;
@@ -1308,7 +1404,7 @@
         }
 
         .dbg-metric .dm-val {
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 1.05rem;
             font-weight: 700;
             color: var(--neo);
@@ -1439,7 +1535,7 @@
         }
 
         .lead-gate-card h3 {
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 1.22rem;
             font-weight: 700;
             color: var(--dark);
@@ -1509,7 +1605,7 @@
             color: #fff;
             border: none;
             border-radius: 10px;
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-weight: 700;
             font-size: 0.95rem;
             cursor: pointer;
@@ -1562,7 +1658,7 @@
             border: 1px solid rgba(17, 228, 122, 0.28);
             border-radius: 10px;
             padding: 8px 16px;
-            font-family: 'Instrument Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 0.82rem;
             font-weight: 600;
             cursor: pointer;
@@ -1604,30 +1700,33 @@
         header, .hero, #debugPanel { display: none !important; }
 
         #titre-bar {
-            flex: 0 0 44px;
-            background: var(--surface);
+            flex: 0 0 52px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--dark);
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 800;
-            font-size: 1rem;
-            letter-spacing: -0.01em;
+            color: var(--secondary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.02rem;
+            letter-spacing: -0.015em;
         }
 
-        #profileBar { position: fixed; top: 7px; right: 12px; z-index: 9100; margin: 0; }
+        #profileBar { position: fixed; top: 9px; right: 12px; z-index: 9100; margin: 0; }
 
         #intro-banner {
             flex: 0 0 auto;
-            background: var(--tile);
+            background: var(--surface);
             border-bottom: 1px solid var(--border);
-            color: var(--dark);
-            padding: 9px var(--page-x);
-            font-size: 0.82rem;
-            line-height: 1.4;
+            color: var(--text-body);
+            padding: 14px var(--page-x);
+            font-size: 0.85rem;
+            line-height: 1.45;
             text-align: center;
+            animation: fadeIn 0.4s ease both;
         }
         #intro-banner strong { font-weight: 800; }
         .phase-wizard #intro-banner { display: none; }
@@ -1643,30 +1742,36 @@
 
         /* Chaque colonne = une seule tuile claire, avec son titre. */
         .col-card {
-            background: var(--tile);
-            color: var(--dark);
-            border-radius: 14px;
-            padding: 14px 16px;
+            background: var(--surface);
+            color: var(--secondary);
+            border-radius: 18px;
+            padding: 22px;
             border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 14px;
             overflow: hidden;
+            animation: fadeUp 0.6s var(--ease-out) both;
+            transition: box-shadow 0.3s ease;
         }
+        .col-card:hover { box-shadow: var(--shadow-md); }
+        #top-section > .col-card:nth-child(2) { animation-delay: 0.1s; }
+        #top-section > .col-card:nth-child(3) { animation-delay: 0.2s; }
         .col-card-hd {
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 800;
-            font-size: 1rem;
-            color: var(--dark);
-            padding-bottom: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 1.02rem;
+            color: var(--secondary);
+            padding-bottom: 14px;
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
+            letter-spacing: -0.018em;
         }
-        /* colonne Dimensionnement : fond vert melon d'eau */
-        #col-dim { background: var(--melon); }
+        #col-dim { background: var(--surface); }
         /* sous-titre de bloc : même police que les titres de colonne, plus petit */
         .sub-hd {
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-weight: 700;
             font-size: 0.8rem;
             color: var(--dark);
@@ -1696,17 +1801,19 @@
         }
 
         .r-cell {
-            background: var(--dark);
-            color: #fff;
-            border-radius: 12px;
-            padding: 12px 14px;
-            border: 1px solid rgba(17, 228, 122, 0.10);
+            background: transparent;
+            color: var(--secondary);
+            border-radius: 14px;
+            padding: 16px;
+            border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
+            transition: border-color 0.2s ease;
         }
+        .r-cell:hover { border-color: var(--secondary); }
 
         .r-cell-hd {
-            font-size: 0.6rem;
+            font-size: 0.62rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.09em;
@@ -1735,7 +1842,7 @@
         }
         .dim-stat-val {
             display: block;
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-weight: 700;
             font-size: 1.35rem;
             color: var(--dark);
@@ -1743,7 +1850,7 @@
         }
         .dim-stat-lbl {
             display: block;
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-weight: 700;
             font-size: 0.7rem;
             color: var(--dark);
@@ -1752,19 +1859,20 @@
 
         /* ─── Colonne Économies ─── */
         .eco-hero {
-            background: rgba(17, 228, 122, 0.12);
-            border: 1px solid rgba(1, 114, 103, 0.30);
-            border-radius: 11px;
-            padding: 14px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px 18px;
             text-align: center;
             flex-shrink: 0;
         }
+        .eco-hero::before { content: none; }
         .eco-hero .val {
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 800;
-            font-size: 2rem;
-            color: var(--respire);
-            letter-spacing: -0.02em;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 2.2rem;
+            color: var(--secondary);
+            letter-spacing: -0.028em;
             line-height: 1.05;
         }
         .eco-hero .lbl {
@@ -1787,11 +1895,11 @@
             justify-content: center;
         }
         .eco-side-box .val {
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: var(--respire);
-            letter-spacing: -0.02em;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 1.6rem;
+            color: var(--secondary);
+            letter-spacing: -0.025em;
         }
         .eco-side-box .lbl {
             font-size: 0.71rem;
@@ -1830,7 +1938,7 @@
         .info-i:hover { background: var(--muted); color: #fff; }
         /* sous-sous-titre (ex : Scénarios) */
         .subsub-hd {
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-weight: 700;
             font-size: 0.62rem;
             text-transform: uppercase;
@@ -1839,11 +1947,11 @@
             margin-top: 8px;
         }
         .col-metric .val {
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 700;
-            font-size: 1.45rem;
-            color: var(--respire);
-            letter-spacing: -0.02em;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 1.55rem;
+            color: var(--secondary);
+            letter-spacing: -0.025em;
         }
         .col-metric .lbl {
             font-size: 0.71rem;
@@ -1902,22 +2010,24 @@
         .scenario {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 7px 9px;
+            border-radius: 12px;
+            padding: 10px 12px;
             text-align: left;
             font-family: inherit;
             color: inherit;
             cursor: pointer;
-            transition: background .15s, border-color .15s;
+            transition: border-color .2s ease, background .2s ease;
         }
-        .scenario:hover { border-color: var(--green-mid); }
+        .scenario:hover {
+            border-color: var(--secondary);
+        }
         .scenario.active {
-            background: rgba(17, 228, 122, 0.12);
-            border-color: rgba(1, 114, 103, 0.45);
+            background: transparent;
+            border-color: var(--secondary);
         }
         .scenario-name { font-size: 0.62rem; color: var(--dark); line-height: 1.25; }
         .scenario-val {
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-weight: 700;
             font-size: 0.98rem;
             color: var(--dark);
@@ -1930,20 +2040,22 @@
         .col-card .auto-section { margin: 0; }
 
         .facture-pct {
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--neo);
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.55rem;
+            color: var(--primary);
             line-height: 1.15;
+            letter-spacing: -0.02em;
         }
 
         .impact-prod { display: flex; flex-direction: column; }
         .impact-prod-val {
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 800;
-            font-size: 1.6rem;
-            color: var(--soleil);
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.65rem;
+            color: #C8860B;
             line-height: 1.1;
+            letter-spacing: -0.02em;
         }
         .impact-prod-lbl { font-size: 0.72rem; color: var(--muted); }
         .impact-foyers {
@@ -1990,7 +2102,7 @@
         }
         #inputs-header h2 {
             margin: 0;
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-weight: 800;
             font-size: 1.05rem;
             color: var(--dark);
@@ -2074,11 +2186,7 @@
             margin: 0 auto;
         }
 
-        /* ── HERO WIZARD : intro de la page 1 (DA chaude : melon + respire + neo) ── */
-        @keyframes wizFadeUp {
-            from { opacity: 0; transform: translateY(28px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        /* ── HERO WIZARD : pattern d'intro aligné sur Hero.tsx du site ──────── */
         #wizard-hero { display: none; }
         .phase-wizard #wizard-hero {
             display: block;
@@ -2090,54 +2198,48 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 7px 16px;
-            background: var(--melon);
-            color: var(--respire);
-            border: 1px solid rgba(1, 114, 103, 0.15);
-            border-radius: 999px;
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 700;
-            font-size: 0.78rem;
-            letter-spacing: 0.01em;
+            padding: 8px 16px;
+            background: var(--primary-tint);
+            color: var(--primary);
+            border-radius: var(--radius-pill);
+            font-size: 0.85rem;
+            font-weight: 500;
             margin-bottom: 22px;
-            animation: wizFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+            animation: fadeUp 0.5s var(--ease-out) both;
         }
-        .wiz-badge-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--neo);
-            box-shadow: 0 0 0 3px rgba(17, 228, 122, 0.20);
-        }
+        .wiz-badge svg { width: 16px; height: 16px; }
         .wiz-title {
-            font-family: 'Bricolage Grotesque', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: clamp(2rem, 4.5vw, 3rem);
-            font-weight: 800;
-            color: var(--dark);
-            line-height: 1.08;
+            font-weight: 700;
+            color: var(--secondary);
+            line-height: 1.1;
             letter-spacing: -0.025em;
-            margin: 0 auto 18px;
+            margin-bottom: 18px;
             max-width: 24ch;
-            animation: wizFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeUp 0.6s var(--ease-out) 0.1s both;
         }
         .wiz-title em {
             font-style: normal;
-            color: var(--respire);
+            color: var(--primary);
         }
         .wiz-sub {
-            font-size: 1rem;
+            font-size: 1.05rem;
             line-height: 1.6;
-            color: var(--mid);
+            color: var(--text-body);
             max-width: 56ch;
             margin: 0 auto;
-            animation: wizFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+            animation: fadeUp 0.6s var(--ease-out) 0.2s both;
         }
+        /* les cards du wizard arrivent avec un délai pour suivre le hero */
         .phase-wizard #zone-conso .card,
         .phase-wizard #zone-prod .card {
-            animation: wizFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+            animation-delay: 0.3s;
         }
         .phase-wizard #wizard-nav {
-            animation: wizFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+            animation: fadeUp 0.6s var(--ease-out) 0.4s both;
         }
 
         #wizard-nav { display: none; }
@@ -2151,16 +2253,37 @@
         }
         #wizard-nav button {
             font-family: inherit;
-            font-weight: 700;
-            font-size: 0.9rem;
-            padding: 11px 22px;
-            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.93rem;
+            padding: 14px 28px;
+            border-radius: 16px;
             border: none;
             cursor: pointer;
+            transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
-        #wizPrev { background: var(--surface); color: var(--dark); box-shadow: 0 1px 3px rgba(13, 26, 20, 0.08); }
-        #wizNext { background: var(--dark); color: #fff; }
-        #wizProgress { font-size: 0.8rem; font-weight: 600; color: var(--dark); }
+        #wizPrev {
+            background: var(--surface);
+            color: var(--secondary);
+            border: 1px solid var(--border);
+        }
+        #wizPrev:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+        #wizNext {
+            background: var(--primary);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #wizNext:hover {
+            background: var(--primary-light);
+            box-shadow: var(--shadow-primary);
+            transform: translateY(-2px);
+        }
+        #wizProgress { font-size: 0.82rem; font-weight: 500; color: var(--text-muted); }
 
         #wizMsg { display: none; }
         .phase-wizard #wizMsg.show {
@@ -2183,25 +2306,24 @@
         .tile-btn[data-group="contrat"][data-val="flex"] { display: none; }
         #fld-contrat .tile-grid { grid-template-columns: 1fr 1fr; }
 
-        /* labels des tuiles résultats : lisibles en blanc sur fond sombre */
-        .r-cell .metric .lbl { color: rgba(255, 255, 255, 0.9); }
+        .r-cell .metric .lbl { color: var(--text-muted); }
 
         /* Révélation progressive des champs Consommation (phase-wizard uniquement) */
         .phase-wizard #card-foyer .field { display: none; }
         .phase-wizard #card-appareils { display: none; }
-        .phase-wizard #card-foyer .field.rv-on { display: block; animation: rvIn .42s ease both; }
-        .phase-wizard #card-appareils.rv-on { display: flex; animation: rvIn .42s ease both; }
+        .phase-wizard #card-foyer .field.rv-on { display: block; animation: rvIn .55s var(--ease-out) both; }
+        .phase-wizard #card-appareils.rv-on { display: flex; animation: rvIn .55s var(--ease-out) both; }
 
         /* idem pour la carte Production */
         .phase-wizard #card-prod .field,
         .phase-wizard #card-prod .divider,
         .phase-wizard #card-prod [id^="block-tarif"] { display: none; }
-        .phase-wizard #card-prod .field.rv-on { display: block; animation: rvIn .42s ease both; }
+        .phase-wizard #card-prod .field.rv-on { display: block; animation: rvIn .55s var(--ease-out) both; }
         .phase-wizard #card-prod .divider.rv-on { display: block; }
-        .phase-wizard #card-prod [id^="block-tarif"].rv-on:not(.hidden) { display: block; animation: rvIn .42s ease both; }
+        .phase-wizard #card-prod [id^="block-tarif"].rv-on:not(.hidden) { display: block; animation: rvIn .55s var(--ease-out) both; }
 
         @keyframes rvIn {
-            from { opacity: 0; transform: translateY(-16px); }
+            from { opacity: 0; transform: translateY(20px); }
             to   { opacity: 1; transform: translateY(0); }
         }
 
@@ -2299,7 +2421,7 @@
     <div class="lead-gate" id="leadGate">
         <div class="lead-gate-card">
             <button type="button" class="lead-gate-close" id="leadGateClose" aria-label="Fermer">×</button>
-            <div class="lead-gate-icon">✉️</div>
+            <div class="lead-gate-icon" data-icon="mail"></div>
             <h3>Déjà intéressé&nbsp;?</h3>
             <p>Laissez-nous votre email pour être recontacté(e) au sujet de votre projet.</p>
             <form id="leadGateForm">
@@ -2322,13 +2444,13 @@
             <div class="batt-choice">
                 <div class="sub-hd">Votre modèle Revolty</div>
                 <div class="objectif-selector" id="battSelector">
-                    <button class="objectif-btn" data-batt="0"><span class="obj-icon">🔌</span><span
+                    <button class="objectif-btn" data-batt="0"><span class="obj-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" x2="22" y1="11" y2="13"/></svg></span><span
                             class="obj-label">Sans</span><span class="obj-pct">batterie</span></button>
-                    <button class="objectif-btn" data-batt="5"><span class="obj-icon">⚡</span><span
+                    <button class="objectif-btn" data-batt="5"><span class="obj-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" x2="22" y1="11" y2="13"/><line x1="6" x2="6" y1="11" y2="13"/></svg></span><span
                             class="obj-label">5 kWh</span><span class="obj-pct">Revolty 5</span></button>
-                    <button class="objectif-btn active-confort" data-batt="10"><span class="obj-icon">⚡⚡</span><span
+                    <button class="objectif-btn active-confort" data-batt="10"><span class="obj-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" x2="22" y1="11" y2="13"/><line x1="6" x2="6" y1="11" y2="13"/><line x1="10" x2="10" y1="11" y2="13"/></svg></span><span
                             class="obj-label">10 kWh</span><span class="obj-pct">Revolty 10</span></button>
-                    <button class="objectif-btn" data-batt="15"><span class="obj-icon">⚡⚡⚡</span><span
+                    <button class="objectif-btn" data-batt="15"><span class="obj-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" x2="22" y1="11" y2="13"/><line x1="6" x2="6" y1="11" y2="13"/><line x1="10" x2="10" y1="11" y2="13"/><line x1="14" x2="14" y1="11" y2="13"/></svg></span><span
                             class="obj-label">15 kWh</span><span class="obj-pct">Revolty 15</span></button>
                 </div>
             </div>
@@ -2377,7 +2499,7 @@
                         stroke="#017267" stroke-width="1.7" />
                     <rect id="schemaBattFill" x="114" y="118" width="22" height="20" rx="2"
                         fill="rgba(1,114,103,0.40)" />
-                    <text x="125" y="127" font-size="13" text-anchor="middle">⚡</text>
+                    <path transform="translate(118 122)" d="M4 8c-.5 0-.7-.4-.4-.8L9 .9c.2-.3.5-.2.4.2l-1.1 3.4c-.1.2 0 .4.2.4h4c.5 0 .7.4.4.8l-5.4 6.3c-.2.3-.5.2-.4-.2L8.2 8.4c.1-.2 0-.4-.2-.4z" fill="rgba(255,255,255,0.95)" stroke="none"/>
                     <!-- flèche panneaux → production -->
                     <path d="M84,52 C 124,22 158,30 188,42" fill="none" stroke="#C8860B" stroke-width="2.3"
                         stroke-linecap="round" marker-end="url(#arrSun)" />
@@ -2510,7 +2632,7 @@
                     <div class="impact-sect" id="impact-co2-block" style="display:none">
                         <div class="sub-hd">Empreinte carbone</div>
                         <div class="co2-card" id="outCo2BattRow">
-                            <div class="co2-icon">♻</div>
+                            <div class="co2-icon" data-icon="recycle"></div>
                             <div>
                                 <div class="co2-val" id="outCo2Batt">—</div>
                                 <div class="co2-lbl" id="outCo2BattLbl">vs batterie neuve</div>
@@ -2535,7 +2657,7 @@
 
         <!-- ══ HERO WIZARD (visible uniquement en phase-wizard) ══ -->
         <div id="wizard-hero">
-            <span class="wiz-badge"><span class="wiz-badge-dot"></span> Simulateur Revolty</span>
+            <span class="wiz-badge"><span data-icon="zap"></span> Simulateur Revolty</span>
             <h1 class="wiz-title">Combien votre batterie pourrait vous faire <em>économiser</em> ?</h1>
             <p class="wiz-sub">Quelques questions sur votre foyer et votre installation. On vous dit combien
                 d'autoconsommation vous pouvez atteindre, combien vous gagnez chaque année, et quel modèle Revolty
@@ -2547,15 +2669,15 @@
 
         <!-- FOYER -->
         <div class="card" id="card-foyer">
-            <div class="card-title"><span class="ico">🏠</span> Consommation</div>
+            <div class="card-title"><span class="ico" data-icon="home"></span> Consommation</div>
 
                 <div class="field" id="fld-consomode">
                     <span class="field-label">Comment renseigner votre consommation ?</span>
                     <div class="tile-grid cols-2">
                         <button type="button" class="tile-btn active" data-group="consoMode" data-val="estim"><span
-                                class="tile-icon">🧮</span><span class="tile-label">L'estimer</span></button>
+                                class="tile-icon" data-icon="calculator"></span><span class="tile-label">L'estimer</span></button>
                         <button type="button" class="tile-btn" data-group="consoMode" data-val="manuel"><span
-                                class="tile-icon">✏️</span><span class="tile-label">Je la connais</span></button>
+                                class="tile-icon" data-icon="pencil"></span><span class="tile-label">Je la connais</span></button>
                     </div>
                 </div>
 
@@ -2588,11 +2710,11 @@
                         <span class="field-label">Type de chauffage</span>
                         <div class="tile-grid cols-3">
                             <button type="button" class="tile-btn active" data-group="heat" data-val="gaz"><span
-                                    class="tile-icon">🔥</span><span class="tile-label">Gaz / Bois</span></button>
+                                    class="tile-icon" data-icon="flame"></span><span class="tile-label">Gaz / Bois</span></button>
                             <button type="button" class="tile-btn" data-group="heat" data-val="pompe"><span
-                                    class="tile-icon">🌡️</span><span class="tile-label">Pompe à chaleur</span></button>
+                                    class="tile-icon" data-icon="thermometer"></span><span class="tile-label">Pompe à chaleur</span></button>
                             <button type="button" class="tile-btn" data-group="heat" data-val="elec"><span
-                                    class="tile-icon">🔌</span><span class="tile-label">Résistance électrique</span></button>
+                                    class="tile-icon" data-icon="zap"></span><span class="tile-label">Résistance électrique</span></button>
                         </div>
                     </div>
 
@@ -2600,10 +2722,10 @@
                         <span class="field-label">Présence dans le logement en journée</span>
                         <div class="tile-grid cols-2">
                             <button type="button" class="tile-btn active" data-group="journee" data-val="maison"><span
-                                    class="tile-icon">🏠</span><span class="tile-label">Souvent présent</span><span
+                                    class="tile-icon" data-icon="home"></span><span class="tile-label">Souvent présent</span><span
                                     class="tile-sub">5 j/sem. et +</span></button>
                             <button type="button" class="tile-btn" data-group="journee" data-val="exterieur"><span
-                                    class="tile-icon">🏢</span><span class="tile-label">Souvent absent</span><span
+                                    class="tile-icon" data-icon="building"></span><span class="tile-label">Souvent absent</span><span
                                     class="tile-sub">moins de 5 j/sem.</span></button>
                         </div>
                     </div>
@@ -2627,13 +2749,13 @@
                         <span class="field-label">Usage du chauffage</span>
                         <div class="tile-grid cols-3">
                             <button type="button" class="tile-btn" data-group="usage" data-val="econome"><span
-                                    class="tile-icon">🌱</span><span class="tile-label">Économe</span><span
+                                    class="tile-icon" data-icon="leaf"></span><span class="tile-label">Économe</span><span
                                     class="tile-sub">~45 %</span></button>
                             <button type="button" class="tile-btn active" data-group="usage" data-val="normal"><span
-                                    class="tile-icon">🏠</span><span class="tile-label">Normal</span><span
+                                    class="tile-icon" data-icon="home"></span><span class="tile-label">Normal</span><span
                                     class="tile-sub">~70 %</span></button>
                             <button type="button" class="tile-btn" data-group="usage" data-val="fond"><span
-                                    class="tile-icon">🔥</span><span class="tile-label">À fond</span><span
+                                    class="tile-icon" data-icon="flame"></span><span class="tile-label">À fond</span><span
                                     class="tile-sub">100 %</span></button>
                         </div>
                     </div>
@@ -2654,11 +2776,11 @@
                         <span class="field-label">Chauffage principal</span>
                         <div class="tile-grid cols-3">
                             <button type="button" class="tile-btn active" data-group="heat" data-val="gaz"><span
-                                    class="tile-icon">🔥</span><span class="tile-label">Gaz / Bois</span></button>
+                                    class="tile-icon" data-icon="flame"></span><span class="tile-label">Gaz / Bois</span></button>
                             <button type="button" class="tile-btn" data-group="heat" data-val="pompe"><span
-                                    class="tile-icon">🌡️</span><span class="tile-label">Pompe à chaleur</span></button>
+                                    class="tile-icon" data-icon="thermometer"></span><span class="tile-label">Pompe à chaleur</span></button>
                             <button type="button" class="tile-btn" data-group="heat" data-val="elec"><span
-                                    class="tile-icon">🔌</span><span class="tile-label">Résistance électrique</span></button>
+                                    class="tile-icon" data-icon="zap"></span><span class="tile-label">Résistance électrique</span></button>
                         </div>
                         <p class="dpe-hint">Détermine la saisonnalité (pic hiver) appliquée à votre conso.</p>
                     </div>
@@ -2667,24 +2789,24 @@
 
             <!-- APPAREILS SPÉCIFIQUES (SEAU 3) -->
             <div class="card" id="card-appareils">
-                <div class="card-title"><span class="ico">⚡</span> Appareils spécifiques</div>
+                <div class="card-title"><span class="ico" data-icon="zap"></span> Appareils spécifiques</div>
                 <p class="dpe-hint" style="margin-top:-4px;margin-bottom:10px">Cliquez sur les appareils que vous
                     possédez.</p>
                 <div class="tile-grid cols-5">
                     <button type="button" class="tile-btn active" data-appliance="ecs-joule"><span
-                            class="tile-icon">🚿</span><span class="tile-label">Chauffe-eau</span><span
+                            class="tile-icon" data-icon="droplets"></span><span class="tile-label">Chauffe-eau</span><span
                             class="tile-sub">Résistance</span></button>
                     <button type="button" class="tile-btn" data-appliance="ecs-thermo"><span
-                            class="tile-icon">♨️</span><span class="tile-label">Chauffe-eau</span><span
+                            class="tile-icon" data-icon="thermometer"></span><span class="tile-label">Chauffe-eau</span><span
                             class="tile-sub">Thermodynamique</span></button>
                     <button type="button" class="tile-btn active" data-appliance="ve"><span
-                            class="tile-icon">🚗</span><span class="tile-label">Véhicule électrique</span><span
+                            class="tile-icon" data-icon="car"></span><span class="tile-label">Véhicule électrique</span><span
                             class="tile-sub">&nbsp;</span></button>
                     <button type="button" class="tile-btn" data-appliance="piscine"><span
-                            class="tile-icon">🏊</span><span class="tile-label">Piscine</span><span
+                            class="tile-icon" data-icon="waves"></span><span class="tile-label">Piscine</span><span
                             class="tile-sub">&nbsp;</span></button>
                     <button type="button" class="tile-btn active" data-appliance="clim"><span
-                            class="tile-icon">❄️</span><span class="tile-label">Climatisation</span><span
+                            class="tile-icon" data-icon="snowflake"></span><span class="tile-label">Climatisation</span><span
                             class="tile-sub">&nbsp;</span></button>
                 </div>
             </div>
@@ -2697,7 +2819,7 @@
 
             <!-- INSTALLATION -->
             <div class="card" id="card-prod">
-                <div class="card-title"><span class="ico">☀️</span> Production</div>
+                <div class="card-title"><span class="ico" data-icon="sun"></span> Production</div>
 
                 <div class="field" id="fld-dept">
                     <span class="field-label">Département</span>
@@ -2708,10 +2830,10 @@
                     <span class="field-label">Puissance installée</span>
                     <div class="tile-grid cols-2" style="margin-bottom:8px">
                         <button type="button" class="tile-btn active" data-group="hasPv" data-val="oui"><span
-                                class="tile-icon">☀️</span><span class="tile-label">J'ai des PV</span><span
+                                class="tile-icon" data-icon="sun"></span><span class="tile-label">J'ai des PV</span><span
                                 class="tile-sub">PV = panneaux photovoltaïques</span></button>
                         <button type="button" class="tile-btn" data-group="hasPv" data-val="non"><span
-                                class="tile-icon">🏠</span><span class="tile-label">Pas encore de PV</span><span
+                                class="tile-icon" data-icon="home"></span><span class="tile-label">Pas encore de PV</span><span
                                 class="tile-sub">on simule une installation</span></button>
                     </div>
                     <div class="optional-input-row" id="kwcField">
@@ -2722,8 +2844,8 @@
                         style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:0.64rem;letter-spacing:0.03em;color:var(--dark);margin-top:6px">
                         Ex : 6 kWc ≈ 15 panneaux 400 Wc
                     </div>
-                    <div id="kwcTriWarn" style="display:none;font-size:0.68rem;color:#ffb454;margin-top:5px">
-                        ⚠️ Au-delà de 9 kWc, installation triphasée requise
+                    <div id="kwcTriWarn" style="display:none;font-size:0.68rem;color:#ffb454;margin-top:5px;align-items:center;gap:5px">
+                        <span data-icon="alert-triangle" style="display:inline-flex;width:14px;height:14px;vertical-align:-3px"></span> Au-delà de 9 kWc, installation triphasée requise
                     </div>
                 </div>
 
@@ -2733,12 +2855,12 @@
                     <span class="field-label">Type de contrat électricité</span>
                     <div class="tile-grid cols-3">
                         <button type="button" class="tile-btn active" data-group="contrat" data-val="base"><span
-                                class="tile-icon">💡</span><span class="tile-label">Tarif Base</span></button>
+                                class="tile-icon" data-icon="lightbulb"></span><span class="tile-label">Tarif Base</span></button>
                         <button type="button" class="tile-btn" data-group="contrat" data-val="hphc"><span
-                                class="tile-icon">⏰</span><span class="tile-label">Heures Pleines / Heures
+                                class="tile-icon" data-icon="clock"></span><span class="tile-label">Heures Pleines / Heures
                                 Creuses</span></button>
                         <button type="button" class="tile-btn" data-group="contrat" data-val="flex"><span
-                                class="tile-icon">📈</span><span class="tile-label">Flex horaire</span><span
+                                class="tile-icon" data-icon="trending-up"></span><span class="tile-label">Flex horaire</span><span
                                 class="tile-sub" style="color:var(--violet);font-weight:600">+
                                 smart_flex</span></button>
                     </div>
@@ -2802,13 +2924,13 @@
                     <span class="field-label">Orientation des panneaux</span>
                     <div class="tile-grid cols-3">
                         <button type="button" class="tile-btn" data-group="orient" data-val="est"><span
-                                class="tile-icon">🌅</span><span class="tile-label">Est</span><span
+                                class="tile-icon" data-icon="sunrise"></span><span class="tile-label">Est</span><span
                                 class="tile-sub">matin</span></button>
                         <button type="button" class="tile-btn active" data-group="orient" data-val="sud"><span
-                                class="tile-icon">☀️</span><span class="tile-label">Sud</span><span
+                                class="tile-icon" data-icon="sun"></span><span class="tile-label">Sud</span><span
                                 class="tile-sub">optimal</span></button>
                         <button type="button" class="tile-btn" data-group="orient" data-val="ouest"><span
-                                class="tile-icon">🌇</span><span class="tile-label">Ouest</span><span
+                                class="tile-icon" data-icon="sunset"></span><span class="tile-label">Ouest</span><span
                                 class="tile-sub">soir</span></button>
                     </div>
                 </div>
@@ -2817,13 +2939,13 @@
                     <span class="field-label">Inclinaison toiture</span>
                     <div class="tile-grid cols-3">
                         <button type="button" class="tile-btn" data-group="incl" data-val="20"><span
-                                class="tile-icon">📐</span><span class="tile-label">20°</span><span
+                                class="tile-icon" data-icon="triangle"></span><span class="tile-label">20°</span><span
                                 class="tile-sub">plat</span></button>
                         <button type="button" class="tile-btn active" data-group="incl" data-val="35"><span
-                                class="tile-icon">📐</span><span class="tile-label">35°</span><span
+                                class="tile-icon" data-icon="triangle"></span><span class="tile-label">35°</span><span
                                 class="tile-sub">standard</span></button>
                         <button type="button" class="tile-btn" data-group="incl" data-val="45"><span
-                                class="tile-icon">📐</span><span class="tile-label">45°</span><span
+                                class="tile-icon" data-icon="triangle"></span><span class="tile-label">45°</span><span
                                 class="tile-sub">pentu</span></button>
                     </div>
                 </div>
@@ -2832,16 +2954,16 @@
                     <span class="field-label">Ombrage</span>
                     <div class="tile-grid cols-4">
                         <button type="button" class="tile-btn active" data-group="ombrage" data-val="0"><span
-                                class="tile-icon">☀️</span><span class="tile-label">Aucun</span><span
+                                class="tile-icon" data-icon="sun"></span><span class="tile-label">Aucun</span><span
                                 class="tile-sub">&nbsp;</span></button>
                         <button type="button" class="tile-btn" data-group="ombrage" data-val="0.1"><span
-                                class="tile-icon">🌤️</span><span class="tile-label">Léger</span><span
+                                class="tile-icon" data-icon="cloud-sun"></span><span class="tile-label">Léger</span><span
                                 class="tile-sub">10 %</span></button>
                         <button type="button" class="tile-btn" data-group="ombrage" data-val="0.2"><span
-                                class="tile-icon">⛅</span><span class="tile-label">Moyen</span><span class="tile-sub">20
+                                class="tile-icon" data-icon="cloud-sun"></span><span class="tile-label">Moyen</span><span class="tile-sub">20
                                 %</span></button>
                         <button type="button" class="tile-btn" data-group="ombrage" data-val="0.3"><span
-                                class="tile-icon">☁️</span><span class="tile-label">Fort</span><span class="tile-sub">30
+                                class="tile-icon" data-icon="cloud"></span><span class="tile-label">Fort</span><span class="tile-sub">30
                                 %</span></button>
                     </div>
                 </div>
@@ -2883,9 +3005,9 @@
             <span class="delta-val" id="outDeltaBatt">—</span>
         </div>
         <div class="eco-rows">
-            <div class="eco-row"><span class="eco-lbl">☀️ Autoconso directe</span><span class="eco-val green"
+            <div class="eco-row"><span class="eco-lbl"><span data-icon="sun" class="eco-emoji"></span> Autoconso directe</span><span class="eco-val green"
                     id="ecoDirecte">—</span></div>
-            <div class="eco-row"><span class="eco-lbl">⚡ Revente surplus</span><span class="eco-val"
+            <div class="eco-row"><span class="eco-lbl"><span data-icon="zap" class="eco-emoji"></span> Revente surplus</span><span class="eco-val"
                     id="ecoRevente">—</span></div>
         </div>
         <div class="chart-wrap">
@@ -2973,7 +3095,7 @@
     <!-- ── DEBUG ──────────────────────────────────────────────────────────────── -->
     <div id="debugPanel" data-private>
         <div class="dbg-header">
-            <span class="dbg-title">🔬 Debug — Journée type heure par heure</span>
+            <span class="dbg-title"><span data-icon="microscope"></span>Debug — Journée type heure par heure</span>
             <div class="dbg-controls">
                 <div class="dbg-months" id="dbgMonths">
                     <button class="dbg-m active" data-m="0">Jan</button><button class="dbg-m" data-m="1">Fév</button>
@@ -3022,7 +3144,7 @@
     <!-- ─── MODALE — hypothèse de dimensionnement PV (mode « Pas encore de PV ») ─── -->
     <div id="pvNoticeOverlay" class="pv-notice-overlay">
         <div class="pv-notice-card">
-            <div class="pv-notice-icon">☀️</div>
+            <div class="pv-notice-icon" data-icon="sun"></div>
             <h3>À propos du dimensionnement solaire</h3>
             <p>Nous vous proposons un dimensionnement solaire calculé à partir de votre profil de
                 consommation. Il s'agit d'une <strong>hypothèse de travail</strong> destinée à illustrer
@@ -3037,7 +3159,7 @@
     <!-- ─── MODALE INFO — explications Revente / Pilotage ─── -->
     <div id="infoModalOverlay" class="pv-notice-overlay">
         <div class="pv-notice-card">
-            <div class="pv-notice-icon">ℹ️</div>
+            <div class="pv-notice-icon" data-icon="info"></div>
             <h3 id="infoModalTitle">—</h3>
             <p id="infoModalText">—</p>
             <button type="button" id="infoModalOk">J'ai compris</button>
@@ -3045,6 +3167,53 @@
     </div>
 
     <script>
+        // ═══════════════════════════════════════════════════════════════════════════
+        // ICONS — set Lucide inline injecté sur tout élément [data-icon].
+        // Permet de remplacer les emojis du DOM par des SVG line-icons cohérents
+        // avec la DA du site (couleur via currentColor, taille via CSS du parent).
+        // ═══════════════════════════════════════════════════════════════════════════
+        const LUCIDE_ICONS = {
+            home: '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+            zap: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+            sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+            flame: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+            thermometer: '<path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>',
+            calculator: '<rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/>',
+            pencil: '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/>',
+            building: '<rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/>',
+            leaf: '<path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 19 1c1 2 2 4.5 2 8 0 5.5-4.8 11-10 11Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>',
+            droplets: '<path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"/>',
+            car: '<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>',
+            waves: '<path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>',
+            snowflake: '<line x1="2" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="22"/><path d="m20 16-4-4 4-4"/><path d="m4 8 4 4-4 4"/><path d="m16 4-4 4-4-4"/><path d="m8 20 4-4 4 4"/>',
+            lightbulb: '<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',
+            'trending-up': '<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+            sunrise: '<path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/>',
+            sunset: '<path d="M12 10V2"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m16 6-4 4-4-4"/><path d="M16 18a4 4 0 0 0-8 0"/>',
+            triangle: '<path d="M13.73 4a2 2 0 0 0-3.46 0l-8 14a2 2 0 0 0 1.73 3h16a2 2 0 0 0 1.73-3Z"/>',
+            'cloud-sun': '<path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="m19.07 4.93-1.41 1.41"/><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"/><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/>',
+            cloud: '<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>',
+            mail: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+            'alert-triangle': '<path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+            check: '<path d="M20 6 9 17l-5-5"/>',
+            recycle: '<path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/><path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12"/><path d="m14 16-3 3 3 3"/><path d="M8.293 13.596 7.196 9.5 3.1 10.598"/><path d="m9.344 5.811 1.093-1.892A1.83 1.83 0 0 1 11.985 3a1.784 1.784 0 0 1 1.546.888l3.943 6.843"/><path d="m13.378 9.633 4.096 1.098 1.097-4.096"/>',
+            sparkles: '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>',
+            clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+            microscope: '<path d="M6 18h8"/><path d="M3 22h18"/><path d="M14 22a7 7 0 1 0 0-14h-1"/><path d="M9 14h2"/><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"/><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"/>',
+            info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+            rocket: '<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>'
+        };
+        function _renderIcons(root) {
+            (root || document).querySelectorAll('[data-icon]').forEach(el => {
+                const k = el.getAttribute('data-icon');
+                const path = LUCIDE_ICONS[k];
+                if (!path || el.firstElementChild) return;
+                el.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>';
+            });
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => _renderIcons());
+        else _renderIcons();
+
         (function () {
             // ═══════════════════════════════════════════════════════════════════════════
             // CONSTANTES — PRODUCTION
@@ -6024,7 +6193,7 @@
                 // Banner "tarif flex non adapté" si l'eco flex p50 est inferieure au TRV Base
                 const noteEl = document.getElementById('tarifNote');
                 if (isFlex && ecoBaseRefAnnuelle != null && ecoTotal < ecoBaseRefAnnuelle - 1) {
-                    noteEl.innerHTML += `<div style="color:#FFD145;font-weight:600;margin-top:4px">⚠ Tarif flex non adapté à votre profil — éco TRV Base ≈ ${Math.round(ecoBaseRefAnnuelle).toLocaleString('fr-FR')} €/an</div>`;
+                    noteEl.innerHTML += `<div style="color:#FFD145;font-weight:600;margin-top:4px;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Tarif flex non adapté à votre profil — éco TRV Base ≈ ${Math.round(ecoBaseRefAnnuelle).toLocaleString('fr-FR')} €/an</div>`;
                 }
 
                 // ── Diagnostic : dimensionnement ───────────────────────────────────────
@@ -6038,16 +6207,16 @@
                     dim = 'base'; dimLabel = ''; dimClass = 'dim-badge'; msgText = ''; msgClass = 'surplus-msg hidden';
                 } else if (state.batt >= MAX_BATT_KWH && ratio < DIM_SOUS_RATIO) {
                     dim = 'max'; dimLabel = 'Capacité maximum'; dimClass = 'dim-badge dim-max';
-                    msgText = '💎 Vous avez atteint le max avec une seule batterie ! Votre surplus dépasse cette capacité — contactez-nous pour étudier une installation multi-batteries.'; msgClass = 'surplus-msg max';
+                    msgText = 'Vous avez atteint le max avec une seule batterie ! Votre surplus dépasse cette capacité — contactez-nous pour étudier une installation multi-batteries.'; msgClass = 'surplus-msg max';
                 } else if (ratio < DIM_SOUS_RATIO) {
                     dim = 'sous'; dimLabel = 'Sous-dimensionnée'; dimClass = 'dim-badge dim-sous';
-                    msgText = '📈 Une partie du surplus repart sur le réseau pour presque rien. Le modèle supérieur récupérerait davantage.'; msgClass = 'surplus-msg sous';
+                    msgText = 'Une partie du surplus repart sur le réseau pour presque rien. Le modèle supérieur récupérerait davantage.'; msgClass = 'surplus-msg sous';
                 } else if (ratio <= DIM_OK_RATIO) {
                     dim = 'ok'; dimLabel = 'Bien dimensionnée'; dimClass = 'dim-badge dim-ok';
-                    msgText = '✅ La batterie est bien calibrée pour absorber votre surplus solaire.'; msgClass = 'surplus-msg ok';
+                    msgText = 'La batterie est bien calibrée pour absorber votre surplus solaire.'; msgClass = 'surplus-msg ok';
                 } else {
                     dim = 'sur'; dimLabel = 'Surdimensionnée'; dimClass = 'dim-badge dim-sur';
-                    msgText = '🚀 La batterie a plus de capacité que votre production ne génère de surplus. Ajoutez des panneaux pour en exploiter tout le potentiel.'; msgClass = 'surplus-msg sur';
+                    msgText = 'La batterie a plus de capacité que votre production ne génère de surplus. Ajoutez des panneaux pour en exploiter tout le potentiel.'; msgClass = 'surplus-msg sur';
                 }
                 document.getElementById('resSurplusBar').style.width = (state.batt === 0 ? 0 : Math.min(100, Math.round(Math.min(ratio, 1) * 100))) + '%';
                 document.getElementById('resDimBarTrack').style.display = dim === 'max' ? 'none' : '';
@@ -6116,7 +6285,7 @@
                         : perteAvecBatt + ' % de la production injectée au réseau';
                     _perteEl.classList.add('impact-perte-pos');
                 } else {
-                    _perteEl.textContent = '⚠ ' + perteSansBatt + ' % de la production perdue sans batterie';
+                    _perteEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:4px"><path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>' + perteSansBatt + ' % de la production perdue sans batterie';
                     _perteEl.classList.remove('impact-perte-pos');
                 }
 
@@ -7011,6 +7180,13 @@
                 _showWizardStep(_wizStep - 1);
             });
             _showWizardStep(0);
+
+            // ── DEBUG SKIP ────────────────────────────────────────────────────────
+            // ?skip=1 ou ?skip dans l'URL → saute le wizard, va direct aux résultats
+            // avec les valeurs par défaut. Pratique pour itérer sur la DA résultats.
+            if (new URLSearchParams(location.search).has('skip')) {
+                _enterApp();
+            }
 
             // Modale hypothèse PV : « J'ai compris » referme le bandeau bloquant
             document.getElementById('pvNoticeOk').addEventListener('click', () => {

@@ -235,6 +235,31 @@
             line-height: 1.2;
         }
 
+        /* ── MOIS D'ABSENCE (interne) — calendrier 12 chips ────────────────── */
+        .months-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 5px;
+        }
+        .month-chip {
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 0;
+            background: var(--surface);
+            cursor: pointer;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 0.78rem;
+            color: var(--dark);
+            transition: all 0.15s;
+        }
+        .month-chip:hover { border-color: var(--green-mid); }
+        .month-chip.active {
+            border-color: var(--respire);
+            background: var(--respire);
+            color: #fff;
+        }
+
         /* ── DPE SELECTOR ─────────────────────────────────────────────────────── */
         .dpe-selector {
             display: flex;
@@ -716,7 +741,7 @@
         }
 
         .co2-lbl {
-            font-size: 0.72rem;
+            font-size: 0.85rem;
             color: var(--dark);
             margin-top: 2px;
             line-height: 1.3;
@@ -1064,7 +1089,7 @@
 
         .proj-total {
             font-family: 'Bricolage Grotesque', sans-serif;
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 800;
             color: var(--respire);
             letter-spacing: -0.025em;
@@ -1090,7 +1115,7 @@
         }
 
         .proj-legend span {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--dark);
             display: flex;
             align-items: center;
@@ -1287,6 +1312,27 @@
             font-weight: 600;
         }
 
+        .dbg-soh { display: flex; }
+        .dbg-soh-btn {
+            padding: 4px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 6px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.55);
+            font-family: inherit;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+        .dbg-soh-btn:hover { color: #fff; border-color: rgba(255, 255, 255, 0.30); }
+        .dbg-soh-btn.active {
+            background: rgba(91, 168, 200, 0.20);
+            border-color: #5BA8C8;
+            color: #5BA8C8;
+        }
+
         .dbg-body {
             background: #141412;
             border-radius: 0 0 14px 14px;
@@ -1401,7 +1447,6 @@
         }
 
         .lead-gate-card {
-            position: relative;
             background: var(--surface);
             padding: 28px 26px 22px;
             border-radius: 18px;
@@ -1409,26 +1454,6 @@
             max-width: 360px;
             width: 100%;
             text-align: center;
-            color: var(--dark);
-        }
-
-        .lead-gate-close {
-            position: absolute;
-            top: 6px;
-            right: 8px;
-            background: transparent;
-            border: none;
-            color: var(--mid);
-            font-size: 2.4rem;
-            font-weight: 300;
-            line-height: 1;
-            cursor: pointer;
-            padding: 4px 12px;
-            border-radius: 8px;
-            transition: background .15s, color .15s;
-        }
-        .lead-gate-close:hover {
-            background: var(--bg);
             color: var(--dark);
         }
 
@@ -1537,59 +1562,91 @@
             line-height: 1.35;
         }
 
+        /* DEBUG — bouton magique pour bypasser le lead gate (à retirer en prod) */
+        #debugBypass {
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            z-index: 9999;
+            padding: 10px 16px;
+            background: #8b5cf6;
+            color: #fff;
+            border: 2px dashed #fff;
+            border-radius: 999px;
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.45);
+            transition: transform .15s, box-shadow .15s;
+            letter-spacing: 0.02em;
+        }
+
+        #debugBypass:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(139, 92, 246, 0.55);
+        }
+
+        #debugBypass:active {
+            transform: translateY(0);
+        }
+
         .profile-bar {
-            background: #0D1A14;
-            padding: 14px 24px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             justify-content: center;
             flex-wrap: wrap;
-            border-bottom: 1px solid rgba(17, 228, 122, 0.18);
+            margin-top: 10px;
         }
 
         .profile-bar-label {
-            font-size: 0.72rem;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 0.62rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: rgba(255, 255, 255, 0.55);
+            letter-spacing: 0.1em;
+            color: var(--muted);
             margin-right: 4px;
         }
 
         .profile-btn {
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            border: 1px solid rgba(17, 228, 122, 0.28);
-            border-radius: 10px;
-            padding: 8px 16px;
+            background: var(--surface);
+            color: var(--dark);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 6px 12px;
             font-family: 'Instrument Sans', sans-serif;
-            font-size: 0.82rem;
-            font-weight: 600;
+            font-size: 0.78rem;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.15s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
+            transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
             line-height: 1.15;
         }
 
         .profile-btn:hover {
-            background: rgba(17, 228, 122, 0.12);
-            border-color: var(--neo);
+            border-color: var(--respire);
+            background: var(--melon);
         }
 
         .profile-btn.active {
-            background: var(--neo);
-            color: #0D1A14;
-            border-color: var(--neo);
+            background: var(--respire);
+            color: #fff;
+            border-color: var(--respire);
         }
 
         .profile-btn-sub {
-            font-size: 0.65rem;
+            font-size: 0.68rem;
             font-weight: 500;
-            opacity: 0.7;
-            margin-top: 2px;
+            color: var(--muted);
+            border-left: 1px solid var(--border);
+            padding-left: 7px;
         }
+        .profile-btn:hover .profile-btn-sub { color: var(--respire); border-color: rgba(1, 114, 103, 0.25); }
+        .profile-btn.active .profile-btn-sub { color: rgba(255, 255, 255, 0.85); border-color: rgba(255, 255, 255, 0.3); }
 
         /* ═══════════ LAYOUT ONE-PAGE NO-SCROLL — Tests DA ═══════════ */
         html, body { height: 100%; }
@@ -1601,7 +1658,7 @@
             background: var(--surface);
         }
 
-        header, .hero, #debugPanel { display: none !important; }
+        header, .hero { display: none !important; }
 
         #titre-bar {
             flex: 0 0 44px;
@@ -1617,7 +1674,7 @@
             letter-spacing: -0.01em;
         }
 
-        #profileBar { position: fixed; top: 7px; right: 12px; z-index: 9100; margin: 0; }
+        /* #profileBar reprend la mise en page inline du #inputs-header */
 
         #intro-banner {
             flex: 0 0 auto;
@@ -1689,7 +1746,7 @@
         }
         /* note en taille normale sous une valeur (ex : « grâce à la batterie ») */
         .eco-side-note {
-            font-size: 0.74rem;
+            font-size: 0.85rem;
             color: var(--dark);
             margin-top: 3px;
             line-height: 1.2;
@@ -1737,7 +1794,7 @@
             display: block;
             font-family: 'Bricolage Grotesque', sans-serif;
             font-weight: 700;
-            font-size: 1.35rem;
+            font-size: 1.5rem;
             color: var(--dark);
             letter-spacing: -0.02em;
         }
@@ -1745,7 +1802,7 @@
             display: block;
             font-family: 'Bricolage Grotesque', sans-serif;
             font-weight: 700;
-            font-size: 0.7rem;
+            font-size: 0.85rem;
             color: var(--dark);
             margin-bottom: 2px;
         }
@@ -1768,7 +1825,7 @@
             line-height: 1.05;
         }
         .eco-hero .lbl {
-            font-size: 0.74rem;
+            font-size: 0.85rem;
             color: var(--muted);
             margin-top: 3px;
         }
@@ -1794,7 +1851,7 @@
             letter-spacing: -0.02em;
         }
         .eco-side-box .lbl {
-            font-size: 0.71rem;
+            font-size: 0.85rem;
             color: var(--muted);
             margin-top: 2px;
         }
@@ -1808,45 +1865,63 @@
         /* facture (50 %) + paire revente/pilotage (50 %, eux-mêmes 50/50) */
         .eco-row2 { display: flex; gap: 10px; flex-shrink: 0; }
         .eco-row2 > .col-metric { flex: 1; }
-        .eco-rp-pair { flex: 1; display: flex; gap: 10px; }
-        .eco-rp-pair > .col-metric { flex: 1; border-top: 1px solid var(--border); }
+        .eco-rp-pair { display: flex; gap: 10px; }
+        .eco-rp-pair > .col-metric { flex: 1; border-top: none; }
+        /* Repli "Voir le détail" : revente + pilotage sous le héros éco */
+        .eco-details { flex-shrink: 0; margin-top: 4px; }
+        .eco-details > summary {
+            list-style: none;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--respire);
+            padding: 6px 0;
+            user-select: none;
+        }
+        .eco-details > summary::-webkit-details-marker { display: none; }
+        .eco-details > summary::before {
+            content: '▸';
+            display: inline-block;
+            margin-right: 6px;
+            transition: transform 0.2s;
+        }
+        .eco-details[open] > summary::before { transform: rotate(90deg); }
         /* petit point d'info cliquable */
         .info-i {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             background: var(--border);
             color: var(--dark);
-            font-size: 0.58rem;
-            font-weight: 700;
-            font-style: normal;
             cursor: pointer;
             vertical-align: middle;
-            transition: background 0.15s;
+            transition: background 0.15s, color 0.15s;
+            font-style: normal;
         }
+        .info-i svg { width: 10px; height: 10px; display: block; }
         .info-i:hover { background: var(--muted); color: #fff; }
         /* sous-sous-titre (ex : Scénarios) */
         .subsub-hd {
             font-family: 'Bricolage Grotesque', sans-serif;
             font-weight: 700;
-            font-size: 0.62rem;
+            font-size: 0.72rem;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.05em;
             color: var(--dark);
-            margin-top: 8px;
+            margin-top: 10px;
         }
         .col-metric .val {
             font-family: 'Bricolage Grotesque', sans-serif;
             font-weight: 700;
-            font-size: 1.45rem;
+            font-size: 1.5rem;
             color: var(--respire);
             letter-spacing: -0.02em;
         }
         .col-metric .lbl {
-            font-size: 0.71rem;
+            font-size: 0.85rem;
             color: var(--muted);
             margin-top: 2px;
         }
@@ -1860,8 +1935,10 @@
             border-top: 1px solid var(--border);
             padding-top: 10px;
         }
-        #cell-graph .proj-chart { flex: 1; min-height: 0; margin: 0; }
-        #cell-graph .proj-chart svg { width: 100%; height: 100%; display: block; }
+        #cell-graph .proj-chart,
+        #roi-graph .proj-chart { flex: 1; min-height: 0; margin: 0; }
+        #cell-graph .proj-chart svg,
+        #roi-graph .proj-chart svg { width: 100%; height: 100%; display: block; }
         /* barres de projection : montée en escalier depuis l'axe des abscisses */
         @keyframes projBarIn {
             from { transform: scaleY(0); }
@@ -1873,23 +1950,37 @@
             animation: projBarIn 0.25s ease-out backwards;
         }
 
-        /* ─── Colonne Impact (+ CTA sous la colonne, aligné au bas des autres colonnes) ─── */
-        .impact-col-wrap {
+        /* ─── Colonne Rentabilité (RoI batterie) ─── */
+        #col-roi #roi-body {
+            flex: 1;
             display: flex;
             flex-direction: column;
             gap: 10px;
             min-height: 0;
         }
-        #col-impact { flex: 1; }
-        #col-impact .impact-body {
+        .roi-row2 { display: flex; gap: 10px; flex-shrink: 0; }
+        .roi-row2 > .col-metric { flex: 1; border-top: none; padding: 0; }
+        .roi-breakdown {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+        /* message affiché quand aucune batterie n'est sélectionnée */
+        .roi-empty {
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
-            gap: 14px;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 0.86rem;
+            font-weight: 600;
+            padding: 20px 14px;
         }
-        .impact-sect { display: flex; flex-direction: column; }
-        #impact-cta { flex-shrink: 0; margin: 0; }
+        .roi-empty-ico { font-size: 1.8rem; }
 
         /* scénarios d'inflation du prix de l'élec sous le graphe */
         #proj-scenarios {
@@ -1915,11 +2006,11 @@
             background: rgba(17, 228, 122, 0.12);
             border-color: rgba(1, 114, 103, 0.45);
         }
-        .scenario-name { font-size: 0.62rem; color: var(--dark); line-height: 1.25; }
+        .scenario-name { font-size: 0.74rem; color: var(--dark); line-height: 1.3; }
         .scenario-val {
             font-family: 'Bricolage Grotesque', sans-serif;
             font-weight: 700;
-            font-size: 0.98rem;
+            font-size: 1.1rem;
             color: var(--dark);
             margin-top: 3px;
         }
@@ -1937,55 +2028,11 @@
             line-height: 1.15;
         }
 
-        .impact-prod { display: flex; flex-direction: column; }
-        .impact-prod-val {
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 800;
-            font-size: 1.6rem;
-            color: var(--soleil);
-            line-height: 1.1;
-        }
-        .impact-prod-lbl { font-size: 0.72rem; color: var(--muted); }
-        .impact-foyers {
-            margin-top: 8px;
-            font-size: 0.86rem;
-            font-weight: 600;
-            color: var(--dark);
-        }
-        .impact-perte {
-            margin-top: 6px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: #C0392B;
-            background: rgba(217, 83, 79, 0.12);
-            border-radius: 8px;
-            padding: 8px 10px;
-        }
-        .impact-perte.impact-perte-pos {
-            color: var(--respire);
-            background: rgba(17, 228, 122, 0.10);
-        }
-        #impact-co2-block .divider {
-            border: 0;
-            border-top: 1px solid var(--border);
-            margin: 12px 0 0;
-        }
-        .impact-co2-hd {
-            margin-top: 10px;
-            font-size: 0.6rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.09em;
-            color: var(--muted);
-        }
-        #impact-co2-block .co2-card { margin-top: 8px; }
-
-
         #inputs-header {
             flex: 0 0 auto;
             background: var(--surface);
             border-top: 2px solid var(--dark);
-            padding: 16px var(--page-x) 0;
+            padding: 16px var(--page-x) 14px;
             text-align: center;
         }
         #inputs-header h2 {
@@ -2057,10 +2104,9 @@
             border-radius: 0;
         }
 
-        /* ═══ FLUX : wizard → app (la pop-up lead s'affiche par-dessus l'app) ═══ */
-        /* pop-up lead : masquée par défaut, visible quand .show est ajouté */
-        #leadGate { display: none; }
-        #leadGate.show { display: flex; }
+        /* ═══ FLUX EN 3 PHASES : wizard → lead gate → app ═══ */
+        /* lead gate visible uniquement pendant la phase-gate */
+        body:not(.phase-gate) #leadGate { display: none !important; }
 
         /* phase-wizard : on cache résultats + CTA, #inputs-section devient l'assistant */
         .phase-wizard #top-section { display: none; }
@@ -2072,72 +2118,6 @@
         .phase-wizard #zone-prod {
             max-width: 900px;
             margin: 0 auto;
-        }
-
-        /* ── HERO WIZARD : intro de la page 1 (DA chaude : melon + respire + neo) ── */
-        @keyframes wizFadeUp {
-            from { opacity: 0; transform: translateY(28px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        #wizard-hero { display: none; }
-        .phase-wizard #wizard-hero {
-            display: block;
-            max-width: 900px;
-            margin: 32px auto 28px;
-            text-align: center;
-        }
-        .wiz-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 7px 16px;
-            background: var(--melon);
-            color: var(--respire);
-            border: 1px solid rgba(1, 114, 103, 0.15);
-            border-radius: 999px;
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 700;
-            font-size: 0.78rem;
-            letter-spacing: 0.01em;
-            margin-bottom: 22px;
-            animation: wizFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-        }
-        .wiz-badge-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--neo);
-            box-shadow: 0 0 0 3px rgba(17, 228, 122, 0.20);
-        }
-        .wiz-title {
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-size: clamp(2rem, 4.5vw, 3rem);
-            font-weight: 800;
-            color: var(--dark);
-            line-height: 1.08;
-            letter-spacing: -0.025em;
-            margin: 0 auto 18px;
-            max-width: 24ch;
-            animation: wizFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
-        }
-        .wiz-title em {
-            font-style: normal;
-            color: var(--respire);
-        }
-        .wiz-sub {
-            font-size: 1rem;
-            line-height: 1.6;
-            color: var(--mid);
-            max-width: 56ch;
-            margin: 0 auto;
-            animation: wizFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
-        }
-        .phase-wizard #zone-conso .card,
-        .phase-wizard #zone-prod .card {
-            animation: wizFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
-        }
-        .phase-wizard #wizard-nav {
-            animation: wizFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
         }
 
         #wizard-nav { display: none; }
@@ -2205,6 +2185,43 @@
             to   { opacity: 1; transform: translateY(0); }
         }
 
+        /* ─── Onglets résultats (mobile/tablette) ─── */
+        #results-tabs { display: none; }
+        @media (max-width: 800px) {
+            #results-tabs {
+                display: flex;
+                gap: 6px;
+                padding: 10px var(--page-x) 0;
+                background: var(--bg);
+            }
+            .results-tab {
+                flex: 1;
+                font-family: 'Bricolage Grotesque', sans-serif;
+                font-weight: 700;
+                font-size: 0.9rem;
+                padding: 10px 12px;
+                border-radius: 10px 10px 0 0;
+                border: 1px solid var(--border);
+                border-bottom: none;
+                background: var(--surface);
+                color: var(--muted);
+                cursor: pointer;
+                transition: background 0.15s, color 0.15s;
+            }
+            .results-tab.active {
+                background: var(--respire);
+                color: #fff;
+                border-color: var(--respire);
+            }
+            body.phase-app #top-section { display: block !important; padding-top: 0; }
+            /* Onglet Économies (par défaut) : col-eco + col-roi */
+            body:not(.tab-details) #col-dim { display: none; }
+            /* Onglet Détails : col-dim */
+            body.tab-details #col-eco,
+            body.tab-details #col-roi { display: none; }
+            .phase-wizard #results-tabs { display: none; }
+        }
+
         /* ═══════════ MOBILE — layout one-page empilé (≤ 760px) ═══════════ */
         @media (max-width: 760px) {
             /* le « no-scroll » desktop devient une page qui défile ; pas de débordement latéral */
@@ -2251,7 +2268,8 @@
                proj-chart utilise preserveAspectRatio="none" → le SVG (et son texte)
                se déforme si le conteneur n'a pas le ratio du viewBox (520×200).
                On fige le ratio du conteneur au lieu de le laisser étiré par le flex. */
-            #cell-graph .proj-chart {
+            #cell-graph .proj-chart,
+            #roi-graph .proj-chart {
                 flex: 0 0 auto;
                 aspect-ratio: 520 / 200;
                 min-height: 0;
@@ -2277,12 +2295,16 @@
     </style>
 </head>
 
-<body class="phase-wizard">
+<body class="phase-gate">
 
     <header>
         <div class="logo">Revolty<span>.</span></div>
         <small>Simulateur v4.3 — moteur trois seaux</small>
     </header>
+
+    <!-- DEBUG — bouton magique pour bypasser le preneur de mail (à retirer en prod) -->
+    <button type="button" id="debugBypass" data-private title="Bypass le lead gate (debug interne)">🪄 Skip gate
+        (debug)</button>
 
     <div class="hero">
         <h1>Simulateur d'<em>autoconsommation</em><br />et économies</h1>
@@ -2295,20 +2317,33 @@
     <!-- Bandeau d'accueil résultats — cadre la lecture (notamment dimensionnement auto) -->
     <div id="intro-banner"><span id="introBannerText">—</span></div>
 
-    <!-- Lead popup — pop-up fermable, affichée après l'entrée dans l'app -->
+    <!-- Lead gate (proto — aucune logique backend) — plein écran -->
     <div class="lead-gate" id="leadGate">
         <div class="lead-gate-card">
-            <button type="button" class="lead-gate-close" id="leadGateClose" aria-label="Fermer">×</button>
-            <div class="lead-gate-icon">✉️</div>
-            <h3>Déjà intéressé&nbsp;?</h3>
-            <p>Laissez-nous votre email pour être recontacté(e) au sujet de votre projet.</p>
+            <div class="lead-gate-icon">🔓</div>
+            <h3>Découvrez vos économies</h3>
+            <p>Entrez vos coordonnées pour afficher vos résultats personnalisés</p>
             <form id="leadGateForm">
-                <input type="email" id="leadEmail" placeholder="Votre email" required />
-                <button type="submit">Être recontacté(e)</button>
+                <input type="email" id="leadEmail" placeholder="Email *" required />
+                <input type="text" id="leadFirstname" placeholder="Prénom *" required />
+                <input type="text" id="leadZip" placeholder="Code postal *" pattern="[0-9]{5}" maxlength="5"
+                    required />
+                <input type="tel" id="leadPhone" placeholder="Téléphone (optionnel — pour être rappelé)" />
+                <label class="lead-gate-consent">
+                    <input type="checkbox" id="leadConsent" required />
+                    <span>J'accepte d'être recontacté(e) par Revolty au sujet de ma simulation.</span>
+                </label>
+                <button type="submit">Voir mes résultats →</button>
                 <p class="lead-gate-legal">Données traitées par Revolty à des fins commerciales. Consentement
                     révocable à tout moment.</p>
             </form>
         </div>
+    </div>
+
+    <!-- ─── Onglets résultats (visibles uniquement ≤ 800px) ─── -->
+    <div id="results-tabs" role="tablist" aria-label="Vue des résultats">
+        <button type="button" class="results-tab active" data-tab="eco" role="tab" aria-selected="true">Économies</button>
+        <button type="button" class="results-tab" data-tab="details" role="tab" aria-selected="false">Détails</button>
     </div>
 
     <!-- ─── TOP SECTION ─── -->
@@ -2385,23 +2420,23 @@
                     <path d="M141,120 C 164,133 174,123 188,114" fill="none" stroke="#017267" stroke-width="2.3"
                         stroke-linecap="round" marker-end="url(#arrNeo)" />
                     <!-- puissance installée (au-dessus) puis production annuelle -->
-                    <text x="196" y="18" font-size="7" fill="#0D1A14"
+                    <text x="196" y="18" font-size="9" fill="#0D1A14"
                         font-family="DM Sans,sans-serif">PUISSANCE INSTALLÉE</text>
                     <text id="schemaKwcVal" x="195" y="35" font-size="15" font-weight="700" fill="#C8860B"
                         font-family="Bricolage Grotesque,sans-serif">—</text>
-                    <text x="196" y="53" font-size="7" fill="#0D1A14"
+                    <text x="196" y="53" font-size="9" fill="#0D1A14"
                         font-family="DM Sans,sans-serif">PRODUCTION / AN</text>
                     <text id="outProdAnnuelle" x="195" y="70" font-size="15" font-weight="700" fill="#C8860B"
                         font-family="Bricolage Grotesque,sans-serif">—</text>
-                    <text id="outProdLbl" x="196" y="80" font-size="7" fill="#0D1A14"
+                    <text id="outProdLbl" x="196" y="80" font-size="9" fill="#0D1A14"
                         font-family="DM Sans,sans-serif"></text>
                     <!-- valeur capacité batterie -->
-                    <text x="196" y="107" font-size="7.5" fill="#0D1A14"
+                    <text x="196" y="107" font-size="9" fill="#0D1A14"
                         font-family="DM Sans,sans-serif">CAPACITÉ BATTERIE</text>
                     <text id="schemaBattVal" x="195" y="127" font-size="15" font-weight="700" fill="#017267"
                         font-family="Bricolage Grotesque,sans-serif">10 kWh</text>
                     <!-- consommation annuelle, sous la maison -->
-                    <text x="78" y="151" font-size="7" fill="#0D1A14" text-anchor="middle"
+                    <text x="78" y="151" font-size="9" fill="#0D1A14" text-anchor="middle"
                         font-family="DM Sans,sans-serif">CONSOMMATION / AN</text>
                     <text id="schemaConsoVal" x="78" y="163" font-size="12" font-weight="700" fill="#0D1A14"
                         text-anchor="middle" font-family="Bricolage Grotesque,sans-serif">—</text>
@@ -2454,17 +2489,20 @@
                     <div class="sub-hd">Réduction sur facture</div>
                     <div class="val" id="outPctReduc">—</div>
                 </div>
+            </div>
+            <details class="eco-details">
+                <summary>Voir le détail (revente + pilotage HP/HC)</summary>
                 <div class="eco-rp-pair">
                     <div class="col-metric" id="cell-revente">
-                        <div class="sub-hd">Revente <span class="info-i" data-info="revente">i</span></div>
+                        <div class="sub-hd">Revente <span class="info-i" data-info="revente" aria-label="Info revente"><svg viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><circle cx="5" cy="2.2" r="0.9"/><rect x="4.25" y="3.9" width="1.5" height="4.2" rx="0.5"/></svg></span></div>
                         <div class="val" id="outRevente">—</div>
                     </div>
                     <div class="col-metric" id="cell-pilotage">
-                        <div class="sub-hd">Pilotage <span class="info-i" data-info="pilotage">i</span></div>
+                        <div class="sub-hd">Pilotage <span class="info-i" data-info="pilotage" aria-label="Info pilotage"><svg viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><circle cx="5" cy="2.2" r="0.9"/><rect x="4.25" y="3.9" width="1.5" height="4.2" rx="0.5"/></svg></span></div>
                         <div class="val" id="outPilotage">—</div>
                     </div>
                 </div>
-            </div>
+            </details>
 
             <!-- Graphe projection sur 20 ans -->
             <div class="proj-block" id="cell-graph">
@@ -2479,6 +2517,8 @@
                             style="background:#9B6DFF"></span>Pilotage HP/HC</span>
                     <span id="projLegSurplus" style="display:none"><span class="pleg-sq"
                             style="background:rgba(255,209,69,0.65)"></span>Surplus revendu</span>
+                    <span id="projLegSoh" style="display:none"><span class="pleg-sq"
+                            style="background:#1A6B8A;height:3px;border-radius:1px"></span>Santé batterie (SoH)</span>
                 </div>
                 <div class="subsub-hd">Scénarios</div>
                 <div id="proj-scenarios">
@@ -2498,29 +2538,87 @@
             </div>
         </div>
 
-        <!-- ══ COLONNE 3 — IMPACT (+ CTA sous la colonne) ══ -->
-        <div class="impact-col-wrap">
-            <div class="col-card" id="col-impact">
-                <div class="col-card-hd">Impact</div>
-                <div class="impact-body">
-                    <div class="impact-sect">
-                        <div class="sub-hd">Gaspillage solaire</div>
-                        <div class="impact-perte" id="outPerteSansBatt">—</div>
+        <!-- ══ COLONNE 3 — RENTABILITÉ (RoI batterie) ══ -->
+        <div class="col-card" id="col-roi">
+            <div class="col-card-hd">Rentabilité</div>
+
+            <!-- contenu affiché dès qu'une batterie est sélectionnée -->
+            <div id="roi-body">
+                <div class="eco-hero">
+                    <div class="sub-hd">Retour sur investissement</div>
+                    <div class="val" id="paybackYears">—</div>
+                </div>
+                <div class="roi-row2">
+                    <div class="col-metric">
+                        <div class="sub-hd">Investissement</div>
+                        <div class="val" id="paybackCapex">—</div>
+                        <div class="eco-side-note">576 €/kWh TTC</div>
                     </div>
-                    <div class="impact-sect" id="impact-co2-block" style="display:none">
-                        <div class="sub-hd">Empreinte carbone</div>
-                        <div class="co2-card" id="outCo2BattRow">
-                            <div class="co2-icon">♻</div>
-                            <div>
-                                <div class="co2-val" id="outCo2Batt">—</div>
-                                <div class="co2-lbl" id="outCo2BattLbl">vs batterie neuve</div>
-                            </div>
-                        </div>
+                    <div class="col-metric">
+                        <div class="sub-hd">Économies / an</div>
+                        <div class="val" id="paybackEco">—</div>
+                        <div class="roi-breakdown" id="paybackBreakdown"></div>
                     </div>
                 </div>
+                <div class="proj-block" id="roi-graph">
+                    <div class="sub-hd">Cumul net sur 20 ans</div>
+                    <div class="proj-chart" id="paybackChartWrap"></div>
+                    <div class="subsub-hd">Cumul net (économies − CAPEX) · inflation élec <span
+                            id="roi-infl-lbl">+4 %/an</span> · le point violet marque le break-even.</div>
+                </div>
             </div>
-            <a href="https://revolty.fr/reserver-ma-batterie" class="cta-btn" id="impact-cta"
-                target="_blank">Réserver ma batterie Revolty →</a>
+
+            <!-- message affiché quand aucune batterie n'est sélectionnée -->
+            <div id="roi-empty" class="roi-empty" style="display:none">
+                <div class="roi-empty-ico">🔋</div>
+                <p>Ajoutez une batterie pour voir le retour sur investissement.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── DEBUG — entre les résultats et la zone de saisie (interne) ──────────── -->
+    <div id="debugPanel" data-private>
+        <div class="dbg-header">
+            <span class="dbg-title">🔬 Debug — Journée type heure par heure</span>
+            <div class="dbg-controls">
+                <div class="dbg-soh">
+                    <button class="dbg-soh-btn" id="dbgSohToggle"
+                        title="Applique la dégradation SoH année par année à la projection 20 ans">SoH</button>
+                </div>
+                <div class="dbg-months" id="dbgMonths">
+                    <button class="dbg-m active" data-m="0">Jan</button><button class="dbg-m" data-m="1">Fév</button>
+                    <button class="dbg-m" data-m="2">Mar</button><button class="dbg-m" data-m="3">Avr</button>
+                    <button class="dbg-m" data-m="4">Mai</button><button class="dbg-m" data-m="5">Jun</button>
+                    <button class="dbg-m" data-m="6">Jul</button><button class="dbg-m" data-m="7">Aoû</button>
+                    <button class="dbg-m" data-m="8">Sep</button><button class="dbg-m" data-m="9">Oct</button>
+                    <button class="dbg-m" data-m="10">Nov</button><button class="dbg-m" data-m="11">Déc</button>
+                </div>
+                <div class="dbg-daytype">
+                    <button class="dbg-dt active" data-we="0">Semaine</button>
+                    <button class="dbg-dt" data-we="1">Weekend</button>
+                </div>
+            </div>
+        </div>
+        <div class="dbg-body">
+            <div class="dbg-metrics" id="dbgMetrics"></div>
+            <div class="dbg-chart-wrap">
+                <div class="dbg-legend">
+                    <span class="dleg"><span class="dleg-sq" style="background:#11E47A"></span>Autoconso directe</span>
+                    <span class="dleg"><span class="dleg-sq" style="background:#017267"></span>Restitution
+                        batterie</span>
+                    <span class="dleg"><span class="dleg-sq" style="background:rgba(255,255,255,0.15)"></span>Achat
+                        réseau</span>
+                    <span class="dleg" id="dlegPilot" style="display:none"><span class="dleg-sq"
+                            style="background:#9B6DFF"></span>Recharge HC pilotée</span>
+                    <span class="dleg"><span class="dleg-sq" style="background:rgba(245,166,35,0.55)"></span>Surplus
+                        revendu</span>
+                    <span class="dleg"><span class="dleg-line" style="background:#FFD145"></span>Production PV</span>
+                    <span class="dleg"><span class="dleg-line" style="background:#11E47A"></span>SOC batterie</span>
+                </div>
+                <svg id="dbgChart" width="100%" viewBox="0 0 900 220" preserveAspectRatio="none"
+                    style="display:block;overflow:visible;"></svg>
+                <div class="dbg-xaxis" id="dbgXAxis"></div>
+            </div>
         </div>
     </div>
 
@@ -2528,19 +2626,23 @@
     <div id="inputs-header">
         <h2>Modifier mes déclarations</h2>
         <p>Ajustez les champs ci-dessous : vos résultats se recalculent automatiquement.</p>
+
+        <!-- Profils de test (interne — masqué en mode public) -->
+        <div class="profile-bar" id="profileBar" data-private>
+            <span class="profile-bar-label">Profils test</span>
+            <button type="button" class="profile-btn" data-profile="P1">P1<span class="profile-btn-sub">Bordeaux ·
+                    médian</span></button>
+            <button type="button" class="profile-btn" data-profile="P2">P2<span class="profile-btn-sub">Lyon · petit
+                    foyer</span></button>
+            <button type="button" class="profile-btn" data-profile="P3">P3<span class="profile-btn-sub">Toulouse · gros
+                    + revente</span></button>
+            <button type="button" class="profile-btn" data-profile="P4">P4<span class="profile-btn-sub">Nantes · E/O
+                    gaz</span></button>
+        </div>
     </div>
 
     <!-- ─── INPUTS SECTION ─── -->
     <div id="inputs-section">
-
-        <!-- ══ HERO WIZARD (visible uniquement en phase-wizard) ══ -->
-        <div id="wizard-hero">
-            <span class="wiz-badge"><span class="wiz-badge-dot"></span> Simulateur Revolty</span>
-            <h1 class="wiz-title">Combien votre batterie pourrait vous faire <em>économiser</em> ?</h1>
-            <p class="wiz-sub">Quelques questions sur votre foyer et votre installation. On vous dit combien
-                d'autoconsommation vous pouvez atteindre, combien vous gagnez chaque année, et quel modèle Revolty
-                s'adapte à votre cas.</p>
-        </div>
 
         <!-- ══ ZONE CONSO ══ -->
         <div id="zone-conso">
@@ -2606,6 +2708,27 @@
                                     class="tile-icon">🏢</span><span class="tile-label">Souvent absent</span><span
                                     class="tile-sub">moins de 5 j/sem.</span></button>
                         </div>
+                    </div>
+
+                    <div class="field" id="fld-months-absent" data-private>
+                        <span class="field-label">Mois d'absence prolongée</span>
+                        <div class="months-grid" id="monthsAbsentGrid">
+                            <button type="button" class="month-chip" data-month="0">J</button>
+                            <button type="button" class="month-chip" data-month="1">F</button>
+                            <button type="button" class="month-chip" data-month="2">M</button>
+                            <button type="button" class="month-chip" data-month="3">A</button>
+                            <button type="button" class="month-chip" data-month="4">M</button>
+                            <button type="button" class="month-chip" data-month="5">J</button>
+                            <button type="button" class="month-chip" data-month="6">J</button>
+                            <button type="button" class="month-chip" data-month="7">A</button>
+                            <button type="button" class="month-chip" data-month="8">S</button>
+                            <button type="button" class="month-chip" data-month="9">O</button>
+                            <button type="button" class="month-chip" data-month="10">N</button>
+                            <button type="button" class="month-chip" data-month="11">D</button>
+                        </div>
+                        <p class="dpe-hint">Cliquez les mois où le foyer est inoccupé (résidence secondaire,
+                            longs déplacements). Conso réduite au talon : frigo / congélateur / box / veilles
+                            (~20 %). Chauffage, ECS et VE coupés. Piscine et clim conservent leur saisonnalité.</p>
                     </div>
 
                     <div class="field" data-private>
@@ -2850,14 +2973,6 @@
         </div>
         <!-- /#zone-prod -->
 
-        <!-- navigation du wizard (visible uniquement en phase-wizard) -->
-        <div id="wizMsg"></div>
-        <div id="wizard-nav">
-            <button type="button" id="wizPrev">← Précédent</button>
-            <span id="wizProgress">Étape 1 / 2</span>
-            <button type="button" id="wizNext">Suivant →</button>
-        </div>
-
     </div>
     <!-- /#inputs-section -->
 
@@ -2945,71 +3060,6 @@
                 fixe 20 ans</div>
         </div>
 
-        <!-- paybackSection : non placé dans le layout v1, conservé pour le moteur JS -->
-        <div class="bloc" id="paybackSection" style="display:none">
-            <div class="bloc-label">Rentabilité batterie</div>
-            <div class="metrics" style="margin-bottom:10px">
-                <div class="metric">
-                    <div class="val" id="paybackCapex">—</div>
-                    <div class="lbl">Investissement (576 €/kWh TTC)</div>
-                </div>
-                <div class="metric">
-                    <div class="val" id="paybackEco">—</div>
-                    <div class="lbl">Économies totales / an</div>
-                    <div id="paybackBreakdown"
-                        style="font-size:0.65rem;color:var(--muted);margin-top:4px;line-height:1.3"></div>
-                </div>
-                <div class="metric">
-                    <div class="val" id="paybackYears">—</div>
-                    <div class="lbl">Retour sur investissement</div>
-                </div>
-            </div>
-            <div class="proj-chart" id="paybackChartWrap"></div>
-            <div class="proj-sub" style="margin-top:8px">Cumul net (économies − CAPEX). Inflation élec +4 %/an. Le
-                point violet marque le break-even.</div>
-        </div>
-    </div>
-
-    <!-- ── DEBUG ──────────────────────────────────────────────────────────────── -->
-    <div id="debugPanel" data-private>
-        <div class="dbg-header">
-            <span class="dbg-title">🔬 Debug — Journée type heure par heure</span>
-            <div class="dbg-controls">
-                <div class="dbg-months" id="dbgMonths">
-                    <button class="dbg-m active" data-m="0">Jan</button><button class="dbg-m" data-m="1">Fév</button>
-                    <button class="dbg-m" data-m="2">Mar</button><button class="dbg-m" data-m="3">Avr</button>
-                    <button class="dbg-m" data-m="4">Mai</button><button class="dbg-m" data-m="5">Jun</button>
-                    <button class="dbg-m" data-m="6">Jul</button><button class="dbg-m" data-m="7">Aoû</button>
-                    <button class="dbg-m" data-m="8">Sep</button><button class="dbg-m" data-m="9">Oct</button>
-                    <button class="dbg-m" data-m="10">Nov</button><button class="dbg-m" data-m="11">Déc</button>
-                </div>
-                <div class="dbg-daytype">
-                    <button class="dbg-dt active" data-we="0">Semaine</button>
-                    <button class="dbg-dt" data-we="1">Weekend</button>
-                </div>
-            </div>
-        </div>
-        <div class="dbg-body">
-            <div class="dbg-metrics" id="dbgMetrics"></div>
-            <div class="dbg-chart-wrap">
-                <div class="dbg-legend">
-                    <span class="dleg"><span class="dleg-sq" style="background:#11E47A"></span>Autoconso directe</span>
-                    <span class="dleg"><span class="dleg-sq" style="background:#017267"></span>Restitution
-                        batterie</span>
-                    <span class="dleg"><span class="dleg-sq" style="background:rgba(255,255,255,0.15)"></span>Achat
-                        réseau</span>
-                    <span class="dleg" id="dlegPilot" style="display:none"><span class="dleg-sq"
-                            style="background:#9B6DFF"></span>Recharge HC pilotée</span>
-                    <span class="dleg"><span class="dleg-sq" style="background:rgba(245,166,35,0.55)"></span>Surplus
-                        revendu</span>
-                    <span class="dleg"><span class="dleg-line" style="background:#FFD145"></span>Production PV</span>
-                    <span class="dleg"><span class="dleg-line" style="background:#11E47A"></span>SOC batterie</span>
-                </div>
-                <svg id="dbgChart" width="100%" viewBox="0 0 900 220" preserveAspectRatio="none"
-                    style="display:block;overflow:visible;"></svg>
-                <div class="dbg-xaxis" id="dbgXAxis"></div>
-            </div>
-        </div>
     </div>
 
     <!-- ─── MENTIONS LÉGALES — bandeau bas de page, visible en phase résultats ─── -->
@@ -4970,6 +5020,11 @@
             // Source : Selectra/Linky — talon ≈ 40% de la conso hors chauffage élec
             const TALON_ABSENT = 0.40;
 
+            // Ratio talon "résidence vide" : seau 1 conservé à ce niveau (frigo,
+            // congélateur, box internet, veilles). Chauffage/ECS/VE coupés.
+            // Piscine et clim gardent leur saisonnalité (autonomes).
+            const TALON_ABSENT_MOIS = 0.20;
+
             // ═══════════════════════════════════════════════════════════════════════════
             // SEAU 2 — CHAUFFAGE
             // ═══════════════════════════════════════════════════════════════════════════
@@ -5211,6 +5266,7 @@
             // VE + clim + ECS resistance / 6 kWc S 35deg / 10 kWh / Base sans rachat.
             const state = {
                 persons: 4, dpe: 'D', surface: 140, heat: 'gaz', usage: 'normal', journee: 'maison',
+                monthsAbsent: [],
                 ecs: 'joule', ve: true, piscine: false, clim: true,
                 kwc: 6, hasPv: true,
                 dept: '33', orient: 'sud', incl: 35, ombrage: 0, batt: 10,
@@ -5297,6 +5353,18 @@
                     PISCI_NORM[h] * kwh_pisci_jour +
                     CLIM_NORM[h] * kwh_clim_jour
                 );
+
+                // Mois marqué « absence prolongée » : on coupe tout sauf
+                // talon seau 1 (frigo/congel/box/veilles) + piscine + clim
+                // (équipements autonomes qui tournent en l'absence des habitants).
+                if (state.monthsAbsent && state.monthsAbsent.includes(m)) {
+                    const prof1Talon = prof1.map(v => v * TALON_ABSENT_MOIS);
+                    const prof2Off = prof2.map(() => 0);
+                    const prof3OnlyAuto = new Array(24).fill(0).map((_, h) =>
+                        PISCI_NORM[h] * kwh_pisci_jour + CLIM_NORM[h] * kwh_clim_jour
+                    );
+                    return prof1Talon.map((v, h) => v + prof2Off[h] + prof3OnlyAuto[h]);
+                }
 
                 return prof1.map((v, h) => v + prof2[h] + prof3[h]);
             }
@@ -5655,27 +5723,63 @@
             // ═══════════════════════════════════════════════════════════════════════════
             // PROJECTION 20 ANS — histogramme empilé
             // ═══════════════════════════════════════════════════════════════════════════
-            function renderProjection(ecoDirecte, ecoBatterie, ecoPilot, ecoRevente, battKwh, efcAn) {
+            // Eco par année (en €/an, AVANT scalage par inflation) :
+            // - Toggle SoH OFF : valeurs année-1 constantes (comportement historique,
+            //   projection purement linéaire avec l'inflation élec).
+            // - Toggle SoH ON  : on relance simMensuelle avec battKwh × SoH(année)
+            //   et on redérive bonusBattSolar / bonusPilot à partir des résultats.
+            // Sortie : tableau de HORIZON entrées { d, b, p, s } (direct, batt-solar, pilot, surplus).
+            // Partagé entre renderProjection (graphe 20 ans + scénarios) et renderPayback (RoI).
+            function _buildEcoByYear(ecoDirecte, ecoBatterie, ecoPilot, ecoRevente, battKwh, efcAn, sohCtx) {
+                const sohApplied = !!(sohCtx && sohCtx.applied && battKwh > 0);
+                const out = new Array(HORIZON);
+                for (let y = 0; y < HORIZON; y++) {
+                    const yr1 = y + 1;
+                    if (!sohApplied) {
+                        out[y] = { d: ecoDirecte, b: ecoBatterie, p: ecoPilot, s: ecoRevente };
+                        continue;
+                    }
+                    const soh = Math.max(0, SOH_INIT - SOH_CAL_LOSS * yr1 - SOH_CYC_LOSS * efcAn * yr1);
+                    const bk = battKwh * soh;
+                    const rB = simMensuelle(sohCtx.prodAnnuelle, sohCtx.kwhs, bk, sohCtx.tarifH, sohCtx.pilotActive);
+                    const ecoCoutHC = rB.ecoCoutHC || 0;
+                    const ecoTotal_y = rB.ecoDirecte + rB.ecoBatterie + rB.ecoRevente - ecoCoutHC;
+                    let bonusPilot_y = 0;
+                    if (sohCtx.pilotActive) {
+                        const rNoP = simMensuelle(sohCtx.prodAnnuelle, sohCtx.kwhs, bk, sohCtx.tarifH, false);
+                        const ecoNoPilot_y = rNoP.ecoDirecte + rNoP.ecoBatterie + rNoP.ecoRevente;
+                        bonusPilot_y = ecoTotal_y - ecoNoPilot_y;
+                    }
+                    const deltaBatt_y = ecoTotal_y - sohCtx.ecoTotalBase;
+                    const bonusBattSolar_y = deltaBatt_y - bonusPilot_y;
+                    out[y] = { d: rB.ecoDirecte, b: bonusBattSolar_y, p: bonusPilot_y, s: rB.ecoRevente };
+                }
+                return out;
+            }
+
+            function renderProjection(ecoDirecte, ecoBatterie, ecoPilot, ecoRevente, battKwh, efcAn, ecoByYear) {
                 const sec = document.getElementById('projSection');
                 if (ecoDirecte + ecoBatterie + ecoPilot + ecoRevente <= 0) { sec.style.display = 'none'; return; }
                 sec.style.display = '';
 
-                const showSoh = false; // courbe SoH retirée de la projection
+                const showSoh = battKwh > 0; // courbe SoH (santé batterie) — interne
                 // Légende dynamique : chaque entrée n'apparaît que si sa série existe dans le graphe
                 const _toggleLeg = (id, on) => { const e = document.getElementById(id); if (e) e.style.display = on ? '' : 'none'; };
                 _toggleLeg('projLegBatt', ecoBatterie > 0);
                 _toggleLeg('projLegendPilot', ecoPilot > 0);
                 _toggleLeg('projLegSurplus', ecoRevente > 0);
+                _toggleLeg('projLegSoh', battKwh > 0);
 
                 // Build yearly data — autoconso & pilotage HP/HC grow with elec price, surplus stays fixed
                 const years = [];
                 let cumul = 0;
                 for (let y = 0; y < HORIZON; y++) {
                     const mult = Math.pow(1 + projEscalation, y);
-                    const d = Math.round(ecoDirecte * mult);
-                    const b = Math.round(ecoBatterie * mult);
-                    const p = Math.round(ecoPilot * mult);
-                    const s = Math.round(ecoRevente); // tarif fixe 20 ans
+                    const ey = ecoByYear[y];
+                    const d = Math.round(ey.d * mult);
+                    const b = Math.round(ey.b * mult);
+                    const p = Math.round(ey.p * mult);
+                    const s = Math.round(ey.s); // tarif fixe 20 ans
                     cumul += d + b + p + s;
                     const yr1 = y + 1;
                     const soh = showSoh ? Math.max(0, SOH_INIT - SOH_CAL_LOSS * yr1 - SOH_CYC_LOSS * efcAn * yr1) : null;
@@ -5692,8 +5796,9 @@
                     let cScen = 0;
                     for (let y = 0; y < HORIZON; y++) {
                         const m = Math.pow(1 + r, y);
-                        cScen += Math.round(ecoDirecte * m) + Math.round(ecoBatterie * m)
-                            + Math.round(ecoPilot * m) + Math.round(ecoRevente);
+                        const ey = ecoByYear[y];
+                        cScen += Math.round(ey.d * m) + Math.round(ey.b * m)
+                            + Math.round(ey.p * m) + Math.round(ey.s);
                     }
                     const elScen = document.getElementById(scenId);
                     if (elScen) elScen.textContent = cScen.toLocaleString('fr-FR') + ' €';
@@ -5747,15 +5852,15 @@
                     for (let i = 0; i <= nTicks; i++) {
                         const frac = i / nTicks;
                         const yy = sohScY(frac);
-                        svg += `<text x="${W - PAD_R + 4}" y="${yy + 3}" text-anchor="start" font-size="8" fill="rgba(255,255,255,0.25)" font-family="DM Sans,sans-serif">${Math.round(frac * 100)}%</text>`;
+                        svg += `<text x="${W - PAD_R + 4}" y="${yy + 3}" text-anchor="start" font-size="8" fill="rgba(13,26,20,0.45)" font-family="DM Sans,sans-serif">${Math.round(frac * 100)}%</text>`;
                     }
-                    svg += `<text x="${W - PAD_R + 4}" y="${PAD_T - 2}" text-anchor="start" font-size="7" fill="rgba(255,255,255,0.45)" font-family="DM Sans,sans-serif">SoH</text>`;
+                    svg += `<text x="${W - PAD_R + 4}" y="${PAD_T - 2}" text-anchor="start" font-size="7" fill="#1A6B8A" font-family="DM Sans,sans-serif" font-weight="600">SoH</text>`;
                     const pts = years.map((yr, i) => {
                         const x = PAD_L + i * barGap + 1 + barW / 2;
                         const yy = sohScY(yr.soh);
                         return `${x.toFixed(1)},${yy.toFixed(1)}`;
                     }).join(' ');
-                    svg += `<polyline points="${pts}" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+                    svg += `<polyline points="${pts}" fill="none" stroke="#1A6B8A" stroke-width="1.6" stroke-dasharray="4,2" stroke-linejoin="round" stroke-linecap="round"/>`;
                 }
 
                 svg += '</svg>';
@@ -5776,11 +5881,20 @@
 
             // ─── Payback batterie (économies totales = compute(batt) − compute(0)) ─────
             // deltaBattAn = bonusBattSolarEur + bonusPilotEur — donc pilotage HP/HC inclus
-            function renderPayback(deltaBattAn, battKwh, bonusBattSolarEur, bonusPilotEur) {
-                const sec = document.getElementById('paybackSection');
-                if (!sec) return;
-                if (battKwh <= 0) { sec.style.display = 'none'; return; }
-                sec.style.display = '';
+            function renderPayback(deltaBattAn, battKwh, bonusBattSolarEur, bonusPilotEur, ecoByYear) {
+                const roiBody = document.getElementById('roi-body');
+                const roiEmpty = document.getElementById('roi-empty');
+                if (!roiBody || !roiEmpty) return;
+                if (battKwh <= 0) {
+                    roiBody.style.display = 'none';
+                    roiEmpty.style.display = '';
+                    return;
+                }
+                roiBody.style.display = '';
+                roiEmpty.style.display = 'none';
+                // l'inflation élec suit le scénario cliquable du graphe de projection
+                const _inflEl = document.getElementById('roi-infl-lbl');
+                if (_inflEl) _inflEl.textContent = '+' + Math.round(projEscalation * 100) + ' %/an';
                 const capex = battKwh * CAPEX_BATT_PAR_KWH;
                 document.getElementById('paybackCapex').textContent = capex.toLocaleString('fr-FR') + ' €';
                 const ecoTxt = deltaBattAn > 0
@@ -5802,12 +5916,16 @@
                     return;
                 }
 
-                // Cumul année par année avec inflation élec (l'éco batterie suit le prix élec)
+                // Cumul année par année avec inflation élec (l'éco batterie suit le prix élec).
+                // ecoByYear fournit le delta batt par année (= b + p), qui dégrade avec le SoH
+                // quand le toggle est ON. Sans ecoByYear : valeur année-1 constante (fallback).
                 const years = [];
                 let cum = -capex;
                 let breakeven = null;
                 for (let y = 1; y <= HORIZON; y++) {
-                    const eco = deltaBattAn * Math.pow(1 + ELEC_ESCALATION, y - 1);
+                    const mult = Math.pow(1 + projEscalation, y - 1);
+                    const deltaY = ecoByYear ? (ecoByYear[y - 1].b + ecoByYear[y - 1].p) : deltaBattAn;
+                    const eco = deltaY * mult;
                     const prev = cum;
                     cum += eco;
                     if (breakeven === null && cum >= 0) {
@@ -5831,10 +5949,10 @@
                 let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">`;
                 // grid + zero line
                 const y0 = scY(0);
-                svg += `<line x1="${PAD_L}" y1="${y0}" x2="${W - PAD_R}" y2="${y0}" stroke="rgba(255,255,255,0.25)" stroke-width="1" stroke-dasharray="3,3"/>`;
-                svg += `<text x="${PAD_L - 4}" y="${y0 + 3}" text-anchor="end" font-size="8" fill="rgba(255,255,255,0.4)" font-family="DM Sans,sans-serif">0 €</text>`;
-                svg += `<text x="${PAD_L - 4}" y="${scY(minV) + 3}" text-anchor="end" font-size="8" fill="rgba(255,255,255,0.25)" font-family="DM Sans,sans-serif">${Math.round(minV).toLocaleString('fr-FR')} €</text>`;
-                svg += `<text x="${PAD_L - 4}" y="${scY(maxV) + 3}" text-anchor="end" font-size="8" fill="rgba(255,255,255,0.25)" font-family="DM Sans,sans-serif">${Math.round(maxV).toLocaleString('fr-FR')} €</text>`;
+                svg += `<line x1="${PAD_L}" y1="${y0}" x2="${W - PAD_R}" y2="${y0}" stroke="rgba(13,26,20,0.22)" stroke-width="1" stroke-dasharray="3,3"/>`;
+                svg += `<text x="${PAD_L - 4}" y="${y0 + 3}" text-anchor="end" font-size="8" fill="#0D1A14" font-family="DM Sans,sans-serif">0 €</text>`;
+                svg += `<text x="${PAD_L - 4}" y="${scY(minV) + 3}" text-anchor="end" font-size="8" fill="rgba(13,26,20,0.5)" font-family="DM Sans,sans-serif">${Math.round(minV).toLocaleString('fr-FR')} €</text>`;
+                svg += `<text x="${PAD_L - 4}" y="${scY(maxV) + 3}" text-anchor="end" font-size="8" fill="rgba(13,26,20,0.5)" font-family="DM Sans,sans-serif">${Math.round(maxV).toLocaleString('fr-FR')} €</text>`;
 
                 // surface area
                 const pts = [`${scX(0).toFixed(1)},${scY(-capex).toFixed(1)}`]
@@ -5853,7 +5971,7 @@
 
                 // X labels
                 for (let i = 0; i <= HORIZON; i += 5) {
-                    svg += `<text x="${scX(i)}" y="${H - 4}" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.3)" font-family="DM Sans,sans-serif">${i === 0 ? 'J0' : i + ' ans'}</text>`;
+                    svg += `<text x="${scX(i)}" y="${H - 4}" text-anchor="middle" font-size="8" fill="rgba(13,26,20,0.5)" font-family="DM Sans,sans-serif">${i === 0 ? 'J0' : i + ' ans'}</text>`;
                 }
 
                 svg += '</svg>';
@@ -6102,34 +6220,6 @@
                             + (state.batt > 0 ? ', avec une batterie Revolty de ' + state.batt + ' kWh.' : '.');
                 }
 
-                // Gaspillage solaire — message selon présence batterie
-                const perteSansBatt = Math.max(0, 100 - resBase.autoConsoRate);
-                const _perteEl = document.getElementById('outPerteSansBatt');
-                if (prodAnnuelle <= 0) {
-                    _perteEl.textContent = '—';
-                    _perteEl.classList.remove('impact-perte-pos');
-                } else if (state.batt > 0) {
-                    const perteAvecBatt = Math.max(0, 100 - resBatt.autoConsoRate);
-                    const facteur = perteAvecBatt > 0 ? perteSansBatt / perteAvecBatt : 0;
-                    _perteEl.textContent = facteur >= 1.1
-                        ? 'La batterie divise le gaspillage solaire par ' + facteur.toLocaleString('fr-FR', { maximumFractionDigits: 1 })
-                        : perteAvecBatt + ' % de la production injectée au réseau';
-                    _perteEl.classList.add('impact-perte-pos');
-                } else {
-                    _perteEl.textContent = '⚠ ' + perteSansBatt + ' % de la production perdue sans batterie';
-                    _perteEl.classList.remove('impact-perte-pos');
-                }
-
-                const co2Block = document.getElementById('impact-co2-block');
-                if (state.batt > 0) {
-                    co2Block.style.display = 'block';
-                    const co2Kg = Math.round(state.batt * CO2_BATT_NEUVE);
-                    document.getElementById('outCo2Batt').textContent = co2Kg.toLocaleString('fr-FR') + ' kg CO₂ évités';
-                    document.getElementById('outCo2BattLbl').textContent = 'batterie Revolty reconditionnée ' + state.batt + ' kWh vs neuve, sans lien avec la production solaire';
-                } else {
-                    co2Block.style.display = 'none';
-                }
-
                 // ── Outputs objet (debug) ─────────────────────────────────────────────
                 const outputs = {
                     ecoAnnuelle: ecoTotal, pctReducFacture: pctReduc,
@@ -6140,10 +6230,20 @@
                 };
                 _dbgCtx = { kwhs, prodAnnuelle, battKwh: state.batt, consoAnnuelle: resBatt.consoAnnuelle, tarifH: isFlex ? buildTarifFlexJour(1, 2, state.flexScenario || 'p50') : tarifH };
                 const efcAn = state.batt > 0 ? kwhRest / state.batt : 0;
+                // Contexte SoH : si le toggle est ON, renderProjection relance simMensuelle
+                // chaque année avec battKwh × SoH(année) pour capturer la dégradation.
+                const sohCtx = {
+                    applied: _sohApplied,
+                    prodAnnuelle, kwhs, tarifH, pilotActive,
+                    ecoTotalBase: resBase.ecoDirecte + resBase.ecoBatterie + resBase.ecoRevente,
+                };
+                // Eco par année (calculé une fois, partagé entre projection 20 ans et payback RoI).
+                // Coûteux uniquement quand SoH est activé (20-40 appels simMensuelle).
+                const ecoByYear = _buildEcoByYear(resBatt.ecoDirecte, bonusBattSolarEur, bonusPilotEur, resBatt.ecoRevente, state.batt, efcAn, sohCtx);
                 // Projection : bonus batterie solaire + bonus pilotage HC séparés (violet)
-                renderProjection(resBatt.ecoDirecte, bonusBattSolarEur, bonusPilotEur, resBatt.ecoRevente, state.batt, efcAn);
+                renderProjection(resBatt.ecoDirecte, bonusBattSolarEur, bonusPilotEur, resBatt.ecoRevente, state.batt, efcAn, ecoByYear);
                 // Payback batterie : économies totales batterie (avec − sans), CAPEX = 576 €/kWh × kWh
-                renderPayback(deltaBattEur, state.batt, bonusBattSolarEur, bonusPilotEur);
+                renderPayback(deltaBattEur, state.batt, bonusBattSolarEur, bonusPilotEur, ecoByYear);
                 // Debug window-level pour inspection console
                 window._rev = {
                     pilotActive,
@@ -6597,6 +6697,10 @@
 
             let _dbgState = { m: 0, we: 0 };
             let _dbgCtx = null;
+            // Toggle SoH (interne) : si actif, la projection 20 ans relance simMensuelle
+            // chaque année avec battKwh × SoH(année). OFF par défaut — préserve le
+            // comportement actuel (linéaire avec inflation).
+            let _sohApplied = false;
 
             // Batterie
             document.querySelectorAll('.objectif-btn').forEach(btn => {
@@ -6673,6 +6777,22 @@
                         if (a === 've') state.ve = isOn;
                         else if (a === 'piscine') state.piscine = isOn;
                         else if (a === 'clim') state.clim = isOn;
+                    }
+                    compute();
+                });
+            });
+
+            // Chips « mois d'absence prolongée » (interne) — toggle dans state.monthsAbsent
+            document.querySelectorAll('.month-chip').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const m = parseInt(btn.dataset.month);
+                    const idx = state.monthsAbsent.indexOf(m);
+                    if (idx === -1) {
+                        state.monthsAbsent.push(m);
+                        btn.classList.add('active');
+                    } else {
+                        state.monthsAbsent.splice(idx, 1);
+                        btn.classList.remove('active');
                     }
                     compute();
                 });
@@ -6791,6 +6911,11 @@
                     _dbgState.we = parseInt(btn.dataset.we);
                     renderDebug(_dbgState.m, _dbgState.we);
                 });
+            });
+            document.getElementById('dbgSohToggle').addEventListener('click', (e) => {
+                _sohApplied = !_sohApplied;
+                e.currentTarget.classList.toggle('active', _sohApplied);
+                compute();
             });
 
             // ═══════════════════════════════════════════════════════════════════════════
@@ -6973,44 +7098,11 @@
                 document.getElementById('wizMsg').classList.remove('show');
             }
 
-            // Effacer le signalement d'erreur dès que l'utilisateur corrige
-            document.querySelectorAll('#inputs-section input[type="number"]').forEach(inp => {
-                inp.addEventListener('input', () => {
-                    inp.classList.remove('input-error');
-                    _clearWizMsg();
-                });
-            });
-
+            // Quitte le preneur de mail : affiche la page de résultats (tout éditable)
             function _enterApp() {
                 _body.className = 'phase-app';
                 _restoreZones();
-                compute();
-                window.scrollTo(0, 0);
-                // Pop-up lead : on la propose une fois les résultats affichés.
-                // Délai court pour laisser la page se poser visuellement avant d'ouvrir la modale.
-                setTimeout(() => {
-                    document.getElementById('leadGate').classList.add('show');
-                }, 600);
             }
-
-            document.getElementById('wizNext').addEventListener('click', () => {
-                const bad = _validateStep(_wizStep);
-                if (bad) {
-                    bad.el.classList.add('input-error');
-                    _showWizMsg(bad.msg);
-                    bad.el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-                    bad.el.focus();
-                    return;
-                }
-                _clearWizMsg();
-                if (_wizStep < WIZARD_ZONES.length - 1) _showWizardStep(_wizStep + 1);
-                else _enterApp();
-            });
-            document.getElementById('wizPrev').addEventListener('click', () => {
-                _clearWizMsg();
-                _showWizardStep(_wizStep - 1);
-            });
-            _showWizardStep(0);
 
             // Modale hypothèse PV : « J'ai compris » referme le bandeau bloquant
             document.getElementById('pvNoticeOk').addEventListener('click', () => {
@@ -7041,47 +7133,34 @@
                 document.getElementById('infoModalOverlay').classList.remove('show');
             });
 
-            // Endpoint Apps Script (Google Sheet) — remplacer XXXXX par l'URL de
-            // déploiement « /exec ». Tant que le placeholder est là, l'envoi est OFF.
-            const LEAD_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwYeqhGnLqk-NnwbVDjPxwMLS0cLozZZmU-LSurUaE1tsTK_zTV0Ksv21imD0nywMWOVQ/exec';
-
             _leadForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                // Snapshot des inputs : le `state` est à jour (compute() en entrée d'app).
-                // On ajoute les tarifs, qui ne vivent que dans le DOM.
-                const numOrNull = id => {
-                    const v = parseFloat(document.getElementById(id).value);
-                    return isNaN(v) ? null : v;
-                };
-                const lead = {
+                const payload = {
                     email: document.getElementById('leadEmail').value.trim(),
-                    submittedAt: new Date().toISOString(),
-                    inputs: {
-                        ...state,
-                        tarifBase: numOrNull('tarifBase'),
-                        tarifHP: numOrNull('tarifHP'),
-                        tarifHC: numOrNull('tarifHC'),
-                    },
+                    firstname: document.getElementById('leadFirstname').value.trim(),
+                    zip: document.getElementById('leadZip').value.trim(),
+                    phone: document.getElementById('leadPhone').value.trim(),
                 };
-                window.__revoltyLead = lead;
-                console.log('[lead gate] lead capturé', lead);
-                if (LEAD_SHEET_URL.indexOf('XXXXX') === -1) {
-                    fetch(LEAD_SHEET_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(lead) })
-                        .catch(err => console.warn('[lead gate] envoi échoué', err));
-                }
-                document.getElementById('leadGate').classList.remove('show');
+                console.log('[proto lead gate] données fictives soumises', payload);
+                _enterApp();
             });
 
-            document.getElementById('leadGateClose').addEventListener('click', () => {
-                document.getElementById('leadGate').classList.remove('show');
-            });
+            // DEBUG — saute le wizard + le lead gate (à retirer en prod)
+            const _debugBypass = document.getElementById('debugBypass');
+            if (_debugBypass) {
+                _debugBypass.addEventListener('click', () => {
+                    console.log('[debug] bypass wizard + lead gate');
+                    _enterApp();
+                    _debugBypass.style.display = 'none';
+                });
+            }
 
             // ── MODE PUBLIC / PRIVÉ ──────────────────────────────────────────────────
             // Privé par défaut (usage interne). Pour activer le mode public (champs
             // sensibles masqués + valeurs figées) : ajouter ?mode=public à l'URL.
             // Convention : tout élément avec l'attribut [data-private] est masqué en
             // mode public, et toute clé de PUBLIC_DEFAULTS est forcée à sa valeur.
-            const IS_PUBLIC = new URLSearchParams(location.search).get('mode') !== 'private';
+            const IS_PUBLIC = new URLSearchParams(location.search).get('mode') === 'public';
 
             const PUBLIC_DEFAULTS = {
                 groups: { orient: 'sud', incl: '35', ombrage: '0', usage: 'normal' },
@@ -7138,6 +7217,11 @@
             function _applBtn(a) { return document.querySelector(`.tile-btn[data-appliance="${a}"]`); }
 
             function applyProfile(p) {
+                // Reset mois d'absence (les profils standards n'en utilisent pas)
+                state.monthsAbsent = (p.monthsAbsent || []).slice();
+                document.querySelectorAll('.month-chip').forEach(b =>
+                    b.classList.toggle('active', state.monthsAbsent.includes(parseInt(b.dataset.month)))
+                );
                 // Mode estim
                 _clickGroup('consoMode', 'estim');
                 // Foyer
@@ -7204,8 +7288,19 @@
                 });
             });
 
-            _initWizardConso();
-            _initWizardProd();
+            // ── Onglets résultats (visibles ≤ 800px) : Économies par défaut, Détails en alternative
+            document.querySelectorAll('.results-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.dataset.tab;
+                    document.body.classList.toggle('tab-details', target === 'details');
+                    document.querySelectorAll('.results-tab').forEach(t => {
+                        const isActive = t === tab;
+                        t.classList.toggle('active', isActive);
+                        t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                    });
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
 
             // ── INIT
             compute();
