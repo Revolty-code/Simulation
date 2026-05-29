@@ -2622,22 +2622,6 @@
         #wizNext { background: var(--dark); color: #fff; }
         #wizProgress { font-size: 0.8rem; font-weight: 600; color: var(--dark); }
 
-        #wizSkip { display: none; }
-        .phase-wizard #wizSkip {
-            display: block;
-            margin: 6px auto 0;
-            background: none;
-            border: none;
-            color: var(--muted);
-            font-family: inherit;
-            font-size: 0.78rem;
-            font-weight: 600;
-            text-decoration: underline;
-            cursor: pointer;
-            transition: color .15s;
-        }
-        .phase-wizard #wizSkip:hover { color: var(--dark); }
-
         #wizMsg { display: none; }
         .phase-wizard #wizMsg.show {
             display: block;
@@ -3523,7 +3507,6 @@
             <span id="wizProgress">Étape 1 / 2</span>
             <button type="button" id="wizNext">Suivant →</button>
         </div>
-        <button type="button" id="wizSkip">Passer et voir un exemple de résultats →</button>
     </div>
     <!-- /#inputs-section -->
 
@@ -7805,10 +7788,6 @@
             function _enterApp() {
                 _runComputeLoader(_revealApp);
             }
-
-            // Bouton skip : accès direct aux résultats (valeurs par défaut), sans loader.
-            const _wizSkip = document.getElementById('wizSkip');
-            if (_wizSkip) _wizSkip.addEventListener('click', _revealApp);
 
             document.getElementById('wizNext').addEventListener('click', () => {
                 const bad = _validateStep(_wizStep);

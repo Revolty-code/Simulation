@@ -4083,10 +4083,6 @@ ${isFlexDbg ? `<div class="dbg-metric" style="color:#FF9F45"><div class="dm-val"
         _runComputeLoader(_revealApp);
     }
 
-    // Bouton skip : accès direct aux résultats (valeurs par défaut), sans loader.
-    const _wizSkip = document.getElementById('wizSkip');
-    if (_wizSkip) _wizSkip.addEventListener('click', _revealApp);
-
     document.getElementById('wizNext').addEventListener('click', () => {
         const bad = _validateStep(_wizStep);
         if (bad) {

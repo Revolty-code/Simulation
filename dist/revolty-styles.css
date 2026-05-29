@@ -2611,22 +2611,6 @@ header, .hero, #debugPanel { display: none !important; }
 #wizNext { background: var(--dark); color: #fff; }
 #wizProgress { font-size: 0.8rem; font-weight: 600; color: var(--dark); }
 
-#wizSkip { display: none; }
-.phase-wizard #wizSkip {
-    display: block;
-    margin: 6px auto 0;
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-family: inherit;
-    font-size: 0.78rem;
-    font-weight: 600;
-    text-decoration: underline;
-    cursor: pointer;
-    transition: color .15s;
-}
-.phase-wizard #wizSkip:hover { color: var(--dark); }
-
 #wizMsg { display: none; }
 .phase-wizard #wizMsg.show {
     display: block;
