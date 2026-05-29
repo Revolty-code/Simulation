@@ -173,7 +173,7 @@
 
         .card-title {
             font-family: 'Bricolage Grotesque', sans-serif;
-            font-size: 0.97rem;
+            font-size: 1.25rem;
             font-weight: 700;
             letter-spacing: -0.01em;
             margin-bottom: 22px;
@@ -227,8 +227,8 @@
 
         .field-label {
             display: block;
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-size: 0.8rem;
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 1rem;
             font-weight: 700;
             color: var(--dark);
             margin-bottom: 9px;
@@ -299,7 +299,7 @@
         }
 
         .dpe-hint {
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             color: var(--muted);
             margin-top: 6px;
         }
@@ -348,7 +348,7 @@
             border-radius: 10px;
             padding: 11px 38px 11px 14px;
             font-family: 'Instrument Sans', sans-serif;
-            font-size: 0.93rem;
+            font-size: 1rem;
             color: var(--dark);
             cursor: pointer;
         }
@@ -371,7 +371,7 @@
             border-radius: 10px;
             padding: 10px 14px;
             font-family: 'Instrument Sans', sans-serif;
-            font-size: 0.93rem;
+            font-size: 1rem;
             color: var(--dark);
             background: var(--bg);
             outline: none;
@@ -388,7 +388,7 @@
         }
 
         .optional-input-row .unit {
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             color: var(--muted);
             white-space: nowrap;
         }
@@ -450,11 +450,9 @@
         }
         .objectif-btn .obj-sub {
             display: block;
-            font-size: 0.66rem;
-            font-weight: 600;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--dark);
             line-height: 1.1;
         }
         .objectif-btn:hover { background: rgba(1, 114, 103, 0.07); }
@@ -506,12 +504,12 @@
         .dim-feedback-status {
             font-family: 'Bricolage Grotesque', sans-serif;
             font-weight: 700;
-            font-size: 0.82rem;
+            font-size: 1rem;
             color: var(--dark);
             line-height: 1.2;
         }
         .dim-feedback-msg {
-            font-size: 0.74rem;
+            font-size: 0.8rem;
             color: var(--muted);
             line-height: 1.35;
         }
@@ -589,6 +587,7 @@
         }
 
         .tile-btn {
+            position: relative;
             border: 2px solid var(--border);
             border-radius: 12px;
             padding: 12px 4px;
@@ -602,6 +601,12 @@
             justify-content: center;
             gap: 4px;
             min-height: 72px;
+        }
+
+        .tile-btn .info-i {
+            position: absolute;
+            top: 5px;
+            right: 5px;
         }
 
         .tile-btn:hover {
@@ -625,17 +630,17 @@
         }
 
         .tile-label {
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-size: 0.72rem;
-            font-weight: 700;
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
             color: var(--dark);
             line-height: 1.15;
         }
 
         .tile-sub {
-            font-size: 0.62rem;
+            font-size: 0.8rem;
             color: var(--muted);
-            line-height: 1;
+            line-height: 1.2;
         }
 
         /* ── RESULT ───────────────────────────────────────────────────────────── */
@@ -1159,13 +1164,15 @@
         .pv-notice-icon { font-size: 2.2rem; text-align: center; }
         .pv-notice-card h3 {
             margin: 8px 0 14px;
-            color: #0D1A14;
-            font-size: 1.1rem;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 1.25rem;
             text-align: center;
         }
         .pv-notice-card p {
-            font-size: 0.85rem;
-            color: #5a6b64;
+            font-size: 1rem;
+            color: var(--dark);
             line-height: 1.55;
             margin: 0 0 10px;
         }
@@ -1253,7 +1260,7 @@
 
         .proj-total {
             font-family: 'Bricolage Grotesque', sans-serif;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 800;
             color: var(--respire);
             letter-spacing: -0.025em;
@@ -1261,7 +1268,7 @@
         }
 
         .proj-sub {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--muted);
             margin-bottom: 14px;
         }
@@ -1279,8 +1286,8 @@
         }
 
         .proj-legend span {
-            font-size: 0.75rem;
-            color: var(--dark);
+            font-size: 0.8rem;
+            color: var(--muted);
             display: flex;
             align-items: center;
             gap: 5px;
@@ -1378,7 +1385,7 @@
             border: 1.5px solid var(--border);
             border-radius: 8px;
             font-family: 'Instrument Sans', sans-serif;
-            font-size: 0.9rem;
+            font-size: 1rem;
             color: var(--dark);
             background: var(--bg);
             outline: none;
@@ -1641,7 +1648,7 @@
 
         .lead-gate-card h3 {
             font-family: 'Bricolage Grotesque', sans-serif;
-            font-size: 1.22rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: var(--dark);
             margin-bottom: 6px;
@@ -1649,9 +1656,9 @@
         }
 
         .lead-gate-card>p {
-            font-size: 0.86rem;
-            color: var(--mid);
-            margin-bottom: 18px;
+            font-size: 1rem;
+            color: var(--dark);
+            margin-bottom: 13px;
             line-height: 1.4;
         }
 
@@ -1703,8 +1710,8 @@
             accent-color: var(--respire);
         }
 
-        .lead-gate-card button {
-            margin-top: 8px;
+        .lead-gate-card form button {
+            margin-top: 4px;
             padding: 13px 18px;
             background: var(--respire);
             color: #fff;
@@ -1718,25 +1725,30 @@
             letter-spacing: 0.01em;
         }
 
-        .lead-gate-card button:hover:not(:disabled) {
+        .lead-gate-card form button:hover:not(:disabled) {
             background: var(--green-mid);
         }
 
-        .lead-gate-card button:active:not(:disabled) {
+        .lead-gate-card form button:active:not(:disabled) {
             transform: scale(0.98);
         }
 
-        .lead-gate-card button:disabled {
+        .lead-gate-card form button:disabled {
             opacity: 0.55;
             cursor: wait;
         }
 
         .lead-gate-legal {
-            font-size: 0.68rem;
+            font-size: 0.8rem;
             color: var(--muted);
-            margin-top: 10px;
+            margin-top: 2px;
             line-height: 1.35;
         }
+
+        /* Pop-up lead : le gros CTA réutilisé ne doit pas cumuler sa marge avec
+           celle du paragraphe au-dessus (sinon écart vertical excessif). */
+        .lead-gate-card .cta-btn.cta-eco { margin-top: 4px; }
+        .lead-gate-card .cta-reassure { margin-top: 8px; }
 
         .profile-bar {
             background: #0D1A14;
@@ -1805,16 +1817,19 @@
         header, .hero, #debugPanel { display: none !important; }
 
         #titre-bar {
-            flex: 0 0 44px;
+            flex: 0 0 auto;
+            padding: 12px var(--page-x);
             background: var(--surface);
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
+            text-align: center;
             color: var(--dark);
             font-family: 'Bricolage Grotesque', sans-serif;
             font-weight: 800;
-            font-size: 1rem;
+            font-size: 1.5rem;
+            line-height: 1.2;
             letter-spacing: -0.01em;
         }
 
@@ -1823,10 +1838,10 @@
         #intro-banner {
             flex: 0 0 auto;
             background: var(--tile);
-            border-bottom: 1px solid var(--border);
+            border-top: 1px solid var(--border);
             color: var(--dark);
-            padding: 9px var(--page-x);
-            font-size: 0.82rem;
+            padding: 14px var(--page-x);
+            font-size: 1rem;
             line-height: 1.4;
             text-align: center;
         }
@@ -1857,7 +1872,7 @@
         .col-card-hd {
             font-family: 'Bricolage Grotesque', sans-serif;
             font-weight: 800;
-            font-size: 1rem;
+            font-size: 1.5rem;
             color: var(--dark);
             padding-bottom: 8px;
             border-bottom: 1px solid var(--border);
@@ -1868,7 +1883,7 @@
         .sub-hd {
             font-family: 'Bricolage Grotesque', sans-serif;
             font-weight: 700;
-            font-size: 0.8rem;
+            font-size: 1.25rem;
             color: var(--dark);
             margin-bottom: 3px;
             line-height: 1.2;
@@ -1936,7 +1951,7 @@
         /* 4 valeurs clés sous l'illu — grille 2×2 sobre, valeurs en jaune doré */
         .install-stats {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 8px;
             flex-shrink: 0;
         }
@@ -1967,17 +1982,14 @@
         .install-stat--solar .install-val { color: #C8860B; }     /* jaune doré : production solaire */
         .install-stat--home  .install-val { color: var(--dark); } /* noir : consommation */
         .install-sub {
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             color: var(--muted);
             line-height: 1.2;
             margin-top: 2px;
         }
         .install-lbl {
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 600;
             line-height: 1.2;
         }
         .install-prod-sub {
@@ -1999,16 +2011,16 @@
         .dim-stat-val {
             display: block;
             font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 700;
-            font-size: 1.5rem;
+            font-weight: 800;
+            font-size: 1.3rem;
             color: var(--dark);
             letter-spacing: -0.02em;
         }
         .dim-stat-lbl {
             display: block;
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 700;
-            font-size: 0.85rem;
+            font-family: 'Instrument Sans', sans-serif;
+            font-weight: 500;
+            font-size: 1rem;
             color: var(--dark);
             margin-bottom: 2px;
         }
@@ -2051,8 +2063,8 @@
         }
         .eco-side-box .val {
             font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 700;
-            font-size: 1.5rem;
+            font-weight: 800;
+            font-size: 2rem;
             color: var(--respire);
             letter-spacing: -0.02em;
         }
@@ -2111,18 +2123,16 @@
         .info-i:hover { background: var(--muted); color: #fff; }
         /* sous-sous-titre (ex : Scénarios) */
         .subsub-hd {
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 700;
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--dark);
+            font-family: 'Instrument Sans', sans-serif;
+            font-weight: 500;
+            font-size: 0.8rem;
+            color: var(--muted);
             margin-top: 10px;
         }
         .col-metric .val {
             font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 700;
-            font-size: 1.5rem;
+            font-weight: 800;
+            font-size: 1.3rem;
             color: var(--respire);
             letter-spacing: -0.02em;
         }
@@ -2189,9 +2199,37 @@
             color: var(--respire);
             margin-top: 2px;
         }
-        #impact-card-co2    .impact-ico { color: var(--respire); }
         #impact-card-kwh    .impact-ico { color: #C8860B; }
         #impact-card-recond .impact-ico { color: var(--respire); }
+        #impact-card-pointe    .impact-ico { color: #9B6DFF; }
+        #impact-card-autonomie .impact-ico { color: #C8860B; }
+
+        /* Séparateur + cartes "pistes alternatives" (présentation interne, à arbitrer) */
+        .impact-options-sep {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 0.62rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .impact-options-sep::before,
+        .impact-options-sep::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+        .impact-card-option { border-style: dashed; }
+        .impact-opt-tag {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 2px;
+        }
         .impact-card-body { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
         .impact-val {
             font-family: 'Bricolage Grotesque', sans-serif;
@@ -2203,11 +2241,11 @@
         }
         .impact-lbl {
             font-size: 0.8rem;
-            color: var(--dark);
+            color: var(--muted);
             line-height: 1.3;
         }
         .impact-sub {
-            font-size: 0.72rem;
+            font-size: 0.8rem;
             color: var(--muted);
             margin-top: 3px;
             line-height: 1.3;
@@ -2230,7 +2268,7 @@
         .contact-hd {
             font-family: 'Bricolage Grotesque', sans-serif;
             font-weight: 800;
-            font-size: 1rem;
+            font-size: 1.25rem;
             color: var(--dark);
             padding-bottom: 8px;
             margin-bottom: 12px;
@@ -2256,18 +2294,18 @@
         .contact-name {
             font-family: 'Bricolage Grotesque', sans-serif;
             font-weight: 800;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: var(--dark);
             line-height: 1.15;
             letter-spacing: -0.01em;
         }
         .contact-title {
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             color: var(--respire);
             font-weight: 600;
         }
         .contact-bio {
-            font-size: 0.76rem;
+            font-size: 1rem;
             color: var(--dark);
             line-height: 1.45;
             margin: 0 0 10px;
@@ -2320,11 +2358,11 @@
             background: rgba(17, 228, 122, 0.12);
             border-color: rgba(1, 114, 103, 0.45);
         }
-        .scenario-name { font-size: 0.74rem; color: var(--dark); line-height: 1.3; }
+        .scenario-name { font-size: 1rem; font-weight: 500; color: var(--dark); line-height: 1.3; }
         .scenario-val {
             font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 700;
-            font-size: 1.1rem;
+            font-weight: 800;
+            font-size: 1.15rem;
             color: var(--dark);
             margin-top: 3px;
         }
@@ -2388,7 +2426,7 @@
         .impact-roi-val {
             font-family: 'Bricolage Grotesque', sans-serif;
             font-weight: 800;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             color: var(--respire);
             line-height: 1.1;
             letter-spacing: -0.02em;
@@ -2396,7 +2434,7 @@
         }
         .impact-roi-note {
             margin-top: 12px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--muted);
             line-height: 1.4;
         }
@@ -2406,6 +2444,7 @@
             flex: 0 0 auto;
             background: var(--surface);
             border-top: 2px solid var(--dark);
+            margin-top: 48px;
             padding: 16px var(--page-x) 0;
             text-align: center;
         }
@@ -2413,13 +2452,13 @@
             margin: 0;
             font-family: 'Bricolage Grotesque', sans-serif;
             font-weight: 800;
-            font-size: 1.05rem;
+            font-size: 1.5rem;
             color: var(--dark);
         }
         #inputs-header p {
             margin: 4px 0 0;
-            font-size: 0.78rem;
-            color: var(--muted);
+            font-size: 1rem;
+            color: var(--dark);
         }
         .phase-wizard #inputs-header { display: none; }
 
@@ -2473,7 +2512,7 @@
 
         .lead-gate {
             position: fixed;
-            inset: 44px 0 0 0;
+            inset: 0;
             z-index: 9000;
             border-radius: 0;
         }
@@ -2583,6 +2622,22 @@
         #wizNext { background: var(--dark); color: #fff; }
         #wizProgress { font-size: 0.8rem; font-weight: 600; color: var(--dark); }
 
+        #wizSkip { display: none; }
+        .phase-wizard #wizSkip {
+            display: block;
+            margin: 6px auto 0;
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-family: inherit;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-decoration: underline;
+            cursor: pointer;
+            transition: color .15s;
+        }
+        .phase-wizard #wizSkip:hover { color: var(--dark); }
+
         #wizMsg { display: none; }
         .phase-wizard #wizMsg.show {
             display: block;
@@ -2659,6 +2714,11 @@
                 display: block !important;
                 padding-top: 0;
             }
+            /* En block, le gap de grille saute → on espace les tuiles empilées à la main */
+            body.phase-app #top-section .col-card,
+            body.phase-app #top-section .contact-card {
+                margin-bottom: 14px;
+            }
             .impact-col-wrap { display: contents; }
             /* Onglet Économies (par défaut) : col-eco + col-roi + CTA */
             body:not(.tab-details) #col-dim,
@@ -2734,6 +2794,111 @@
                 grid-template-columns: 1fr;
             }
         }
+        /* ═══════════ ÉCRAN DE CALCUL (fake ~2 s) ═══════════ */
+        .compute-loader {
+            position: fixed;
+            inset: 0;
+            z-index: 4000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 28px;
+            background: radial-gradient(120% 120% at 50% 0%, #12281f 0%, var(--dark) 62%);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity .3s ease, visibility .3s ease;
+        }
+        .compute-loader.show { opacity: 1; visibility: visible; }
+
+        .cl-card {
+            width: 100%;
+            max-width: 440px;
+            text-align: center;
+            color: #fff;
+            transform: translateY(10px);
+            transition: transform .4s ease;
+        }
+        .compute-loader.show .cl-card { transform: translateY(0); }
+
+        .cl-sun { position: relative; width: 84px; height: 84px; margin: 0 auto 28px; }
+        .cl-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.12);
+            border-top-color: var(--neo);
+            border-right-color: var(--neo);
+            animation: cl-spin .9s linear infinite;
+        }
+        .cl-sun-emoji {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            animation: cl-bob 1.8s ease-in-out infinite;
+        }
+        @keyframes cl-spin { to { transform: rotate(360deg); } }
+        @keyframes cl-bob { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+
+        .cl-title {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: clamp(1.4rem, 5vw, 1.95rem);
+            letter-spacing: -0.01em;
+            margin-bottom: 12px;
+        }
+        .cl-step {
+            font-size: 0.95rem;
+            color: var(--neo);
+            min-height: 1.4em;
+            margin-bottom: 24px;
+            transition: opacity .22s ease;
+        }
+        .cl-step.swap { opacity: 0; }
+
+        .cl-bar {
+            width: 100%;
+            height: 6px;
+            border-radius: 99px;
+            background: rgba(255, 255, 255, 0.12);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        .cl-bar-fill {
+            height: 100%;
+            width: 0;
+            border-radius: 99px;
+            background: linear-gradient(90deg, var(--green), var(--neo));
+            transition: width 2s cubic-bezier(.4, .05, .25, 1);
+        }
+
+        .cl-blog {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 20px;
+            border-radius: 99px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background .2s ease, border-color .2s ease;
+        }
+        .cl-blog:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        .cl-blog .cl-arrow { transition: transform .2s ease; }
+        .cl-blog:hover .cl-arrow { transform: translateX(3px); }
+        @media (prefers-reduced-motion: reduce) {
+            .cl-ring, .cl-sun-emoji { animation: none; }
+            .cl-bar-fill { transition: none; }
+            .compute-loader, .cl-card { transition: none; }
+        }
     </style>
 </head>
 
@@ -2741,19 +2906,16 @@
 
     <header>
         <div class="logo">Revolty<span>.</span></div>
-        <small>Simulateur v4.3 — moteur trois seaux</small>
+        <small>Simulateur v4.3 · moteur trois seaux</small>
     </header>
 
     <div class="hero">
         <h1>Simulateur d'<em>autoconsommation</em><br />et économies</h1>
-        <p>Modèle saisonnier heure par heure — DPE, isolation, appareils spécifiques.</p>
+        <p>Modèle saisonnier heure par heure : DPE, isolation, appareils spécifiques.</p>
     </div>
 
     <!-- ═══════════ LAYOUT ONE-PAGE — Tests DA ═══════════ -->
-    <div id="titre-bar">Votre simulation de batterie Revolty</div>
-
-    <!-- Bandeau d'accueil résultats — mentions légales / cadre de lecture -->
-    <div id="intro-banner"><span id="introBannerText">Cette simulation est une estimation indicative, calculée à partir de données statistiques nationales et des informations que vous avez saisies. Elle ne constitue ni un devis, ni une étude de dimensionnement, ni un conseil personnalisé.</span></div>
+    <div id="titre-bar">On vous dit tout. Gratuitement, sans rien vous demander en retour.</div>
 
     <!-- Lead popup — pop-up fermable, affichée après l'entrée dans l'app -->
     <div class="lead-gate" id="leadGate">
@@ -2763,8 +2925,8 @@
             <!-- État initial : capture email -->
             <div id="leadGateInitial">
                 <div class="lead-gate-icon">✉️</div>
-                <h3>Déjà intéressé&nbsp;?</h3>
-                <p>Laissez-nous votre email pour être recontacté(e) au sujet de votre projet.</p>
+                <h3>On en parle&nbsp;?</h3>
+                <p>Laissez-nous votre email&nbsp;: un membre de l'équipe Revolty revient vers vous pour parler de votre projet.</p>
                 <form id="leadGateForm">
                     <input type="email" id="leadEmail" placeholder="Votre email" required />
                     <button type="submit">Être recontacté(e)</button>
@@ -2776,13 +2938,11 @@
             <!-- État succès : remerciement + CTA secondaire vers la réservation -->
             <div id="leadGateSuccess" style="display:none">
                 <div class="lead-gate-icon lead-gate-icon-ok">✓</div>
-                <h3>Merci&nbsp;!</h3>
-                <p>Un conseiller Revolty vous recontactera bientôt. Pour aller plus vite, vous pouvez
-                    <strong>réserver votre batterie</strong> dès maintenant&nbsp;:</p>
+                <h3>C'est noté, merci&nbsp;!</h3>
+                <p>On revient vers vous très vite. Envie d'avancer dès maintenant&nbsp;? <strong>Réservez votre batterie</strong>, c'est sans engagement&nbsp;:</p>
                 <a href="https://revolty.fr/reserver-ma-batterie" class="cta-btn cta-eco" target="_blank">
                     <span class="cta-action">Réserver votre batterie <span class="cta-arrow">→</span></span>
                 </a>
-                <p class="cta-reassure">Gratuit · Sans engagement</p>
             </div>
         </div>
     </div>
@@ -2835,13 +2995,16 @@
             <div class="install-illu">
                 <img src="pics/Installation.svg" alt="Installation solaire avec batterie" />
             </div>
-            <!-- 2 valeurs clés sous l'illustration : Solaire (prod + puissance) · Consommation.
+            <!-- 3 valeurs clés sous l'illustration : Production solaire / an · Puissance installée · Consommation.
                  La capacité batterie est déjà dans le segmented control au-dessus → non répétée ici. -->
             <div class="install-stats">
                 <div class="install-stat install-stat--solar">
                     <span class="install-val" id="outProdAnnuelle">—</span>
                     <span class="install-lbl">Production solaire / an</span>
-                    <span class="install-sub"><span id="schemaKwcVal">—</span> installés</span>
+                </div>
+                <div class="install-stat install-stat--solar">
+                    <span class="install-val" id="schemaKwcVal">—</span>
+                    <span class="install-lbl">Puissance installée</span>
                 </div>
                 <div class="install-stat install-stat--home">
                     <span class="install-val" id="schemaConsoVal">—</span>
@@ -2879,20 +3042,18 @@
                     <div class="val" id="outEcoTotal">—</div>
                 </div>
                 <div class="eco-side-box" id="cell-bonus-batt">
-                    <div class="sub-hd">Dont</div>
+                    <div class="sub-hd">Dont, grâce à la batterie</div>
                     <div class="val" id="ecoBatterie">—</div>
-                    <div class="eco-side-note">grâce à la batterie</div>
                 </div>
             </div>
 
             <!-- CTA principal : combine le % réduction et l'appel à l'action -->
             <a href="https://revolty.fr/reserver-ma-batterie" class="cta-btn cta-eco" id="impact-cta" target="_blank">
-                <span class="cta-stat">Vous réduisez <strong id="outPctReduc">—</strong> votre facture</span>
-                <span class="cta-action">Réservez votre batterie <span class="cta-arrow">→</span></span>
+                <span class="cta-stat" id="ctaStat">Vous effacez <strong id="outPctReduc">—</strong> de votre facture</span>
+                <span class="cta-action" id="ctaAction">Je réserve ma batterie <span class="cta-arrow">→</span></span>
             </a>
-            <p class="cta-reassure">Gratuit · Sans engagement</p>
             <details class="eco-details">
-                <summary>Voir le détail (revente + pilotage HP/HC)</summary>
+                <summary>Dans le détail : revente et pilotage heures creuses</summary>
                 <div class="eco-rp-pair">
                     <div class="col-metric" id="cell-revente">
                         <div class="sub-hd">Revente <span class="info-i" data-info="revente" aria-label="Info revente"><svg viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><circle cx="5" cy="2.2" r="0.9"/><rect x="4.25" y="3.9" width="1.5" height="4.2" rx="0.5"/></svg></span></div>
@@ -2907,7 +3068,7 @@
 
             <!-- Graphe projection sur 20 ans -->
             <div class="proj-block" id="cell-graph">
-                <div class="sub-hd">Projection sur 20 ans</div>
+                <div class="sub-hd">Ce que ça représente sur 20 ans</div>
                 <div class="proj-total" id="projTotal">—</div>
                 <div class="proj-chart" id="projChartWrap"></div>
                 <div class="proj-legend">
@@ -2919,13 +3080,14 @@
                     <span id="projLegSurplus" style="display:none"><span class="pleg-sq"
                             style="background:rgba(255,209,69,0.65)"></span>Surplus revendu</span>
                 </div>
+                <div style="margin-top:14px;margin-bottom:3px;font-size:1rem;font-weight:500;color:var(--dark);line-height:1.25">Faites varier le scénario d'évolution du prix de l'électricité</div>
                 <div id="proj-scenarios">
                     <button type="button" class="scenario active" data-esc="0.04">
-                        <div class="scenario-name">EDF · +4 %/an</div>
+                        <div class="scenario-name">Hausse modérée · +4 %/an</div>
                         <div class="scenario-val" id="scenEdf">—</div>
                     </button>
                     <button type="button" class="scenario" data-esc="0.10">
-                        <div class="scenario-name">Crise énergétique · +10 %/an</div>
+                        <div class="scenario-name">Flambée des prix · +10 %/an</div>
                         <div class="scenario-val" id="scenCrise">—</div>
                     </button>
                 </div>
@@ -2939,38 +3101,14 @@
                 <div class="impact-body">
                     <div class="impact-sect">
                         <div class="impact-roi-val" id="outRoiRange">—</div>
-                        <div class="impact-roi-note">Estimation pour une utilisation normale de la batterie.</div>
+                        <div class="impact-roi-note">Pour une utilisation classique au quotidien.</div>
                     </div>
                 </div>
             </div>
             <div class="col-card" id="col-impact">
                 <div class="col-card-hd">Impact</div>
                 <div class="impact-body">
-                    <!-- 1. CO₂ évité grâce à l'autoconsommation solaire (sur 20 ans) -->
-                    <div class="impact-card" id="impact-card-co2">
-                        <svg class="impact-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M12 22 V14"/>
-                            <path d="M8 14 Q 4 14 4 10 Q 4 5 9 5 Q 11 2 12 2 Q 13 2 15 5 Q 20 5 20 10 Q 20 14 16 14 Z"/>
-                        </svg>
-                        <div class="impact-card-body">
-                            <div class="impact-val" id="outCo2Evite">—</div>
-                            <div class="impact-lbl">de CO₂ évités sur 20 ans</div>
-                        </div>
-                    </div>
-                    <!-- 2. Électricité propre consommée (sur 20 ans) -->
-                    <div class="impact-card" id="impact-card-kwh">
-                        <svg class="impact-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <circle cx="12" cy="12" r="9"/>
-                            <polyline points="13 5 8 13 12 13 11 19 16 11 12 11 13 5"/>
-                        </svg>
-                        <div class="impact-card-body">
-                            <div class="impact-val" id="outKwhPropres">—</div>
-                            <div class="impact-lbl">d'électricité propre sur 20 ans</div>
-                        </div>
-                    </div>
-                    <!-- 3. Batterie reconditionnée Revolty (vs batterie neuve) — caché si pas de batterie -->
+                    <!-- 1. CO₂ évité grâce à la batterie reconditionnée — caché si pas de batterie -->
                     <div class="impact-card" id="impact-card-recond" style="display:none">
                         <svg class="impact-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -2981,7 +3119,33 @@
                         </svg>
                         <div class="impact-card-body">
                             <div class="impact-val" id="outCo2Batt">—</div>
-                            <div class="impact-lbl">grâce à la batterie reconditionnée Revolty</div>
+                            <div class="impact-lbl">grâce à votre batterie Revolty, reconditionnée en France</div>
+                        </div>
+                    </div>
+                    <!-- 2. Jours d'autonomie -->
+                    <div class="impact-card" id="impact-card-autonomie">
+                        <svg class="impact-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 11 L12 4 L21 11"/>
+                            <path d="M5 10 V20 H19 V10"/>
+                            <circle cx="12" cy="14" r="2.5"/>
+                            <path d="M12 14 L12 11"/>
+                        </svg>
+                        <div class="impact-card-body">
+                            <div class="impact-val" id="outAutonomie">—</div>
+                            <div class="impact-lbl">jours par an où votre maison vit en totale autonomie, sans rien tirer du réseau</div>
+                        </div>
+                    </div>
+                    <!-- 3. Électricité propre consommée (sur 20 ans) -->
+                    <div class="impact-card" id="impact-card-kwh">
+                        <svg class="impact-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9"/>
+                            <polyline points="13 5 8 13 12 13 11 19 16 11 12 11 13 5"/>
+                        </svg>
+                        <div class="impact-card-body">
+                            <div class="impact-val" id="outKwhPropres">—</div>
+                            <div class="impact-lbl">d'électricité 100 % solaire consommée chez vous sur 20 ans</div>
                         </div>
                     </div>
                 </div>
@@ -2989,7 +3153,7 @@
 
             <!-- Carte contact : interlocuteur direct — hors tuile Impact, sibling dans impact-col-wrap -->
             <div class="contact-card">
-                <div class="contact-hd">👋 Votre interlocuteur direct chez Revolty</div>
+                <div class="contact-hd">👋 Votre contact direct chez Revolty</div>
                 <div class="contact-identity">
                     <img class="contact-photo" src="pics/Valentin.jpeg" alt="Valentin Heuzé" />
                     <div class="contact-id-txt">
@@ -2997,8 +3161,7 @@
                         <div class="contact-title">Président &amp; Ingénieur</div>
                     </div>
                 </div>
-                <p class="contact-bio">Valentin est là pour répondre à toutes vos questions techniques
-                    et commerciales, de la première prise de contact jusqu'à votre première installation.</p>
+                <p class="contact-bio">Une question technique, un doute sur votre projet ? Valentin vous répond en direct, du premier message jusqu'au jour de l'installation.</p>
                 <div class="contact-links">
                     <a href="mailto:valentin@revolty.fr" class="contact-link">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
@@ -3034,8 +3197,8 @@
 
     <!-- ─── SÉPARATEUR RÉSULTATS / SAISIE ─── -->
     <div id="inputs-header">
-        <h2>Modifier mes déclarations</h2>
-        <p>Ajustez les champs ci-dessous : vos résultats se recalculent automatiquement.</p>
+        <h2>Affinez votre simulation</h2>
+        <p>Modifiez ce que vous voulez : tout se recalcule en direct.</p>
     </div>
 
     <!-- ─── INPUTS SECTION ─── -->
@@ -3044,10 +3207,8 @@
         <!-- ══ HERO WIZARD (visible uniquement en phase-wizard) ══ -->
         <div id="wizard-hero">
             <span class="wiz-badge"><span class="wiz-badge-dot"></span> Simulateur Revolty</span>
-            <h1 class="wiz-title">Combien votre batterie pourrait vous faire <em>économiser</em> ?</h1>
-            <p class="wiz-sub">Quelques questions sur votre foyer et votre installation. On vous dit combien
-                d'autoconsommation vous pouvez atteindre, combien vous gagnez chaque année, et quel modèle Revolty
-                s'adapte à votre cas.</p>
+            <h1 class="wiz-title">Combien votre batterie peut vous faire <em>économiser</em> ?</h1>
+            <p class="wiz-sub">Trois minutes, quelques questions sur votre maison, et on vous montre tout : l'énergie solaire que vous gardez pour vous, ce que vous économisez chaque année et la batterie Revolty taillée pour votre foyer.</p>
         </div>
 
         <!-- ══ ZONE CONSO ══ -->
@@ -3055,13 +3216,13 @@
 
         <!-- FOYER -->
         <div class="card" id="card-foyer">
-            <div class="card-title"><span class="ico">🏠</span> Consommation</div>
+            <div class="card-title"><span class="ico">🏠</span> Votre consommation</div>
 
                 <div class="field" id="fld-consomode">
-                    <span class="field-label">Comment renseigner votre consommation ?</span>
+                    <span class="field-label">Votre consommation, on l'estime ou vous la connaissez ?</span>
                     <div class="tile-grid cols-2">
                         <button type="button" class="tile-btn active" data-group="consoMode" data-val="estim"><span
-                                class="tile-icon">🧮</span><span class="tile-label">L'estimer</span></button>
+                                class="tile-icon">🧮</span><span class="tile-label">Estimons-la ensemble !</span></button>
                         <button type="button" class="tile-btn" data-group="consoMode" data-val="manuel"><span
                                 class="tile-icon">✏️</span><span class="tile-label">Je la connais</span></button>
                     </div>
@@ -3069,7 +3230,7 @@
 
                 <div id="estimFields">
                     <div class="field" id="fld-persons">
-                        <span class="field-label">Nombre de personnes</span>
+                        <span class="field-label">Combien êtes-vous dans le foyer ?</span>
                         <div class="tile-grid cols-5">
                             <button type="button" class="tile-btn" data-group="persons" data-val="1"><span
                                     class="tile-icon">1</span><span class="tile-label">personne</span></button>
@@ -3085,7 +3246,7 @@
                     </div>
 
                     <div class="field" id="fld-surface">
-                        <span class="field-label">Surface du logement</span>
+                        <span class="field-label">Surface de votre logement</span>
                         <div class="slider-row">
                             <input type="range" id="surface" min="30" max="250" step="5" value="140" />
                             <span class="slider-val"><span id="surfaceVal">140</span> m²</span>
@@ -3093,19 +3254,19 @@
                     </div>
 
                     <div class="field" id="fld-heat-e">
-                        <span class="field-label">Type de chauffage</span>
+                        <span class="field-label">Comment vous chauffez-vous ?</span>
                         <div class="tile-grid cols-3">
                             <button type="button" class="tile-btn active" data-group="heat" data-val="gaz"><span
                                     class="tile-icon">🔥</span><span class="tile-label">Gaz / Bois</span></button>
                             <button type="button" class="tile-btn" data-group="heat" data-val="pompe"><span
                                     class="tile-icon">🌡️</span><span class="tile-label">Pompe à chaleur</span></button>
                             <button type="button" class="tile-btn" data-group="heat" data-val="elec"><span
-                                    class="tile-icon">🔌</span><span class="tile-label">Résistance électrique</span></button>
+                                    class="tile-icon">🔌</span><span class="tile-label">Radiateurs électriques</span></button>
                         </div>
                     </div>
 
                     <div class="field" id="fld-presence">
-                        <span class="field-label">Présence dans le logement en journée</span>
+                        <span class="field-label">Êtes-vous chez vous en journée ?</span>
                         <div class="tile-grid cols-2">
                             <button type="button" class="tile-btn active" data-group="journee" data-val="maison"><span
                                     class="tile-icon">🏠</span><span class="tile-label">Souvent présent</span><span
@@ -3119,15 +3280,15 @@
                     <div class="field" data-private>
                         <span class="field-label">Isolation / Classe DPE</span>
                         <div class="dpe-selector">
-                            <button class="dpe-btn" data-dpe="A" title="A — très performant (BBC, RT2012+)">A</button>
-                            <button class="dpe-btn" data-dpe="B" title="B — performant">B</button>
-                            <button class="dpe-btn" data-dpe="C" title="C — bon (construction récente)">C</button>
-                            <button class="dpe-btn active" data-dpe="D" title="D — moyen (années 80–90)">D</button>
-                            <button class="dpe-btn" data-dpe="E" title="E — énergivore (avant 1975)">E</button>
-                            <button class="dpe-btn" data-dpe="F" title="F — passoire thermique">F</button>
-                            <button class="dpe-btn" data-dpe="G" title="G — très passoire">G</button>
+                            <button class="dpe-btn" data-dpe="A" title="A : très performant (BBC, RT2012+)">A</button>
+                            <button class="dpe-btn" data-dpe="B" title="B : performant">B</button>
+                            <button class="dpe-btn" data-dpe="C" title="C : bon (construction récente)">C</button>
+                            <button class="dpe-btn active" data-dpe="D" title="D : moyen (années 80-90)">D</button>
+                            <button class="dpe-btn" data-dpe="E" title="E : énergivore (avant 1975)">E</button>
+                            <button class="dpe-btn" data-dpe="F" title="F : passoire thermique">F</button>
+                            <button class="dpe-btn" data-dpe="G" title="G : très passoire">G</button>
                         </div>
-                        <p class="dpe-hint">Source : Open DPE ADEME 2021 — besoin thermique médian par classe (3 301
+                        <p class="dpe-hint">Source : Open DPE ADEME 2021, besoin thermique médian par classe (3 301
                             maisons)</p>
                     </div>
 
@@ -3155,34 +3316,33 @@
                                 step="100" />
                             <span class="unit">kWh / an</span>
                         </div>
-                        <p class="dpe-hint">Chiffre indiqué sur votre facture EDF ou dans votre espace Enedis.</p>
+                        <p class="dpe-hint">Vous le trouvez sur votre facture ou dans votre espace client (EDF, Enedis…).</p>
                     </div>
 
                     <div class="field" id="fld-heat-m">
-                        <span class="field-label">Chauffage principal</span>
+                        <span class="field-label">Votre chauffage principal</span>
                         <div class="tile-grid cols-3">
                             <button type="button" class="tile-btn active" data-group="heat" data-val="gaz"><span
                                     class="tile-icon">🔥</span><span class="tile-label">Gaz / Bois</span></button>
                             <button type="button" class="tile-btn" data-group="heat" data-val="pompe"><span
                                     class="tile-icon">🌡️</span><span class="tile-label">Pompe à chaleur</span></button>
                             <button type="button" class="tile-btn" data-group="heat" data-val="elec"><span
-                                    class="tile-icon">🔌</span><span class="tile-label">Résistance électrique</span></button>
+                                    class="tile-icon">🔌</span><span class="tile-label">Radiateurs électriques</span></button>
                         </div>
-                        <p class="dpe-hint">Détermine la saisonnalité (pic hiver) appliquée à votre conso.</p>
+                        <p class="dpe-hint">Sert à placer le pic de consommation en hiver.</p>
                     </div>
                 </div>
             </div>
 
             <!-- APPAREILS SPÉCIFIQUES (SEAU 3) -->
             <div class="card" id="card-appareils">
-                <div class="card-title"><span class="ico">⚡</span> Appareils spécifiques</div>
-                <p class="dpe-hint" style="margin-top:-4px;margin-bottom:10px">Cliquez sur les appareils que vous
-                    possédez.</p>
+                <div class="card-title"><span class="ico">⚡</span> Vos appareils les plus gourmands</div>
+                <p class="field-label" style="margin-top:-4px;margin-bottom:10px">Vous avez l'un de ces appareils chez vous ?</p>
                 <div class="tile-grid cols-5">
                     <button type="button" class="tile-btn active" data-appliance="ecs-joule"><span
                             class="tile-icon">🚿</span><span class="tile-label">Chauffe-eau</span><span
                             class="tile-sub">Résistance</span></button>
-                    <button type="button" class="tile-btn" data-appliance="ecs-thermo"><span
+                    <button type="button" class="tile-btn" data-appliance="ecs-thermo"><span class="info-i" data-info="chauffeeau" aria-label="Résistance ou thermodynamique ?"><svg viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><circle cx="5" cy="2.2" r="0.9"/><rect x="4.25" y="3.9" width="1.5" height="4.2" rx="0.5"/></svg></span><span
                             class="tile-icon">♨️</span><span class="tile-label">Chauffe-eau</span><span
                             class="tile-sub">Thermodynamique</span></button>
                     <button type="button" class="tile-btn active" data-appliance="ve"><span
@@ -3205,7 +3365,7 @@
 
             <!-- INSTALLATION -->
             <div class="card" id="card-prod">
-                <div class="card-title"><span class="ico">☀️</span> Production</div>
+                <div class="card-title"><span class="ico">☀️</span> Votre production solaire</div>
 
                 <div class="field" id="fld-dept">
                     <span class="field-label">Département</span>
@@ -3216,11 +3376,11 @@
                     <span class="field-label">Puissance installée</span>
                     <div class="tile-grid cols-2" style="margin-bottom:8px">
                         <button type="button" class="tile-btn active" data-group="hasPv" data-val="oui"><span
-                                class="tile-icon">☀️</span><span class="tile-label">J'ai des PV</span><span
+                                class="tile-icon">☀️</span><span class="tile-label">Oui, j'ai des panneaux</span><span
                                 class="tile-sub">PV = panneaux photovoltaïques</span></button>
                         <button type="button" class="tile-btn" data-group="hasPv" data-val="non"><span
-                                class="tile-icon">🏠</span><span class="tile-label">Pas encore de PV</span><span
-                                class="tile-sub">on simule une installation</span></button>
+                                class="tile-icon">🏠</span><span class="tile-label">Pas encore / je ne connais pas</span><span
+                                class="tile-sub">on en simule une pour vous</span></button>
                     </div>
                     <div class="optional-input-row" id="kwcField">
                         <input type="number" id="kwcInput" min="0" max="20" step="0.1" value="6" />
@@ -3238,7 +3398,7 @@
                 <div class="divider" id="prod-divider"></div>
 
                 <div class="field" id="fld-contrat">
-                    <span class="field-label">Type de contrat électricité</span>
+                    <span class="field-label">Votre contrat d'électricité</span>
                     <div class="tile-grid cols-3">
                         <button type="button" class="tile-btn active" data-group="contrat" data-val="base"><span
                                 class="tile-icon">💡</span><span class="tile-label">Tarif Base</span></button>
@@ -3255,7 +3415,7 @@
                 <div id="block-tarif-flex" class="hidden">
                     <div class="tarif-custom">
                         <div class="tarif-custom-field" style="flex:1">
-                            <label>Scénario de prix spot</label>
+                            <label>Scénario de prix</label>
                             <div class="tile-grid cols-3" style="margin-top:6px">
                                 <button type="button" class="tile-btn" data-group="flexScenario" data-val="p10"><span
                                         class="tile-label">Bas (p10)</span></button>
@@ -3268,7 +3428,7 @@
                     </div>
                     <div style="font-size:0.68rem; color:var(--muted); margin-top:5px;">
                         Tarif indexé sur le spot Day-ahead FR (ENTSO-E 2024-2026), TVA + acheminement inclus. La
-                        fourchette p10–p90 reflète la variabilité historique.
+                        fourchette p10 à p90 reflète la variabilité historique.
                     </div>
                 </div>
 
@@ -3277,8 +3437,7 @@
                         <div class="tarif-custom-field"><label>Prix Base (€/kWh)</label><input type="number"
                                 id="tarifBase" value="0.1940" step="0.001" min="0.05" max="0.5" /></div>
                     </div>
-                    <div style="font-size:0.68rem; color:var(--muted); margin-top:5px;">Pré-rempli TRV mars 2026.
-                        Modifiable.</div>
+                    <div style="font-size:0.68rem; color:var(--muted); margin-top:5px;">Prix EDF en vigueur, vous pouvez l'ajuster</div>
                 </div>
 
                 <div id="block-tarifs-custom" class="hidden">
@@ -3288,8 +3447,7 @@
                         <div class="tarif-custom-field"><label>Prix HC (€/kWh)</label><input type="number" id="tarifHC"
                                 value="0.1579" step="0.001" min="0.05" max="0.5" /></div>
                     </div>
-                    <div style="font-size:0.68rem; color:var(--muted); margin-top:5px;">Pré-rempli TRV mars 2026.
-                        Modifiable.</div>
+                    <div style="font-size:0.68rem; color:var(--muted); margin-top:5px;">Prix EDF en vigueur, vous pouvez l'ajuster</div>
                 </div>
 
                 <div class="divider" id="rachat-divider"></div>
@@ -3302,7 +3460,7 @@
                         <span class="unit">€ / kWh</span>
                     </div>
                     <div style="font-size:0.68rem;color:var(--muted);margin-top:5px">
-                        0 si pas de contrat de revente · EDF Obligation d'Achat actuel ≈ 0,04 €/kWh
+                        Sans contrat de revente ? Laissez 0. Avec EDF OA, mettez 0,04 €
                     </div>
                 </div>
 
@@ -3365,8 +3523,12 @@
             <span id="wizProgress">Étape 1 / 2</span>
             <button type="button" id="wizNext">Suivant →</button>
         </div>
+        <button type="button" id="wizSkip">Passer et voir un exemple de résultats →</button>
     </div>
     <!-- /#inputs-section -->
+
+    <!-- Footer — mentions légales / cadre de lecture -->
+    <footer id="intro-banner"><span id="introBannerText">Ceci est une estimation construite à partir de vos réponses et de données nationales de référence, pour vous donner un ordre de grandeur fiable. Ce n'est ni un devis, ni une étude de dimensionnement, ni un conseil personnalisé.</span></footer>
 
     <!-- ─── STASH : composants conservés pour le moteur JS (hors écran) ─── -->
     <div class="result-card locked" id="js-stash">
@@ -3418,10 +3580,10 @@
         <div class="methodo-panel" id="methodPanel">
             <h4>Modèle trois seaux v4</h4>
             La consommation est décomposée en trois composantes indépendantes :
-            <br><br><strong>Seau 1 — Usages courants</strong> : électroménager, éclairage, audiovisuel,
+            <br><br><strong>Seau 1, usages courants</strong> : électroménager, éclairage, audiovisuel,
             informatique, cuisson. Driver : nombre de personnes. Source : Panel Elecdom ADEME/Enertech/RTE 2021.
             Profil horaire : RES1 Enedis corrigé (contribution ECS et clim nationales soustraites).
-            <br><br><strong>Seau 2 — Chauffage</strong> :
+            <br><br><strong>Seau 2, chauffage</strong> :
             <code>surface × Bch[DPE] × coeff[heat] × behav[DPE]</code>. Bch =
             besoin thermique bâtiment (kWh_th/m²/an), issu de l'Open DPE ADEME sur 3 301 maisons.
             <code>coeff</code> = 0 (gaz), 0,33 (PAC air/eau ≥2017, COP=3), 0,87 (résistance, pertes distribution
@@ -3431,10 +3593,10 @@
             Sources : Sunikka-Blank &amp; Galvin (BRI 2012), Allibe (thèse EDF R&amp;D / Mines ParisTech 2012),
             ENL/SDES 2020.
             Saisonnalité fort hiver.
-            <br><br><strong>Seau 3 — Appareils spécifiques</strong> : ECS (profil 23h mesuré, Panel Elecdom), VE
-            (même profil nocturne), piscine (8h–18h mai–sept), clim (14h–18h juin–août, modèle
-            surface × intensité kWh/m² par zone RT2012 — ancrage ADEME 2,3 kWh/m², ~1 kWh/m² nord
-            → ~4 kWh/m² Méditerranée, +35% si chauffage PAC réversible). Addition pure — pas de
+            <br><br><strong>Seau 3, appareils spécifiques</strong> : ECS (profil 23h mesuré, Panel Elecdom), VE
+            (même profil nocturne), piscine (8h-18h mai-sept), clim (14h-18h juin-août, modèle
+            surface × intensité kWh/m² par zone RT2012 ; ancrage ADEME 2,3 kWh/m², ~1 kWh/m² nord
+            → ~4 kWh/m² Méditerranée, +35% si chauffage PAC réversible). Addition pure, pas de
             double-comptage avec RES1 corrigé.
             <h4>Simulation batterie</h4>
             SOC propagé heure par heure, 3 passes de convergence vers régime permanent. Rendement aller-retour
@@ -3523,14 +3685,12 @@
     <div id="pvNoticeOverlay" class="pv-notice-overlay">
         <div class="pv-notice-card">
             <div class="pv-notice-icon">☀️</div>
-            <h3>À propos du dimensionnement solaire</h3>
-            <p>Nous vous proposons un dimensionnement solaire calculé à partir de votre profil de
-                consommation. Il s'agit d'une <strong>hypothèse de travail</strong> destinée à illustrer
-                le potentiel d'une batterie Revolty. Ce n'est ni un devis, ni une étude de
-                dimensionnement adaptée à votre logement.</p>
-            <p><strong>Revolty ne commercialise pas de panneaux photovoltaïques. Pour tout projet solaire,
-                rapprochez-vous d'un installateur photovoltaïque professionnel certifié RGE.</strong></p>
-            <button type="button" id="pvNoticeOk">J'ai compris</button>
+            <h3>Pas de soucis !</h3>
+            <p>On part d'une hypothèse calculée sur votre consommation, juste pour vous montrer ce
+                qu'une batterie Revolty pourrait vous apporter. <strong>Ceci n'est pas un devis.</strong></p>
+            <p>Un projet solaire vous tente ? On se fera un plaisir de vous mettre en relation avec un
+                installateur certifié RGE de confiance.</p>
+            <button type="button" id="pvNoticeOk">C'est noté, merci !</button>
         </div>
     </div>
 
@@ -3541,6 +3701,22 @@
             <h3 id="infoModalTitle">—</h3>
             <p id="infoModalText">—</p>
             <button type="button" id="infoModalOk">J'ai compris</button>
+        </div>
+    </div>
+
+    <!-- ─── ÉCRAN DE CALCUL — fake ~2 s, capte l'attention + pousse le blog ─── -->
+    <div id="computeLoader" class="compute-loader" aria-hidden="true" role="status" aria-live="polite">
+        <div class="cl-card">
+            <div class="cl-sun">
+                <div class="cl-ring"></div>
+                <div class="cl-sun-emoji">☀️</div>
+            </div>
+            <div class="cl-title">Votre simulation se compile…</div>
+            <div class="cl-step" id="clStep">On réveille le soleil de votre région</div>
+            <div class="cl-bar"><div class="cl-bar-fill" id="clBarFill"></div></div>
+            <a class="cl-blog" href="https://revolty.fr/blog" target="_blank" rel="noopener">
+                En attendant, faites un tour sur notre blog <span class="cl-arrow">→</span>
+            </a>
         </div>
     </div>
 
@@ -5054,8 +5230,7 @@
             const BATT_EFF = 0.92;   // round-trip LFP (0.96 × 0.96)
             const SOC_INIT = 0.30;   // SOC initial pour la convergence en régime permanent (30%)
             const AUTOPROD_CAP = 95; // plafond du taux d'autoproduction affiché (%)
-            const DIM_SOUS_RATIO = 0.75; // seuil sous-dimensionnement batterie (ratio capacité / surplus/j)
-            const DIM_OK_RATIO = 1.25; // seuil sur-dimensionnement batterie
+            const DIM_SOUS_RATIO = 0.75; // seuil "surplus déborde la capacité max" (cas multi-batteries)
 
             // Impact carbone — batterie reconditionnée Revolty
             // Source : données internes Revolty — 1 tCO₂eq pour 10 kWh de batterie neuve
@@ -6283,7 +6458,10 @@
                 const roiBlock = document.getElementById('col-roi');
                 const roiOut = document.getElementById('outRoiRange');
                 if (roiBlock && roiOut) {
-                    if (battKwh <= 0 || deltaBattAn <= 0) {
+                    if (battKwh <= 0) {
+                        roiOut.textContent = '—';
+                        roiBlock.style.display = '';
+                    } else if (deltaBattAn <= 0) {
                         roiBlock.style.display = 'none';
                     } else {
                         const capexLoc = battKwh * CAPEX_BATT_PAR_KWH;
@@ -6303,7 +6481,7 @@
                         } else {
                             const lo = Math.floor(bkLoc);
                             const hi = lo + 1;
-                            roiOut.textContent = 'Entre ' + lo + ' et ' + hi + ' ans';
+                            roiOut.textContent = 'Rentabilisée en ' + lo + ' à ' + hi + ' ans';
                             roiBlock.style.display = '';
                         }
                     }
@@ -6402,7 +6580,7 @@
                     const inp = document.getElementById('kwcInput');
                     if (inp && parseFloat(inp.value) !== kwc) inp.value = kwc.toFixed(1);
                     document.getElementById('kwcHelper').textContent =
-                        `Hypothèse PV indexée sur votre consommation : ${kwc} kWc`;
+                        `On simule ${kwc} kWc, adapté à votre profil`;
                     if (typeof updateKwcWarn === 'function') updateKwcWarn();
                 }
                 const kwc = state.kwc || 0;
@@ -6456,20 +6634,34 @@
                 const ecoTotalBase = resBase.ecoDirecte + resBase.ecoBatterie + resBase.ecoRevente;
                 const fmt = v => v > 0 ? '+\u00a0' + v.toLocaleString('fr-FR') + '\u00a0€' : '—';
 
-                // ── Highlight batterie « OPTIMALE » — calée sur le surplus ──────────────
-                // Optimale = celle dont le ratio capacité/surplus journalier est le plus
-                // proche de 1 — même méthode physique que le diagnostic ci-dessous, donc
-                // jamais de contradiction. Surplus mesuré sans batterie (resBase) →
-                // indépendant du choix utilisateur, pas de boucle de rétroaction.
-                const surplusJourBrut = resBase.kWhSurplus / 365;
-                let optimalBatt = null;
-                if (surplusJourBrut > 0.1) {
-                    let bestDiff = Infinity;
-                    [5, 10, 15].forEach(k => {
-                        const diff = Math.abs(k / surplusJourBrut - 1);
-                        if (diff < bestDiff) { bestDiff = diff; optimalBatt = k; }
-                    });
-                }
+                // ── Highlight batterie « OPTIMALE » — optimum RoI × énergie ─────────────
+                // Deux objectifs antagonistes : le RoI favorise la plus petite (CAPEX
+                // linéaire) ; la conso/prod captée favorise la plus grosse (éco annuelle
+                // plus élevée, mais saturante). On les unifie en UNE fonction objectif :
+                // la valeur nette sur l'horizon = Σ(éco escaladée) − CAPEX. Comme l'éco
+                // marginale décroît et le CAPEX marginal est constant, cette courbe a un
+                // sommet : l'optimum est son argmax, vraiment calculé sur le profil (pas
+                // un seuil fixe). k=0 (sans batterie, valeur nette 0) est dans la course :
+                // si aucune taille ne crée de valeur positive, aucune n'est badgée.
+                const BATT_OPTS = [5, 10, 15];
+                // Éco totale nette pour une capacité donnée — même formule qu'ecoTotal
+                // (pilotage HP/HC inclus si contrat hphc, coût HC déduit en flex).
+                const ecoForBatt = k => {
+                    if (k <= 0) return ecoTotalBase;
+                    const pilot = state.contrat === 'hphc';
+                    const r = simMensuelle(prodAnnuelle, kwhs, k, tarifH, pilot);
+                    return r.ecoDirecte + r.ecoBatterie + r.ecoRevente - (r.ecoCoutHC || 0);
+                };
+                // Facteur d'annuité escaladée sur l'horizon (même escalade que
+                // renderPayback, sans actualisation pour rester cohérent avec la tuile RoI).
+                let annuiteEsc = 0;
+                for (let y = 1; y <= HORIZON; y++) annuiteEsc += Math.pow(1 + projEscalation, y - 1);
+                const valeurNette = k => (ecoForBatt(k) - ecoTotalBase) * annuiteEsc - k * CAPEX_BATT_PAR_KWH;
+                let optimalBatt = null, bestVal = 0; // 0 = valeur nette du « sans batterie »
+                BATT_OPTS.forEach(k => {
+                    const v = valeurNette(k);
+                    if (v > bestVal) { bestVal = v; optimalBatt = k; }
+                });
                 document.querySelectorAll('.objectif-btn').forEach(btn => {
                     const b = parseInt(btn.dataset.batt);
                     btn.classList.toggle('optimal-batt', optimalBatt !== null && b === optimalBatt);
@@ -6503,12 +6695,40 @@
                 // Le CTA dit déjà "Vous réduisez X votre facture" → on n'affiche pas le signe moins (double négation).
                 // La sticky bar le préfixe via du texte HTML ("− X facture").
                 const pctReducTxt = pctReduc > 0 ? pctReduc + ' %' : '—';
-                document.getElementById('outPctReduc').textContent = pctReducTxt;
+                const _pctEl = document.getElementById('outPctReduc');
+                if (_pctEl) _pctEl.textContent = pctReducTxt;
                 // Sticky bar mobile : on parle en € (plus parlant qu'un %)
                 const _stickyEco = document.getElementById('stickyEcoTxt');
                 if (_stickyEco) _stickyEco.textContent = ecoTotal > 0
                     ? ecoTotal.toLocaleString('fr-FR') + ' €'
                     : '—';
+
+                // CTA contextuel : sans batterie, on n'invite pas à « réserver » (incohérent) →
+                // upsell chiffré qui, au clic, sélectionne la batterie optimale (cf. listener init).
+                const _cta = document.getElementById('impact-cta');
+                const _ctaStat = document.getElementById('ctaStat');
+                const _ctaAction = document.getElementById('ctaAction');
+                if (_cta && _ctaStat && _ctaAction) {
+                    if (state.batt === 0) {
+                        const uplift = optimalBatt ? Math.round(ecoForBatt(optimalBatt) - ecoTotalBase) : 0;
+                        if (optimalBatt && uplift > 0) {
+                            _ctaStat.innerHTML = '<strong>+' + uplift.toLocaleString('fr-FR') + ' €/an</strong> avec une Revolty ' + optimalBatt;
+                            _ctaAction.innerHTML = 'Voir l\'effet d\'une batterie <span class="cta-arrow">→</span>';
+                            _cta.dataset.mode = 'upsell';
+                            _cta.dataset.targetBatt = optimalBatt;
+                        } else {
+                            _ctaStat.innerHTML = 'Et avec une batterie&nbsp;?';
+                            _ctaAction.innerHTML = 'Découvrir les batteries Revolty <span class="cta-arrow">→</span>';
+                            _cta.dataset.mode = 'link';
+                            delete _cta.dataset.targetBatt;
+                        }
+                    } else {
+                        _ctaStat.innerHTML = 'Vous effacez <strong id="outPctReduc">' + pctReducTxt + '</strong> de votre facture';
+                        _ctaAction.innerHTML = 'Je réserve ma batterie <span class="cta-arrow">→</span>';
+                        _cta.dataset.mode = 'link';
+                        delete _cta.dataset.targetBatt;
+                    }
+                }
 
                 document.getElementById('outAutoConso').textContent = resBatt.autoConsoRate + '%';
                 document.getElementById('outAutoProd').textContent = resBatt.autoProdRate + '%';
@@ -6564,7 +6784,7 @@
                 // Banner "tarif flex non adapté" si l'eco flex p50 est inferieure au TRV Base
                 const noteEl = document.getElementById('tarifNote');
                 if (isFlex && ecoBaseRefAnnuelle != null && ecoTotal < ecoBaseRefAnnuelle - 1) {
-                    noteEl.innerHTML += `<div style="color:#FFD145;font-weight:600;margin-top:4px">⚠ Tarif flex non adapté à votre profil — éco TRV Base ≈ ${Math.round(ecoBaseRefAnnuelle).toLocaleString('fr-FR')} €/an</div>`;
+                    noteEl.innerHTML += `<div style="color:#FFD145;font-weight:600;margin-top:4px">⚠ Tarif flex non adapté à votre profil, éco TRV Base ≈ ${Math.round(ecoBaseRefAnnuelle).toLocaleString('fr-FR')} €/an</div>`;
                 }
 
                 // ── Diagnostic : dimensionnement ───────────────────────────────────────
@@ -6573,21 +6793,25 @@
                 const surplusJourMoy = (kWhStockedIn + resBatt.kWhSurplus) / 365;
                 const ratio = surplusJourMoy > 0.1 ? state.batt / surplusJourMoy : 999;
                 const MAX_BATT_KWH = 15;
+                // Classification alignée sur la batterie OPTIMALE (optimum RoI × énergie)
+                // plutôt que sur le ratio physique seul : sinon le badge « OPTIMALE » et
+                // ce diagnostic pourraient se contredire. Le ratio physique ne sert plus
+                // qu'au cas « max » (surplus qui déborde même la plus grosse batterie).
                 let dim, dimLabel, dimClass, msgText, msgClass;
                 if (state.batt === 0) {
                     dim = 'base'; dimLabel = ''; dimClass = 'dim-badge'; msgText = ''; msgClass = 'surplus-msg hidden';
-                } else if (state.batt >= MAX_BATT_KWH && ratio < DIM_SOUS_RATIO) {
-                    dim = 'max'; dimLabel = 'Capacité maximum'; dimClass = 'dim-badge dim-max';
-                    msgText = '💎 Vous avez atteint le max avec une seule batterie ! Votre surplus dépasse cette capacité — contactez-nous pour étudier une installation multi-batteries.'; msgClass = 'surplus-msg max';
-                } else if (ratio < DIM_SOUS_RATIO) {
-                    dim = 'sous'; dimLabel = 'Sous-dimensionnée'; dimClass = 'dim-badge dim-sous';
-                    msgText = '📈 Une partie du surplus repart sur le réseau pour presque rien. Le modèle supérieur récupérerait davantage.'; msgClass = 'surplus-msg sous';
-                } else if (ratio <= DIM_OK_RATIO) {
-                    dim = 'ok'; dimLabel = 'Bien dimensionnée'; dimClass = 'dim-badge dim-ok';
-                    msgText = '✅ La batterie est bien calibrée pour absorber votre surplus solaire.'; msgClass = 'surplus-msg ok';
+                } else if (state.batt >= MAX_BATT_KWH && optimalBatt === MAX_BATT_KWH && ratio < DIM_SOUS_RATIO) {
+                    dim = 'max'; dimLabel = 'Au max 💎'; dimClass = 'dim-badge dim-max';
+                    msgText = 'Le maximum d\'une seule batterie, et vous la remplissez déjà ! Votre surplus va même au-delà : parlons-en pour une installation multi-batteries.'; msgClass = 'surplus-msg max';
+                } else if (optimalBatt !== null && state.batt < optimalBatt) {
+                    dim = 'sous'; dimLabel = 'Vous pouvez faire mieux 💡'; dimClass = 'dim-badge dim-sous';
+                    msgText = 'Une partie de votre solaire part sans être valorisée. La Revolty ' + optimalBatt + ' en profiterait bien plus.'; msgClass = 'surplus-msg sous';
+                } else if (optimalBatt !== null && state.batt === optimalBatt) {
+                    dim = 'ok'; dimLabel = 'Pile la bonne taille 🎯'; dimClass = 'dim-badge dim-ok';
+                    msgText = 'Cette batterie capte votre surplus solaire au meilleur rapport entre rentabilité et énergie. Difficile de faire mieux.'; msgClass = 'surplus-msg ok';
                 } else {
-                    dim = 'sur'; dimLabel = 'Surdimensionnée'; dimClass = 'dim-badge dim-sur';
-                    msgText = '🚀 La batterie a plus de capacité que votre production ne génère de surplus. Ajoutez des panneaux pour en exploiter tout le potentiel.'; msgClass = 'surplus-msg sur';
+                    dim = 'sur'; dimLabel = 'Un peu trop grande ☀️'; dimClass = 'dim-badge dim-sur';
+                    msgText = 'Cette batterie voit plus grand que votre production. Ajoutez des panneaux et vous exploiterez tout son potentiel.'; msgClass = 'surplus-msg sur';
                 }
                 // Feedback de dimensionnement inline (dot coloré + status + message court).
                 // Le state vit sur le conteneur .dim-feedback via is-ok / is-sous / is-sur / is-max.
@@ -6629,19 +6853,12 @@
 
                 // Bandeau d'accueil : texte légal statique (rempli dans le HTML, plus de mise à jour dynamique).
 
-                // ── Impact : 3 cartes positives (CO₂ réseau évité, kWh propres, batterie reconditionnée)
-                // Hypothèse : intensité carbone réseau France ≈ 50 g CO₂/kWh.
+                // ── Impact : kWh propres + batterie reconditionnée + pistes alternatives ──
                 const HORIZON_YEARS = 20;
-                const INTENSITE_RESEAU = 0.050;   // kg CO₂ / kWh
 
                 const kWhAutoconsoAn = prodAnnuelle * (resBatt.autoConsoRate || 0) / 100;
                 const kWhPropres20 = Math.round(kWhAutoconsoAn * HORIZON_YEARS);
-                const co2EviteRes20 = Math.round(kWhPropres20 * INTENSITE_RESEAU);
 
-                document.getElementById('outCo2Evite').textContent =
-                    co2EviteRes20 >= 1000
-                        ? (co2EviteRes20 / 1000).toFixed(1).replace('.', ',') + ' tonnes'
-                        : co2EviteRes20.toLocaleString('fr-FR') + ' kg';
                 document.getElementById('outKwhPropres').textContent =
                     kWhPropres20.toLocaleString('fr-FR') + ' kWh';
 
@@ -6655,6 +6872,17 @@
                 } else {
                     _recond.style.display = 'none';
                 }
+
+                // Jours d'autonomie : vrais jours sans AUCUN soutirage réseau.
+                // On compte les jours-types (semaine/weekend × 12 mois) dont le soutirage
+                // journalier est nul, pondérés par leur nombre de jours. ≈ 0 en solaire seul
+                // (nuits toujours achetées), grimpe avec la batterie.
+                let joursAutonomie = 0;
+                (resBatt.debugMonthly || []).forEach(dm => {
+                    if (dm.dAchat < 0.05) joursAutonomie += dm.nDays;
+                });
+                document.getElementById('outAutonomie').textContent =
+                    joursAutonomie.toLocaleString('fr-FR') + ' jours';
 
                 // ── Outputs objet (debug) ─────────────────────────────────────────────
                 const outputs = {
@@ -7135,6 +7363,18 @@
                 });
             });
 
+            // CTA « sans batterie » en mode upsell : le clic sélectionne la batterie
+            // optimale et recalcule, au lieu d'ouvrir la page de réservation.
+            const _impactCta = document.getElementById('impact-cta');
+            if (_impactCta) _impactCta.addEventListener('click', (e) => {
+                if (_impactCta.dataset.mode === 'upsell') {
+                    e.preventDefault();
+                    const btn = document.querySelector('.objectif-btn[data-batt="' + _impactCta.dataset.targetBatt + '"]');
+                    if (btn) btn.click();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+
             // DPE
             document.querySelectorAll('.dpe-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -7264,7 +7504,7 @@
                 DEPT_LIST.forEach(d => {
                     const opt = document.createElement('option');
                     opt.value = d.code;
-                    opt.textContent = d.code + ' — ' + d.nom;
+                    opt.textContent = d.code + ' · ' + d.nom;
                     if (d.code === state.dept) opt.selected = true;
                     sel.appendChild(opt);
                 });
@@ -7326,6 +7566,11 @@
             const _body = document.body;
             const _leadForm = document.getElementById('leadGateForm');
             const WIZARD_ZONES = ['zone-conso', 'zone-prod'];
+            // Sous-titre du hero, contextuel à l'étape : accueil chaleureux puis « on y est presque ».
+            const _WIZ_SUBS = [
+                'Trois minutes, quelques questions sur votre maison, et on vous montre tout : l\'énergie solaire que vous gardez pour vous, ce que vous économisez chaque année et la batterie Revolty taillée pour votre foyer.',
+                'On y est presque ! Encore deux, trois infos sur vos panneaux et votre contrat, et on vous livre vos chiffres.'
+            ];
             let _wizStep = 0;
             let _pvNoticeShown = false; // modale hypothèse PV affichée une seule fois
 
@@ -7339,6 +7584,8 @@
                 document.getElementById('wizNext').textContent = last ? 'Voir mes résultats →' : 'Suivant →';
                 document.getElementById('wizProgress').textContent =
                     'Étape ' + (_wizStep + 1) + ' / ' + WIZARD_ZONES.length;
+                const _sub = document.querySelector('.wiz-sub');
+                if (_sub) _sub.textContent = _WIZ_SUBS[_wizStep] || _WIZ_SUBS[0];
             }
 
             function _restoreZones() {
@@ -7455,7 +7702,7 @@
                     const shown = card.querySelectorAll('.field.rv-on');
                     return {
                         el: shown.length ? shown[shown.length - 1] : card,
-                        msg: 'Merci de renseigner toutes les informations de cette étape avant de continuer.'
+                        msg: 'Il manque quelques infos pour continuer.'
                     };
                 }
                 if (WIZARD_ZONES[step] === 'zone-prod'
@@ -7464,7 +7711,7 @@
                     const shown = card.querySelectorAll('.field.rv-on');
                     return {
                         el: shown.length ? shown[shown.length - 1] : card,
-                        msg: 'Merci de renseigner toutes les informations de cette étape avant de continuer.'
+                        msg: 'Il manque quelques infos pour continuer.'
                     };
                 }
                 const zone = document.getElementById(WIZARD_ZONES[step]);
@@ -7476,15 +7723,15 @@
                     const unit = unitEl ? ' ' + unitEl.textContent.trim() : '';
                     const v = parseFloat(inp.value);
                     if (inp.value.trim() === '' || isNaN(v)) {
-                        return { el: inp, msg: 'Merci de renseigner tous les champs de cette étape avant de continuer.' };
+                        return { el: inp, msg: 'Il manque quelques infos pour continuer.' };
                     }
                     // bornes min/max uniquement — on n'impose PAS le step (saisie libre)
                     const min = parseFloat(inp.min), max = parseFloat(inp.max);
                     if (!isNaN(min) && v < min) {
-                        return { el: inp, msg: 'Valeur trop basse : le minimum est ' + min.toLocaleString('fr-FR') + unit + '.' };
+                        return { el: inp, msg: 'C\'est un peu bas : le minimum est ' + min.toLocaleString('fr-FR') + unit + '.' };
                     }
                     if (!isNaN(max) && v > max) {
-                        return { el: inp, msg: 'Valeur trop élevée : le maximum est ' + max.toLocaleString('fr-FR') + unit + '.' };
+                        return { el: inp, msg: 'C\'est un peu élevé : le maximum est ' + max.toLocaleString('fr-FR') + unit + '.' };
                     }
                 }
                 return null;
@@ -7507,7 +7754,43 @@
                 });
             });
 
-            function _enterApp() {
+            // Écran de calcul (fake ~2 s) : perceived performance + on pousse le blog
+            // pendant que le regard est figé sur l'écran.
+            const _CL_STEPS = [
+                'On réveille le soleil de votre région ☀️',
+                'On simule votre année, heure par heure…',
+                'On dimensionne votre batterie Revolty…',
+                'On chasse le moindre kWh perdu…'
+            ];
+            function _runComputeLoader(done) {
+                const loader = document.getElementById('computeLoader');
+                const stepEl = document.getElementById('clStep');
+                const fill = document.getElementById('clBarFill');
+                let i = 0;
+                stepEl.classList.remove('swap');
+                stepEl.textContent = _CL_STEPS[0];
+                fill.style.width = '0';
+                loader.classList.add('show');
+                loader.setAttribute('aria-hidden', 'false');
+                requestAnimationFrame(() => { fill.style.width = '100%'; });
+                const cycle = setInterval(() => {
+                    i++;
+                    if (i >= _CL_STEPS.length) return;
+                    stepEl.classList.add('swap');
+                    setTimeout(() => {
+                        stepEl.textContent = _CL_STEPS[i];
+                        stepEl.classList.remove('swap');
+                    }, 220);
+                }, 500);
+                setTimeout(() => {
+                    clearInterval(cycle);
+                    loader.classList.remove('show');
+                    loader.setAttribute('aria-hidden', 'true');
+                    done();
+                }, 2000);
+            }
+
+            function _revealApp() {
                 _body.className = 'phase-app';
                 _restoreZones();
                 compute();
@@ -7518,6 +7801,14 @@
                     document.getElementById('leadGate').classList.add('show');
                 }, 600);
             }
+
+            function _enterApp() {
+                _runComputeLoader(_revealApp);
+            }
+
+            // Bouton skip : accès direct aux résultats (valeurs par défaut), sans loader.
+            const _wizSkip = document.getElementById('wizSkip');
+            if (_wizSkip) _wizSkip.addEventListener('click', _revealApp);
 
             document.getElementById('wizNext').addEventListener('click', () => {
                 const bad = _validateStep(_wizStep);
@@ -7565,19 +7856,24 @@
                 },
                 pilotage: {
                     t: 'Le pilotage heures pleines / heures creuses',
-                    p: 'Avec un contrat Heures Pleines / Heures Creuses, la batterie se recharge automatiquement sur le réseau pendant les heures creuses (électricité moins chère) pour être déchargée en heures pleines. Cet arbitrage sur le tarif réduit votre facture.'
+                    p: 'Avec un contrat Heures Pleines / Heures Creuses, la batterie se recharge automatiquement sur le réseau pendant les heures creuses (électricité moins chère) pour être déchargée en heures pleines. Cet écart de prix réduit votre facture.'
                 },
                 autoconso: {
-                    t: 'Le taux d\'autoconsommation',
-                    p: 'Part de votre production solaire que vous consommez chez vous (directement ou via la batterie), plutôt que de l\'injecter sur le réseau. Plus ce taux est élevé, mieux vous valorisez chaque kWh produit. Une batterie le fait grimper en stockant le surplus du jour pour la soirée.'
+                    t: 'C\'est quoi, l\'autoconsommation ?',
+                    p: 'C\'est la part de votre électricité solaire que vous consommez directement chez vous, au lieu de la renvoyer au réseau. Plus ce taux est élevé, plus votre toit vous fait économiser. Une batterie le booste : elle met de côté le soleil du midi pour vous le rendre le soir, quand vous en avez besoin.'
                 },
                 autoprod: {
-                    t: 'Le taux d\'autoproduction',
-                    p: 'Part de votre consommation électrique couverte par votre production solaire, plutôt que par le réseau. Plus ce taux est élevé, moins vous dépendez du fournisseur. Il dépend de la taille de l\'installation, de votre profil de consommation, et de la batterie qui décale le solaire vers les heures sans soleil.'
+                    t: 'C\'est quoi, l\'autoproduction ?',
+                    p: 'C\'est la part de votre consommation que couvre votre propre solaire, le reste venant du réseau. Plus ce taux est élevé, moins vous dépendez de votre fournisseur et de ses hausses de prix. Il grimpe avec la taille de l\'installation et avec une batterie, qui vous fournit du solaire même la nuit.'
+                },
+                chauffeeau: {
+                    t: 'Résistance ou thermodynamique ?',
+                    p: 'Pour les distinguer, observez votre ballon. Un chauffe-eau thermodynamique est surmonté d\'un bloc rond (une pompe à chaleur) et émet un bruit de ventilation lorsqu\'il chauffe ; il s\'agit généralement d\'un modèle récent. Un chauffe-eau à résistance se présente comme un simple cylindre, silencieux, et reste le plus répandu. En cas de doute, sélectionnez « Résistance ».'
                 }
             };
             document.querySelectorAll('.info-i').forEach(el => {
-                el.addEventListener('click', () => {
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     const info = _INFO_TEXTS[el.dataset.info];
                     if (!info) return;
                     document.getElementById('infoModalTitle').textContent = info.t;

@@ -15,19 +15,16 @@
 
     <header>
         <div class="logo">Revolty<span>.</span></div>
-        <small>Simulateur v4.3 — moteur trois seaux</small>
+        <small>Simulateur v4.3 · moteur trois seaux</small>
     </header>
 
     <div class="hero">
         <h1>Simulateur d'<em>autoconsommation</em><br />et économies</h1>
-        <p>Modèle saisonnier heure par heure — DPE, isolation, appareils spécifiques.</p>
+        <p>Modèle saisonnier heure par heure : DPE, isolation, appareils spécifiques.</p>
     </div>
 
     <!-- ═══════════ LAYOUT ONE-PAGE — Tests DA ═══════════ -->
-    <div id="titre-bar">Votre simulation de batterie Revolty</div>
-
-    <!-- Bandeau d'accueil résultats — mentions légales / cadre de lecture -->
-    <div id="intro-banner"><span id="introBannerText">Cette simulation est une estimation indicative, calculée à partir de données statistiques nationales et des informations que vous avez saisies. Elle ne constitue ni un devis, ni une étude de dimensionnement, ni un conseil personnalisé.</span></div>
+    <div id="titre-bar">On vous dit tout. Gratuitement, sans rien vous demander en retour.</div>
 
     <!-- Lead popup — pop-up fermable, affichée après l'entrée dans l'app -->
     <div class="lead-gate" id="leadGate">
@@ -37,8 +34,8 @@
             <!-- État initial : capture email -->
             <div id="leadGateInitial">
                 <div class="lead-gate-icon">✉️</div>
-                <h3>Déjà intéressé&nbsp;?</h3>
-                <p>Laissez-nous votre email pour être recontacté(e) au sujet de votre projet.</p>
+                <h3>On en parle&nbsp;?</h3>
+                <p>Laissez-nous votre email&nbsp;: un membre de l'équipe Revolty revient vers vous pour parler de votre projet.</p>
                 <form id="leadGateForm">
                     <input type="email" id="leadEmail" placeholder="Votre email" required />
                     <button type="submit">Être recontacté(e)</button>
@@ -50,13 +47,11 @@
             <!-- État succès : remerciement + CTA secondaire vers la réservation -->
             <div id="leadGateSuccess" style="display:none">
                 <div class="lead-gate-icon lead-gate-icon-ok">✓</div>
-                <h3>Merci&nbsp;!</h3>
-                <p>Un conseiller Revolty vous recontactera bientôt. Pour aller plus vite, vous pouvez
-                    <strong>réserver votre batterie</strong> dès maintenant&nbsp;:</p>
+                <h3>C'est noté, merci&nbsp;!</h3>
+                <p>On revient vers vous très vite. Envie d'avancer dès maintenant&nbsp;? <strong>Réservez votre batterie</strong>, c'est sans engagement&nbsp;:</p>
                 <a href="https://revolty.fr/reserver-ma-batterie" class="cta-btn cta-eco" target="_blank">
                     <span class="cta-action">Réserver votre batterie <span class="cta-arrow">→</span></span>
                 </a>
-                <p class="cta-reassure">Gratuit · Sans engagement</p>
             </div>
         </div>
     </div>
@@ -109,13 +104,16 @@
             <div class="install-illu">
                 <img src="https://cdn.jsdelivr.net/gh/Revolty-code/Simulation@main/pics/Installation.svg" alt="Installation solaire avec batterie" />
             </div>
-            <!-- 2 valeurs clés sous l'illustration : Solaire (prod + puissance) · Consommation.
+            <!-- 3 valeurs clés sous l'illustration : Production solaire / an · Puissance installée · Consommation.
                  La capacité batterie est déjà dans le segmented control au-dessus → non répétée ici. -->
             <div class="install-stats">
                 <div class="install-stat install-stat--solar">
                     <span class="install-val" id="outProdAnnuelle">—</span>
                     <span class="install-lbl">Production solaire / an</span>
-                    <span class="install-sub"><span id="schemaKwcVal">—</span> installés</span>
+                </div>
+                <div class="install-stat install-stat--solar">
+                    <span class="install-val" id="schemaKwcVal">—</span>
+                    <span class="install-lbl">Puissance installée</span>
                 </div>
                 <div class="install-stat install-stat--home">
                     <span class="install-val" id="schemaConsoVal">—</span>
@@ -153,20 +151,18 @@
                     <div class="val" id="outEcoTotal">—</div>
                 </div>
                 <div class="eco-side-box" id="cell-bonus-batt">
-                    <div class="sub-hd">Dont</div>
+                    <div class="sub-hd">Dont, grâce à la batterie</div>
                     <div class="val" id="ecoBatterie">—</div>
-                    <div class="eco-side-note">grâce à la batterie</div>
                 </div>
             </div>
 
             <!-- CTA principal : combine le % réduction et l'appel à l'action -->
             <a href="https://revolty.fr/reserver-ma-batterie" class="cta-btn cta-eco" id="impact-cta" target="_blank">
-                <span class="cta-stat">Vous réduisez <strong id="outPctReduc">—</strong> votre facture</span>
-                <span class="cta-action">Réservez votre batterie <span class="cta-arrow">→</span></span>
+                <span class="cta-stat" id="ctaStat">Vous effacez <strong id="outPctReduc">—</strong> de votre facture</span>
+                <span class="cta-action" id="ctaAction">Je réserve ma batterie <span class="cta-arrow">→</span></span>
             </a>
-            <p class="cta-reassure">Gratuit · Sans engagement</p>
             <details class="eco-details">
-                <summary>Voir le détail (revente + pilotage HP/HC)</summary>
+                <summary>Dans le détail : revente et pilotage heures creuses</summary>
                 <div class="eco-rp-pair">
                     <div class="col-metric" id="cell-revente">
                         <div class="sub-hd">Revente <span class="info-i" data-info="revente" aria-label="Info revente"><svg viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><circle cx="5" cy="2.2" r="0.9"/><rect x="4.25" y="3.9" width="1.5" height="4.2" rx="0.5"/></svg></span></div>
@@ -181,7 +177,7 @@
 
             <!-- Graphe projection sur 20 ans -->
             <div class="proj-block" id="cell-graph">
-                <div class="sub-hd">Projection sur 20 ans</div>
+                <div class="sub-hd">Ce que ça représente sur 20 ans</div>
                 <div class="proj-total" id="projTotal">—</div>
                 <div class="proj-chart" id="projChartWrap"></div>
                 <div class="proj-legend">
@@ -193,13 +189,14 @@
                     <span id="projLegSurplus" style="display:none"><span class="pleg-sq"
                             style="background:rgba(255,209,69,0.65)"></span>Surplus revendu</span>
                 </div>
+                <div style="margin-top:14px;margin-bottom:3px;font-size:1rem;font-weight:500;color:var(--dark);line-height:1.25">Faites varier le scénario d'évolution du prix de l'électricité</div>
                 <div id="proj-scenarios">
                     <button type="button" class="scenario active" data-esc="0.04">
-                        <div class="scenario-name">EDF · +4 %/an</div>
+                        <div class="scenario-name">Hausse modérée · +4 %/an</div>
                         <div class="scenario-val" id="scenEdf">—</div>
                     </button>
                     <button type="button" class="scenario" data-esc="0.10">
-                        <div class="scenario-name">Crise énergétique · +10 %/an</div>
+                        <div class="scenario-name">Flambée des prix · +10 %/an</div>
                         <div class="scenario-val" id="scenCrise">—</div>
                     </button>
                 </div>
@@ -213,38 +210,14 @@
                 <div class="impact-body">
                     <div class="impact-sect">
                         <div class="impact-roi-val" id="outRoiRange">—</div>
-                        <div class="impact-roi-note">Estimation pour une utilisation normale de la batterie.</div>
+                        <div class="impact-roi-note">Pour une utilisation classique au quotidien.</div>
                     </div>
                 </div>
             </div>
             <div class="col-card" id="col-impact">
                 <div class="col-card-hd">Impact</div>
                 <div class="impact-body">
-                    <!-- 1. CO₂ évité grâce à l'autoconsommation solaire (sur 20 ans) -->
-                    <div class="impact-card" id="impact-card-co2">
-                        <svg class="impact-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M12 22 V14"/>
-                            <path d="M8 14 Q 4 14 4 10 Q 4 5 9 5 Q 11 2 12 2 Q 13 2 15 5 Q 20 5 20 10 Q 20 14 16 14 Z"/>
-                        </svg>
-                        <div class="impact-card-body">
-                            <div class="impact-val" id="outCo2Evite">—</div>
-                            <div class="impact-lbl">de CO₂ évités sur 20 ans</div>
-                        </div>
-                    </div>
-                    <!-- 2. Électricité propre consommée (sur 20 ans) -->
-                    <div class="impact-card" id="impact-card-kwh">
-                        <svg class="impact-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <circle cx="12" cy="12" r="9"/>
-                            <polyline points="13 5 8 13 12 13 11 19 16 11 12 11 13 5"/>
-                        </svg>
-                        <div class="impact-card-body">
-                            <div class="impact-val" id="outKwhPropres">—</div>
-                            <div class="impact-lbl">d'électricité propre sur 20 ans</div>
-                        </div>
-                    </div>
-                    <!-- 3. Batterie reconditionnée Revolty (vs batterie neuve) — caché si pas de batterie -->
+                    <!-- 1. CO₂ évité grâce à la batterie reconditionnée — caché si pas de batterie -->
                     <div class="impact-card" id="impact-card-recond" style="display:none">
                         <svg class="impact-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -255,7 +228,33 @@
                         </svg>
                         <div class="impact-card-body">
                             <div class="impact-val" id="outCo2Batt">—</div>
-                            <div class="impact-lbl">grâce à la batterie reconditionnée Revolty</div>
+                            <div class="impact-lbl">grâce à votre batterie Revolty, reconditionnée en France</div>
+                        </div>
+                    </div>
+                    <!-- 2. Jours d'autonomie -->
+                    <div class="impact-card" id="impact-card-autonomie">
+                        <svg class="impact-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 11 L12 4 L21 11"/>
+                            <path d="M5 10 V20 H19 V10"/>
+                            <circle cx="12" cy="14" r="2.5"/>
+                            <path d="M12 14 L12 11"/>
+                        </svg>
+                        <div class="impact-card-body">
+                            <div class="impact-val" id="outAutonomie">—</div>
+                            <div class="impact-lbl">jours par an où votre maison vit en totale autonomie, sans rien tirer du réseau</div>
+                        </div>
+                    </div>
+                    <!-- 3. Électricité propre consommée (sur 20 ans) -->
+                    <div class="impact-card" id="impact-card-kwh">
+                        <svg class="impact-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9"/>
+                            <polyline points="13 5 8 13 12 13 11 19 16 11 12 11 13 5"/>
+                        </svg>
+                        <div class="impact-card-body">
+                            <div class="impact-val" id="outKwhPropres">—</div>
+                            <div class="impact-lbl">d'électricité 100 % solaire consommée chez vous sur 20 ans</div>
                         </div>
                     </div>
                 </div>
@@ -263,7 +262,7 @@
 
             <!-- Carte contact : interlocuteur direct — hors tuile Impact, sibling dans impact-col-wrap -->
             <div class="contact-card">
-                <div class="contact-hd">👋 Votre interlocuteur direct chez Revolty</div>
+                <div class="contact-hd">👋 Votre contact direct chez Revolty</div>
                 <div class="contact-identity">
                     <img class="contact-photo" src="https://cdn.jsdelivr.net/gh/Revolty-code/Simulation@main/pics/Valentin.jpeg" alt="Valentin Heuzé" />
                     <div class="contact-id-txt">
@@ -271,8 +270,7 @@
                         <div class="contact-title">Président &amp; Ingénieur</div>
                     </div>
                 </div>
-                <p class="contact-bio">Valentin est là pour répondre à toutes vos questions techniques
-                    et commerciales, de la première prise de contact jusqu'à votre première installation.</p>
+                <p class="contact-bio">Une question technique, un doute sur votre projet ? Valentin vous répond en direct, du premier message jusqu'au jour de l'installation.</p>
                 <div class="contact-links">
                     <a href="mailto:valentin@revolty.fr" class="contact-link">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
@@ -308,8 +306,8 @@
 
     <!-- ─── SÉPARATEUR RÉSULTATS / SAISIE ─── -->
     <div id="inputs-header">
-        <h2>Modifier mes déclarations</h2>
-        <p>Ajustez les champs ci-dessous : vos résultats se recalculent automatiquement.</p>
+        <h2>Affinez votre simulation</h2>
+        <p>Modifiez ce que vous voulez : tout se recalcule en direct.</p>
     </div>
 
     <!-- ─── INPUTS SECTION ─── -->
@@ -318,10 +316,8 @@
         <!-- ══ HERO WIZARD (visible uniquement en phase-wizard) ══ -->
         <div id="wizard-hero">
             <span class="wiz-badge"><span class="wiz-badge-dot"></span> Simulateur Revolty</span>
-            <h1 class="wiz-title">Combien votre batterie pourrait vous faire <em>économiser</em> ?</h1>
-            <p class="wiz-sub">Quelques questions sur votre foyer et votre installation. On vous dit combien
-                d'autoconsommation vous pouvez atteindre, combien vous gagnez chaque année, et quel modèle Revolty
-                s'adapte à votre cas.</p>
+            <h1 class="wiz-title">Combien votre batterie peut vous faire <em>économiser</em> ?</h1>
+            <p class="wiz-sub">Trois minutes, quelques questions sur votre maison, et on vous montre tout : l'énergie solaire que vous gardez pour vous, ce que vous économisez chaque année et la batterie Revolty taillée pour votre foyer.</p>
         </div>
 
         <!-- ══ ZONE CONSO ══ -->
@@ -329,13 +325,13 @@
 
         <!-- FOYER -->
         <div class="card" id="card-foyer">
-            <div class="card-title"><span class="ico">🏠</span> Consommation</div>
+            <div class="card-title"><span class="ico">🏠</span> Votre consommation</div>
 
                 <div class="field" id="fld-consomode">
-                    <span class="field-label">Comment renseigner votre consommation ?</span>
+                    <span class="field-label">Votre consommation, on l'estime ou vous la connaissez ?</span>
                     <div class="tile-grid cols-2">
                         <button type="button" class="tile-btn active" data-group="consoMode" data-val="estim"><span
-                                class="tile-icon">🧮</span><span class="tile-label">L'estimer</span></button>
+                                class="tile-icon">🧮</span><span class="tile-label">Estimons-la ensemble !</span></button>
                         <button type="button" class="tile-btn" data-group="consoMode" data-val="manuel"><span
                                 class="tile-icon">✏️</span><span class="tile-label">Je la connais</span></button>
                     </div>
@@ -343,7 +339,7 @@
 
                 <div id="estimFields">
                     <div class="field" id="fld-persons">
-                        <span class="field-label">Nombre de personnes</span>
+                        <span class="field-label">Combien êtes-vous dans le foyer ?</span>
                         <div class="tile-grid cols-5">
                             <button type="button" class="tile-btn" data-group="persons" data-val="1"><span
                                     class="tile-icon">1</span><span class="tile-label">personne</span></button>
@@ -359,7 +355,7 @@
                     </div>
 
                     <div class="field" id="fld-surface">
-                        <span class="field-label">Surface du logement</span>
+                        <span class="field-label">Surface de votre logement</span>
                         <div class="slider-row">
                             <input type="range" id="surface" min="30" max="250" step="5" value="140" />
                             <span class="slider-val"><span id="surfaceVal">140</span> m²</span>
@@ -367,19 +363,19 @@
                     </div>
 
                     <div class="field" id="fld-heat-e">
-                        <span class="field-label">Type de chauffage</span>
+                        <span class="field-label">Comment vous chauffez-vous ?</span>
                         <div class="tile-grid cols-3">
                             <button type="button" class="tile-btn active" data-group="heat" data-val="gaz"><span
                                     class="tile-icon">🔥</span><span class="tile-label">Gaz / Bois</span></button>
                             <button type="button" class="tile-btn" data-group="heat" data-val="pompe"><span
                                     class="tile-icon">🌡️</span><span class="tile-label">Pompe à chaleur</span></button>
                             <button type="button" class="tile-btn" data-group="heat" data-val="elec"><span
-                                    class="tile-icon">🔌</span><span class="tile-label">Résistance électrique</span></button>
+                                    class="tile-icon">🔌</span><span class="tile-label">Radiateurs électriques</span></button>
                         </div>
                     </div>
 
                     <div class="field" id="fld-presence">
-                        <span class="field-label">Présence dans le logement en journée</span>
+                        <span class="field-label">Êtes-vous chez vous en journée ?</span>
                         <div class="tile-grid cols-2">
                             <button type="button" class="tile-btn active" data-group="journee" data-val="maison"><span
                                     class="tile-icon">🏠</span><span class="tile-label">Souvent présent</span><span
@@ -393,15 +389,15 @@
                     <div class="field" data-private>
                         <span class="field-label">Isolation / Classe DPE</span>
                         <div class="dpe-selector">
-                            <button class="dpe-btn" data-dpe="A" title="A — très performant (BBC, RT2012+)">A</button>
-                            <button class="dpe-btn" data-dpe="B" title="B — performant">B</button>
-                            <button class="dpe-btn" data-dpe="C" title="C — bon (construction récente)">C</button>
-                            <button class="dpe-btn active" data-dpe="D" title="D — moyen (années 80–90)">D</button>
-                            <button class="dpe-btn" data-dpe="E" title="E — énergivore (avant 1975)">E</button>
-                            <button class="dpe-btn" data-dpe="F" title="F — passoire thermique">F</button>
-                            <button class="dpe-btn" data-dpe="G" title="G — très passoire">G</button>
+                            <button class="dpe-btn" data-dpe="A" title="A : très performant (BBC, RT2012+)">A</button>
+                            <button class="dpe-btn" data-dpe="B" title="B : performant">B</button>
+                            <button class="dpe-btn" data-dpe="C" title="C : bon (construction récente)">C</button>
+                            <button class="dpe-btn active" data-dpe="D" title="D : moyen (années 80-90)">D</button>
+                            <button class="dpe-btn" data-dpe="E" title="E : énergivore (avant 1975)">E</button>
+                            <button class="dpe-btn" data-dpe="F" title="F : passoire thermique">F</button>
+                            <button class="dpe-btn" data-dpe="G" title="G : très passoire">G</button>
                         </div>
-                        <p class="dpe-hint">Source : Open DPE ADEME 2021 — besoin thermique médian par classe (3 301
+                        <p class="dpe-hint">Source : Open DPE ADEME 2021, besoin thermique médian par classe (3 301
                             maisons)</p>
                     </div>
 
@@ -429,34 +425,33 @@
                                 step="100" />
                             <span class="unit">kWh / an</span>
                         </div>
-                        <p class="dpe-hint">Chiffre indiqué sur votre facture EDF ou dans votre espace Enedis.</p>
+                        <p class="dpe-hint">Vous le trouvez sur votre facture ou dans votre espace client (EDF, Enedis…).</p>
                     </div>
 
                     <div class="field" id="fld-heat-m">
-                        <span class="field-label">Chauffage principal</span>
+                        <span class="field-label">Votre chauffage principal</span>
                         <div class="tile-grid cols-3">
                             <button type="button" class="tile-btn active" data-group="heat" data-val="gaz"><span
                                     class="tile-icon">🔥</span><span class="tile-label">Gaz / Bois</span></button>
                             <button type="button" class="tile-btn" data-group="heat" data-val="pompe"><span
                                     class="tile-icon">🌡️</span><span class="tile-label">Pompe à chaleur</span></button>
                             <button type="button" class="tile-btn" data-group="heat" data-val="elec"><span
-                                    class="tile-icon">🔌</span><span class="tile-label">Résistance électrique</span></button>
+                                    class="tile-icon">🔌</span><span class="tile-label">Radiateurs électriques</span></button>
                         </div>
-                        <p class="dpe-hint">Détermine la saisonnalité (pic hiver) appliquée à votre conso.</p>
+                        <p class="dpe-hint">Sert à placer le pic de consommation en hiver.</p>
                     </div>
                 </div>
             </div>
 
             <!-- APPAREILS SPÉCIFIQUES (SEAU 3) -->
             <div class="card" id="card-appareils">
-                <div class="card-title"><span class="ico">⚡</span> Appareils spécifiques</div>
-                <p class="dpe-hint" style="margin-top:-4px;margin-bottom:10px">Cliquez sur les appareils que vous
-                    possédez.</p>
+                <div class="card-title"><span class="ico">⚡</span> Vos appareils les plus gourmands</div>
+                <p class="field-label" style="margin-top:-4px;margin-bottom:10px">Vous avez l'un de ces appareils chez vous ?</p>
                 <div class="tile-grid cols-5">
                     <button type="button" class="tile-btn active" data-appliance="ecs-joule"><span
                             class="tile-icon">🚿</span><span class="tile-label">Chauffe-eau</span><span
                             class="tile-sub">Résistance</span></button>
-                    <button type="button" class="tile-btn" data-appliance="ecs-thermo"><span
+                    <button type="button" class="tile-btn" data-appliance="ecs-thermo"><span class="info-i" data-info="chauffeeau" aria-label="Résistance ou thermodynamique ?"><svg viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><circle cx="5" cy="2.2" r="0.9"/><rect x="4.25" y="3.9" width="1.5" height="4.2" rx="0.5"/></svg></span><span
                             class="tile-icon">♨️</span><span class="tile-label">Chauffe-eau</span><span
                             class="tile-sub">Thermodynamique</span></button>
                     <button type="button" class="tile-btn active" data-appliance="ve"><span
@@ -479,7 +474,7 @@
 
             <!-- INSTALLATION -->
             <div class="card" id="card-prod">
-                <div class="card-title"><span class="ico">☀️</span> Production</div>
+                <div class="card-title"><span class="ico">☀️</span> Votre production solaire</div>
 
                 <div class="field" id="fld-dept">
                     <span class="field-label">Département</span>
@@ -490,11 +485,11 @@
                     <span class="field-label">Puissance installée</span>
                     <div class="tile-grid cols-2" style="margin-bottom:8px">
                         <button type="button" class="tile-btn active" data-group="hasPv" data-val="oui"><span
-                                class="tile-icon">☀️</span><span class="tile-label">J'ai des PV</span><span
+                                class="tile-icon">☀️</span><span class="tile-label">Oui, j'ai des panneaux</span><span
                                 class="tile-sub">PV = panneaux photovoltaïques</span></button>
                         <button type="button" class="tile-btn" data-group="hasPv" data-val="non"><span
-                                class="tile-icon">🏠</span><span class="tile-label">Pas encore de PV</span><span
-                                class="tile-sub">on simule une installation</span></button>
+                                class="tile-icon">🏠</span><span class="tile-label">Pas encore / je ne connais pas</span><span
+                                class="tile-sub">on en simule une pour vous</span></button>
                     </div>
                     <div class="optional-input-row" id="kwcField">
                         <input type="number" id="kwcInput" min="0" max="20" step="0.1" value="6" />
@@ -512,7 +507,7 @@
                 <div class="divider" id="prod-divider"></div>
 
                 <div class="field" id="fld-contrat">
-                    <span class="field-label">Type de contrat électricité</span>
+                    <span class="field-label">Votre contrat d'électricité</span>
                     <div class="tile-grid cols-3">
                         <button type="button" class="tile-btn active" data-group="contrat" data-val="base"><span
                                 class="tile-icon">💡</span><span class="tile-label">Tarif Base</span></button>
@@ -529,7 +524,7 @@
                 <div id="block-tarif-flex" class="hidden">
                     <div class="tarif-custom">
                         <div class="tarif-custom-field" style="flex:1">
-                            <label>Scénario de prix spot</label>
+                            <label>Scénario de prix</label>
                             <div class="tile-grid cols-3" style="margin-top:6px">
                                 <button type="button" class="tile-btn" data-group="flexScenario" data-val="p10"><span
                                         class="tile-label">Bas (p10)</span></button>
@@ -542,7 +537,7 @@
                     </div>
                     <div style="font-size:0.68rem; color:var(--muted); margin-top:5px;">
                         Tarif indexé sur le spot Day-ahead FR (ENTSO-E 2024-2026), TVA + acheminement inclus. La
-                        fourchette p10–p90 reflète la variabilité historique.
+                        fourchette p10 à p90 reflète la variabilité historique.
                     </div>
                 </div>
 
@@ -551,8 +546,7 @@
                         <div class="tarif-custom-field"><label>Prix Base (€/kWh)</label><input type="number"
                                 id="tarifBase" value="0.1940" step="0.001" min="0.05" max="0.5" /></div>
                     </div>
-                    <div style="font-size:0.68rem; color:var(--muted); margin-top:5px;">Pré-rempli TRV mars 2026.
-                        Modifiable.</div>
+                    <div style="font-size:0.68rem; color:var(--muted); margin-top:5px;">Prix EDF en vigueur, vous pouvez l'ajuster</div>
                 </div>
 
                 <div id="block-tarifs-custom" class="hidden">
@@ -562,8 +556,7 @@
                         <div class="tarif-custom-field"><label>Prix HC (€/kWh)</label><input type="number" id="tarifHC"
                                 value="0.1579" step="0.001" min="0.05" max="0.5" /></div>
                     </div>
-                    <div style="font-size:0.68rem; color:var(--muted); margin-top:5px;">Pré-rempli TRV mars 2026.
-                        Modifiable.</div>
+                    <div style="font-size:0.68rem; color:var(--muted); margin-top:5px;">Prix EDF en vigueur, vous pouvez l'ajuster</div>
                 </div>
 
                 <div class="divider" id="rachat-divider"></div>
@@ -576,7 +569,7 @@
                         <span class="unit">€ / kWh</span>
                     </div>
                     <div style="font-size:0.68rem;color:var(--muted);margin-top:5px">
-                        0 si pas de contrat de revente · EDF Obligation d'Achat actuel ≈ 0,04 €/kWh
+                        Sans contrat de revente ? Laissez 0. Avec EDF OA, mettez 0,04 €
                     </div>
                 </div>
 
@@ -639,8 +632,12 @@
             <span id="wizProgress">Étape 1 / 2</span>
             <button type="button" id="wizNext">Suivant →</button>
         </div>
+        <button type="button" id="wizSkip">Passer et voir un exemple de résultats →</button>
     </div>
     <!-- /#inputs-section -->
+
+    <!-- Footer — mentions légales / cadre de lecture -->
+    <footer id="intro-banner"><span id="introBannerText">Ceci est une estimation construite à partir de vos réponses et de données nationales de référence, pour vous donner un ordre de grandeur fiable. Ce n'est ni un devis, ni une étude de dimensionnement, ni un conseil personnalisé.</span></footer>
 
     <!-- ─── STASH : composants conservés pour le moteur JS (hors écran) ─── -->
     <div class="result-card locked" id="js-stash">
@@ -692,10 +689,10 @@
         <div class="methodo-panel" id="methodPanel">
             <h4>Modèle trois seaux v4</h4>
             La consommation est décomposée en trois composantes indépendantes :
-            <br><br><strong>Seau 1 — Usages courants</strong> : électroménager, éclairage, audiovisuel,
+            <br><br><strong>Seau 1, usages courants</strong> : électroménager, éclairage, audiovisuel,
             informatique, cuisson. Driver : nombre de personnes. Source : Panel Elecdom ADEME/Enertech/RTE 2021.
             Profil horaire : RES1 Enedis corrigé (contribution ECS et clim nationales soustraites).
-            <br><br><strong>Seau 2 — Chauffage</strong> :
+            <br><br><strong>Seau 2, chauffage</strong> :
             <code>surface × Bch[DPE] × coeff[heat] × behav[DPE]</code>. Bch =
             besoin thermique bâtiment (kWh_th/m²/an), issu de l'Open DPE ADEME sur 3 301 maisons.
             <code>coeff</code> = 0 (gaz), 0,33 (PAC air/eau ≥2017, COP=3), 0,87 (résistance, pertes distribution
@@ -705,10 +702,10 @@
             Sources : Sunikka-Blank &amp; Galvin (BRI 2012), Allibe (thèse EDF R&amp;D / Mines ParisTech 2012),
             ENL/SDES 2020.
             Saisonnalité fort hiver.
-            <br><br><strong>Seau 3 — Appareils spécifiques</strong> : ECS (profil 23h mesuré, Panel Elecdom), VE
-            (même profil nocturne), piscine (8h–18h mai–sept), clim (14h–18h juin–août, modèle
-            surface × intensité kWh/m² par zone RT2012 — ancrage ADEME 2,3 kWh/m², ~1 kWh/m² nord
-            → ~4 kWh/m² Méditerranée, +35% si chauffage PAC réversible). Addition pure — pas de
+            <br><br><strong>Seau 3, appareils spécifiques</strong> : ECS (profil 23h mesuré, Panel Elecdom), VE
+            (même profil nocturne), piscine (8h-18h mai-sept), clim (14h-18h juin-août, modèle
+            surface × intensité kWh/m² par zone RT2012 ; ancrage ADEME 2,3 kWh/m², ~1 kWh/m² nord
+            → ~4 kWh/m² Méditerranée, +35% si chauffage PAC réversible). Addition pure, pas de
             double-comptage avec RES1 corrigé.
             <h4>Simulation batterie</h4>
             SOC propagé heure par heure, 3 passes de convergence vers régime permanent. Rendement aller-retour
@@ -797,14 +794,12 @@
     <div id="pvNoticeOverlay" class="pv-notice-overlay">
         <div class="pv-notice-card">
             <div class="pv-notice-icon">☀️</div>
-            <h3>À propos du dimensionnement solaire</h3>
-            <p>Nous vous proposons un dimensionnement solaire calculé à partir de votre profil de
-                consommation. Il s'agit d'une <strong>hypothèse de travail</strong> destinée à illustrer
-                le potentiel d'une batterie Revolty. Ce n'est ni un devis, ni une étude de
-                dimensionnement adaptée à votre logement.</p>
-            <p><strong>Revolty ne commercialise pas de panneaux photovoltaïques. Pour tout projet solaire,
-                rapprochez-vous d'un installateur photovoltaïque professionnel certifié RGE.</strong></p>
-            <button type="button" id="pvNoticeOk">J'ai compris</button>
+            <h3>Pas de soucis !</h3>
+            <p>On part d'une hypothèse calculée sur votre consommation, juste pour vous montrer ce
+                qu'une batterie Revolty pourrait vous apporter. <strong>Ceci n'est pas un devis.</strong></p>
+            <p>Un projet solaire vous tente ? On se fera un plaisir de vous mettre en relation avec un
+                installateur certifié RGE de confiance.</p>
+            <button type="button" id="pvNoticeOk">C'est noté, merci !</button>
         </div>
     </div>
 
@@ -815,6 +810,22 @@
             <h3 id="infoModalTitle">—</h3>
             <p id="infoModalText">—</p>
             <button type="button" id="infoModalOk">J'ai compris</button>
+        </div>
+    </div>
+
+    <!-- ─── ÉCRAN DE CALCUL — fake ~2 s, capte l'attention + pousse le blog ─── -->
+    <div id="computeLoader" class="compute-loader" aria-hidden="true" role="status" aria-live="polite">
+        <div class="cl-card">
+            <div class="cl-sun">
+                <div class="cl-ring"></div>
+                <div class="cl-sun-emoji">☀️</div>
+            </div>
+            <div class="cl-title">Votre simulation se compile…</div>
+            <div class="cl-step" id="clStep">On réveille le soleil de votre région</div>
+            <div class="cl-bar"><div class="cl-bar-fill" id="clBarFill"></div></div>
+            <a class="cl-blog" href="https://revolty.fr/blog" target="_blank" rel="noopener">
+                En attendant, faites un tour sur notre blog <span class="cl-arrow">→</span>
+            </a>
         </div>
     </div>
 

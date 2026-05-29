@@ -1507,8 +1507,7 @@
     const BATT_EFF = 0.92;   // round-trip LFP (0.96 × 0.96)
     const SOC_INIT = 0.30;   // SOC initial pour la convergence en régime permanent (30%)
     const AUTOPROD_CAP = 95; // plafond du taux d'autoproduction affiché (%)
-    const DIM_SOUS_RATIO = 0.75; // seuil sous-dimensionnement batterie (ratio capacité / surplus/j)
-    const DIM_OK_RATIO = 1.25; // seuil sur-dimensionnement batterie
+    const DIM_SOUS_RATIO = 0.75; // seuil "surplus déborde la capacité max" (cas multi-batteries)
 
     // Impact carbone — batterie reconditionnée Revolty
     // Source : données internes Revolty — 1 tCO₂eq pour 10 kWh de batterie neuve
@@ -2736,7 +2735,10 @@
         const roiBlock = document.getElementById('col-roi');
         const roiOut = document.getElementById('outRoiRange');
         if (roiBlock && roiOut) {
-            if (battKwh <= 0 || deltaBattAn <= 0) {
+            if (battKwh <= 0) {
+                roiOut.textContent = '—';
+                roiBlock.style.display = '';
+            } else if (deltaBattAn <= 0) {
                 roiBlock.style.display = 'none';
             } else {
                 const capexLoc = battKwh * CAPEX_BATT_PAR_KWH;
@@ -2756,7 +2758,7 @@
                 } else {
                     const lo = Math.floor(bkLoc);
                     const hi = lo + 1;
-                    roiOut.textContent = 'Entre ' + lo + ' et ' + hi + ' ans';
+                    roiOut.textContent = 'Rentabilisée en ' + lo + ' à ' + hi + ' ans';
                     roiBlock.style.display = '';
                 }
             }
@@ -2855,7 +2857,7 @@
             const inp = document.getElementById('kwcInput');
             if (inp && parseFloat(inp.value) !== kwc) inp.value = kwc.toFixed(1);
             document.getElementById('kwcHelper').textContent =
-                `Hypothèse PV indexée sur votre consommation : ${kwc} kWc`;
+                `On simule ${kwc} kWc, adapté à votre profil`;
             if (typeof updateKwcWarn === 'function') updateKwcWarn();
         }
         const kwc = state.kwc || 0;
@@ -2909,20 +2911,34 @@
         const ecoTotalBase = resBase.ecoDirecte + resBase.ecoBatterie + resBase.ecoRevente;
         const fmt = v => v > 0 ? '+\u00a0' + v.toLocaleString('fr-FR') + '\u00a0€' : '—';
 
-        // ── Highlight batterie « OPTIMALE » — calée sur le surplus ──────────────
-        // Optimale = celle dont le ratio capacité/surplus journalier est le plus
-        // proche de 1 — même méthode physique que le diagnostic ci-dessous, donc
-        // jamais de contradiction. Surplus mesuré sans batterie (resBase) →
-        // indépendant du choix utilisateur, pas de boucle de rétroaction.
-        const surplusJourBrut = resBase.kWhSurplus / 365;
-        let optimalBatt = null;
-        if (surplusJourBrut > 0.1) {
-            let bestDiff = Infinity;
-            [5, 10, 15].forEach(k => {
-                const diff = Math.abs(k / surplusJourBrut - 1);
-                if (diff < bestDiff) { bestDiff = diff; optimalBatt = k; }
-            });
-        }
+        // ── Highlight batterie « OPTIMALE » — optimum RoI × énergie ─────────────
+        // Deux objectifs antagonistes : le RoI favorise la plus petite (CAPEX
+        // linéaire) ; la conso/prod captée favorise la plus grosse (éco annuelle
+        // plus élevée, mais saturante). On les unifie en UNE fonction objectif :
+        // la valeur nette sur l'horizon = Σ(éco escaladée) − CAPEX. Comme l'éco
+        // marginale décroît et le CAPEX marginal est constant, cette courbe a un
+        // sommet : l'optimum est son argmax, vraiment calculé sur le profil (pas
+        // un seuil fixe). k=0 (sans batterie, valeur nette 0) est dans la course :
+        // si aucune taille ne crée de valeur positive, aucune n'est badgée.
+        const BATT_OPTS = [5, 10, 15];
+        // Éco totale nette pour une capacité donnée — même formule qu'ecoTotal
+        // (pilotage HP/HC inclus si contrat hphc, coût HC déduit en flex).
+        const ecoForBatt = k => {
+            if (k <= 0) return ecoTotalBase;
+            const pilot = state.contrat === 'hphc';
+            const r = simMensuelle(prodAnnuelle, kwhs, k, tarifH, pilot);
+            return r.ecoDirecte + r.ecoBatterie + r.ecoRevente - (r.ecoCoutHC || 0);
+        };
+        // Facteur d'annuité escaladée sur l'horizon (même escalade que
+        // renderPayback, sans actualisation pour rester cohérent avec la tuile RoI).
+        let annuiteEsc = 0;
+        for (let y = 1; y <= HORIZON; y++) annuiteEsc += Math.pow(1 + projEscalation, y - 1);
+        const valeurNette = k => (ecoForBatt(k) - ecoTotalBase) * annuiteEsc - k * CAPEX_BATT_PAR_KWH;
+        let optimalBatt = null, bestVal = 0; // 0 = valeur nette du « sans batterie »
+        BATT_OPTS.forEach(k => {
+            const v = valeurNette(k);
+            if (v > bestVal) { bestVal = v; optimalBatt = k; }
+        });
         document.querySelectorAll('.objectif-btn').forEach(btn => {
             const b = parseInt(btn.dataset.batt);
             btn.classList.toggle('optimal-batt', optimalBatt !== null && b === optimalBatt);
@@ -2956,12 +2972,40 @@
         // Le CTA dit déjà "Vous réduisez X votre facture" → on n'affiche pas le signe moins (double négation).
         // La sticky bar le préfixe via du texte HTML ("− X facture").
         const pctReducTxt = pctReduc > 0 ? pctReduc + ' %' : '—';
-        document.getElementById('outPctReduc').textContent = pctReducTxt;
+        const _pctEl = document.getElementById('outPctReduc');
+        if (_pctEl) _pctEl.textContent = pctReducTxt;
         // Sticky bar mobile : on parle en € (plus parlant qu'un %)
         const _stickyEco = document.getElementById('stickyEcoTxt');
         if (_stickyEco) _stickyEco.textContent = ecoTotal > 0
             ? ecoTotal.toLocaleString('fr-FR') + ' €'
             : '—';
+
+        // CTA contextuel : sans batterie, on n'invite pas à « réserver » (incohérent) →
+        // upsell chiffré qui, au clic, sélectionne la batterie optimale (cf. listener init).
+        const _cta = document.getElementById('impact-cta');
+        const _ctaStat = document.getElementById('ctaStat');
+        const _ctaAction = document.getElementById('ctaAction');
+        if (_cta && _ctaStat && _ctaAction) {
+            if (state.batt === 0) {
+                const uplift = optimalBatt ? Math.round(ecoForBatt(optimalBatt) - ecoTotalBase) : 0;
+                if (optimalBatt && uplift > 0) {
+                    _ctaStat.innerHTML = '<strong>+' + uplift.toLocaleString('fr-FR') + ' €/an</strong> avec une Revolty ' + optimalBatt;
+                    _ctaAction.innerHTML = 'Voir l\'effet d\'une batterie <span class="cta-arrow">→</span>';
+                    _cta.dataset.mode = 'upsell';
+                    _cta.dataset.targetBatt = optimalBatt;
+                } else {
+                    _ctaStat.innerHTML = 'Et avec une batterie&nbsp;?';
+                    _ctaAction.innerHTML = 'Découvrir les batteries Revolty <span class="cta-arrow">→</span>';
+                    _cta.dataset.mode = 'link';
+                    delete _cta.dataset.targetBatt;
+                }
+            } else {
+                _ctaStat.innerHTML = 'Vous effacez <strong id="outPctReduc">' + pctReducTxt + '</strong> de votre facture';
+                _ctaAction.innerHTML = 'Je réserve ma batterie <span class="cta-arrow">→</span>';
+                _cta.dataset.mode = 'link';
+                delete _cta.dataset.targetBatt;
+            }
+        }
 
         document.getElementById('outAutoConso').textContent = resBatt.autoConsoRate + '%';
         document.getElementById('outAutoProd').textContent = resBatt.autoProdRate + '%';
@@ -3017,7 +3061,7 @@
         // Banner "tarif flex non adapté" si l'eco flex p50 est inferieure au TRV Base
         const noteEl = document.getElementById('tarifNote');
         if (isFlex && ecoBaseRefAnnuelle != null && ecoTotal < ecoBaseRefAnnuelle - 1) {
-            noteEl.innerHTML += `<div style="color:#FFD145;font-weight:600;margin-top:4px">⚠ Tarif flex non adapté à votre profil — éco TRV Base ≈ ${Math.round(ecoBaseRefAnnuelle).toLocaleString('fr-FR')} €/an</div>`;
+            noteEl.innerHTML += `<div style="color:#FFD145;font-weight:600;margin-top:4px">⚠ Tarif flex non adapté à votre profil, éco TRV Base ≈ ${Math.round(ecoBaseRefAnnuelle).toLocaleString('fr-FR')} €/an</div>`;
         }
 
         // ── Diagnostic : dimensionnement ───────────────────────────────────────
@@ -3026,21 +3070,25 @@
         const surplusJourMoy = (kWhStockedIn + resBatt.kWhSurplus) / 365;
         const ratio = surplusJourMoy > 0.1 ? state.batt / surplusJourMoy : 999;
         const MAX_BATT_KWH = 15;
+        // Classification alignée sur la batterie OPTIMALE (optimum RoI × énergie)
+        // plutôt que sur le ratio physique seul : sinon le badge « OPTIMALE » et
+        // ce diagnostic pourraient se contredire. Le ratio physique ne sert plus
+        // qu'au cas « max » (surplus qui déborde même la plus grosse batterie).
         let dim, dimLabel, dimClass, msgText, msgClass;
         if (state.batt === 0) {
             dim = 'base'; dimLabel = ''; dimClass = 'dim-badge'; msgText = ''; msgClass = 'surplus-msg hidden';
-        } else if (state.batt >= MAX_BATT_KWH && ratio < DIM_SOUS_RATIO) {
-            dim = 'max'; dimLabel = 'Capacité maximum'; dimClass = 'dim-badge dim-max';
-            msgText = '💎 Vous avez atteint le max avec une seule batterie ! Votre surplus dépasse cette capacité — contactez-nous pour étudier une installation multi-batteries.'; msgClass = 'surplus-msg max';
-        } else if (ratio < DIM_SOUS_RATIO) {
-            dim = 'sous'; dimLabel = 'Sous-dimensionnée'; dimClass = 'dim-badge dim-sous';
-            msgText = '📈 Une partie du surplus repart sur le réseau pour presque rien. Le modèle supérieur récupérerait davantage.'; msgClass = 'surplus-msg sous';
-        } else if (ratio <= DIM_OK_RATIO) {
-            dim = 'ok'; dimLabel = 'Bien dimensionnée'; dimClass = 'dim-badge dim-ok';
-            msgText = '✅ La batterie est bien calibrée pour absorber votre surplus solaire.'; msgClass = 'surplus-msg ok';
+        } else if (state.batt >= MAX_BATT_KWH && optimalBatt === MAX_BATT_KWH && ratio < DIM_SOUS_RATIO) {
+            dim = 'max'; dimLabel = 'Au max 💎'; dimClass = 'dim-badge dim-max';
+            msgText = 'Le maximum d\'une seule batterie, et vous la remplissez déjà ! Votre surplus va même au-delà : parlons-en pour une installation multi-batteries.'; msgClass = 'surplus-msg max';
+        } else if (optimalBatt !== null && state.batt < optimalBatt) {
+            dim = 'sous'; dimLabel = 'Vous pouvez faire mieux 💡'; dimClass = 'dim-badge dim-sous';
+            msgText = 'Une partie de votre solaire part sans être valorisée. La Revolty ' + optimalBatt + ' en profiterait bien plus.'; msgClass = 'surplus-msg sous';
+        } else if (optimalBatt !== null && state.batt === optimalBatt) {
+            dim = 'ok'; dimLabel = 'Pile la bonne taille 🎯'; dimClass = 'dim-badge dim-ok';
+            msgText = 'Cette batterie capte votre surplus solaire au meilleur rapport entre rentabilité et énergie. Difficile de faire mieux.'; msgClass = 'surplus-msg ok';
         } else {
-            dim = 'sur'; dimLabel = 'Surdimensionnée'; dimClass = 'dim-badge dim-sur';
-            msgText = '🚀 La batterie a plus de capacité que votre production ne génère de surplus. Ajoutez des panneaux pour en exploiter tout le potentiel.'; msgClass = 'surplus-msg sur';
+            dim = 'sur'; dimLabel = 'Un peu trop grande ☀️'; dimClass = 'dim-badge dim-sur';
+            msgText = 'Cette batterie voit plus grand que votre production. Ajoutez des panneaux et vous exploiterez tout son potentiel.'; msgClass = 'surplus-msg sur';
         }
         // Feedback de dimensionnement inline (dot coloré + status + message court).
         // Le state vit sur le conteneur .dim-feedback via is-ok / is-sous / is-sur / is-max.
@@ -3082,19 +3130,12 @@
 
         // Bandeau d'accueil : texte légal statique (rempli dans le HTML, plus de mise à jour dynamique).
 
-        // ── Impact : 3 cartes positives (CO₂ réseau évité, kWh propres, batterie reconditionnée)
-        // Hypothèse : intensité carbone réseau France ≈ 50 g CO₂/kWh.
+        // ── Impact : kWh propres + batterie reconditionnée + pistes alternatives ──
         const HORIZON_YEARS = 20;
-        const INTENSITE_RESEAU = 0.050;   // kg CO₂ / kWh
 
         const kWhAutoconsoAn = prodAnnuelle * (resBatt.autoConsoRate || 0) / 100;
         const kWhPropres20 = Math.round(kWhAutoconsoAn * HORIZON_YEARS);
-        const co2EviteRes20 = Math.round(kWhPropres20 * INTENSITE_RESEAU);
 
-        document.getElementById('outCo2Evite').textContent =
-            co2EviteRes20 >= 1000
-                ? (co2EviteRes20 / 1000).toFixed(1).replace('.', ',') + ' tonnes'
-                : co2EviteRes20.toLocaleString('fr-FR') + ' kg';
         document.getElementById('outKwhPropres').textContent =
             kWhPropres20.toLocaleString('fr-FR') + ' kWh';
 
@@ -3108,6 +3149,17 @@
         } else {
             _recond.style.display = 'none';
         }
+
+        // Jours d'autonomie : vrais jours sans AUCUN soutirage réseau.
+        // On compte les jours-types (semaine/weekend × 12 mois) dont le soutirage
+        // journalier est nul, pondérés par leur nombre de jours. ≈ 0 en solaire seul
+        // (nuits toujours achetées), grimpe avec la batterie.
+        let joursAutonomie = 0;
+        (resBatt.debugMonthly || []).forEach(dm => {
+            if (dm.dAchat < 0.05) joursAutonomie += dm.nDays;
+        });
+        document.getElementById('outAutonomie').textContent =
+            joursAutonomie.toLocaleString('fr-FR') + ' jours';
 
         // ── Outputs objet (debug) ─────────────────────────────────────────────
         const outputs = {
@@ -3447,22 +3499,22 @@
         }
         const fE = v => (v >= 0 ? '+' : '') + v.toFixed(2).replace('.', ',') + ' €';
         document.getElementById('dbgMetrics').innerHTML = `
-    <div class="dbg-metric hl"><div class="dm-val">${consoAn.toLocaleString('fr-FR')} kWh</div><div class="dm-lbl">Conso annuelle simulée</div></div>
-    <div class="dbg-metric"><div class="dm-val">${f(totConso)}</div><div class="dm-lbl">Conso journée</div></div>
-    <div class="dbg-metric hl"><div class="dm-val">${Math.round(consoMois).toLocaleString('fr-FR')} kWh</div><div class="dm-lbl">Conso mois</div></div>
-    <div class="dbg-metric hl"><div class="dm-val">${Math.round(prodAnnuelle).toLocaleString('fr-FR')} kWh</div><div class="dm-lbl">Prod PV annuelle</div></div>
-    <div class="dbg-metric hl"><div class="dm-val">${f(totProd)}</div><div class="dm-lbl">Production PV</div></div>
-    <div class="dbg-metric"><div class="dm-val">${f(totDir)}</div><div class="dm-lbl">Autoconso directe</div></div>
-    <div class="dbg-metric"><div class="dm-val">${f(totRest)}</div><div class="dm-lbl">Restitution batt.</div></div>
-    <div class="dbg-metric red"><div class="dm-val">${f(totAchat)}</div><div class="dm-lbl">Achat réseau</div></div>
-    ${pilotActive ? `<div class="dbg-metric" style="color:#9B6DFF"><div class="dm-val" style="color:#9B6DFF">${f(totPilot)}</div><div class="dm-lbl">Recharge HC pilotée</div></div>` : ''}
-    ${pilotActive ? `<div class="dbg-metric" style="color:#9B6DFF"><div class="dm-val" style="color:#9B6DFF">${fE(gainJour)}</div><div class="dm-lbl">Bénéfice pilotage ce jour</div></div>` : ''}
-    <div class="dbg-metric"><div class="dm-val">${autoRate}%</div><div class="dm-lbl">Autoconso journée</div></div>
-    ${battKwh > 0 ? `<div class="dbg-metric"><div class="dm-val">${(H.soc[23] * 1000).toFixed(0)} Wh</div><div class="dm-lbl">SOC fin journée</div></div>` : ''}
-    <div class="dbg-metric" style="color:#FF9F45"><div class="dm-val" style="color:#FF9F45">${prixMin.toFixed(3).replace('.', ',')} – ${prixMax.toFixed(3).replace('.', ',')}</div><div class="dm-lbl">Prix min – max (€/kWh)</div></div>
-    <div class="dbg-metric" style="color:#FF9F45"><div class="dm-val" style="color:#FF9F45">${prixMoy.toFixed(4).replace('.', ',')}</div><div class="dm-lbl">Prix moyen jour</div></div>
-    ${isFlexDbg ? `<div class="dbg-metric" style="color:#FF9F45"><div class="dm-val" style="color:#FF9F45">${(prixMax / prixMin).toFixed(2)}×</div><div class="dm-lbl">Ratio pic/creux</div></div>` : ''}
-  `;
+<div class="dbg-metric hl"><div class="dm-val">${consoAn.toLocaleString('fr-FR')} kWh</div><div class="dm-lbl">Conso annuelle simulée</div></div>
+<div class="dbg-metric"><div class="dm-val">${f(totConso)}</div><div class="dm-lbl">Conso journée</div></div>
+<div class="dbg-metric hl"><div class="dm-val">${Math.round(consoMois).toLocaleString('fr-FR')} kWh</div><div class="dm-lbl">Conso mois</div></div>
+<div class="dbg-metric hl"><div class="dm-val">${Math.round(prodAnnuelle).toLocaleString('fr-FR')} kWh</div><div class="dm-lbl">Prod PV annuelle</div></div>
+<div class="dbg-metric hl"><div class="dm-val">${f(totProd)}</div><div class="dm-lbl">Production PV</div></div>
+<div class="dbg-metric"><div class="dm-val">${f(totDir)}</div><div class="dm-lbl">Autoconso directe</div></div>
+<div class="dbg-metric"><div class="dm-val">${f(totRest)}</div><div class="dm-lbl">Restitution batt.</div></div>
+<div class="dbg-metric red"><div class="dm-val">${f(totAchat)}</div><div class="dm-lbl">Achat réseau</div></div>
+${pilotActive ? `<div class="dbg-metric" style="color:#9B6DFF"><div class="dm-val" style="color:#9B6DFF">${f(totPilot)}</div><div class="dm-lbl">Recharge HC pilotée</div></div>` : ''}
+${pilotActive ? `<div class="dbg-metric" style="color:#9B6DFF"><div class="dm-val" style="color:#9B6DFF">${fE(gainJour)}</div><div class="dm-lbl">Bénéfice pilotage ce jour</div></div>` : ''}
+<div class="dbg-metric"><div class="dm-val">${autoRate}%</div><div class="dm-lbl">Autoconso journée</div></div>
+${battKwh > 0 ? `<div class="dbg-metric"><div class="dm-val">${(H.soc[23] * 1000).toFixed(0)} Wh</div><div class="dm-lbl">SOC fin journée</div></div>` : ''}
+<div class="dbg-metric" style="color:#FF9F45"><div class="dm-val" style="color:#FF9F45">${prixMin.toFixed(3).replace('.', ',')} – ${prixMax.toFixed(3).replace('.', ',')}</div><div class="dm-lbl">Prix min – max (€/kWh)</div></div>
+<div class="dbg-metric" style="color:#FF9F45"><div class="dm-val" style="color:#FF9F45">${prixMoy.toFixed(4).replace('.', ',')}</div><div class="dm-lbl">Prix moyen jour</div></div>
+${isFlexDbg ? `<div class="dbg-metric" style="color:#FF9F45"><div class="dm-val" style="color:#FF9F45">${(prixMax / prixMin).toFixed(2)}×</div><div class="dm-lbl">Ratio pic/creux</div></div>` : ''}
+`;
 
         // ── Layout ──
         const ML = 38, MR = battKwh > 0 ? 38 : 8, MT = 4, MB = 28;
@@ -3586,6 +3638,18 @@
             _animateProj = true;
             compute();
         });
+    });
+
+    // CTA « sans batterie » en mode upsell : le clic sélectionne la batterie
+    // optimale et recalcule, au lieu d'ouvrir la page de réservation.
+    const _impactCta = document.getElementById('impact-cta');
+    if (_impactCta) _impactCta.addEventListener('click', (e) => {
+        if (_impactCta.dataset.mode === 'upsell') {
+            e.preventDefault();
+            const btn = document.querySelector('.objectif-btn[data-batt="' + _impactCta.dataset.targetBatt + '"]');
+            if (btn) btn.click();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     });
 
     // DPE
@@ -3717,7 +3781,7 @@
         DEPT_LIST.forEach(d => {
             const opt = document.createElement('option');
             opt.value = d.code;
-            opt.textContent = d.code + ' — ' + d.nom;
+            opt.textContent = d.code + ' · ' + d.nom;
             if (d.code === state.dept) opt.selected = true;
             sel.appendChild(opt);
         });
@@ -3779,6 +3843,11 @@
     const _body = document.body;
     const _leadForm = document.getElementById('leadGateForm');
     const WIZARD_ZONES = ['zone-conso', 'zone-prod'];
+    // Sous-titre du hero, contextuel à l'étape : accueil chaleureux puis « on y est presque ».
+    const _WIZ_SUBS = [
+        'Trois minutes, quelques questions sur votre maison, et on vous montre tout : l\'énergie solaire que vous gardez pour vous, ce que vous économisez chaque année et la batterie Revolty taillée pour votre foyer.',
+        'On y est presque ! Encore deux, trois infos sur vos panneaux et votre contrat, et on vous livre vos chiffres.'
+    ];
     let _wizStep = 0;
     let _pvNoticeShown = false; // modale hypothèse PV affichée une seule fois
 
@@ -3792,6 +3861,8 @@
         document.getElementById('wizNext').textContent = last ? 'Voir mes résultats →' : 'Suivant →';
         document.getElementById('wizProgress').textContent =
             'Étape ' + (_wizStep + 1) + ' / ' + WIZARD_ZONES.length;
+        const _sub = document.querySelector('.wiz-sub');
+        if (_sub) _sub.textContent = _WIZ_SUBS[_wizStep] || _WIZ_SUBS[0];
     }
 
     function _restoreZones() {
@@ -3908,7 +3979,7 @@
             const shown = card.querySelectorAll('.field.rv-on');
             return {
                 el: shown.length ? shown[shown.length - 1] : card,
-                msg: 'Merci de renseigner toutes les informations de cette étape avant de continuer.'
+                msg: 'Il manque quelques infos pour continuer.'
             };
         }
         if (WIZARD_ZONES[step] === 'zone-prod'
@@ -3917,7 +3988,7 @@
             const shown = card.querySelectorAll('.field.rv-on');
             return {
                 el: shown.length ? shown[shown.length - 1] : card,
-                msg: 'Merci de renseigner toutes les informations de cette étape avant de continuer.'
+                msg: 'Il manque quelques infos pour continuer.'
             };
         }
         const zone = document.getElementById(WIZARD_ZONES[step]);
@@ -3929,15 +4000,15 @@
             const unit = unitEl ? ' ' + unitEl.textContent.trim() : '';
             const v = parseFloat(inp.value);
             if (inp.value.trim() === '' || isNaN(v)) {
-                return { el: inp, msg: 'Merci de renseigner tous les champs de cette étape avant de continuer.' };
+                return { el: inp, msg: 'Il manque quelques infos pour continuer.' };
             }
             // bornes min/max uniquement — on n'impose PAS le step (saisie libre)
             const min = parseFloat(inp.min), max = parseFloat(inp.max);
             if (!isNaN(min) && v < min) {
-                return { el: inp, msg: 'Valeur trop basse : le minimum est ' + min.toLocaleString('fr-FR') + unit + '.' };
+                return { el: inp, msg: 'C\'est un peu bas : le minimum est ' + min.toLocaleString('fr-FR') + unit + '.' };
             }
             if (!isNaN(max) && v > max) {
-                return { el: inp, msg: 'Valeur trop élevée : le maximum est ' + max.toLocaleString('fr-FR') + unit + '.' };
+                return { el: inp, msg: 'C\'est un peu élevé : le maximum est ' + max.toLocaleString('fr-FR') + unit + '.' };
             }
         }
         return null;
@@ -3960,7 +4031,43 @@
         });
     });
 
-    function _enterApp() {
+    // Écran de calcul (fake ~2 s) : perceived performance + on pousse le blog
+    // pendant que le regard est figé sur l'écran.
+    const _CL_STEPS = [
+        'On réveille le soleil de votre région ☀️',
+        'On simule votre année, heure par heure…',
+        'On dimensionne votre batterie Revolty…',
+        'On chasse le moindre kWh perdu…'
+    ];
+    function _runComputeLoader(done) {
+        const loader = document.getElementById('computeLoader');
+        const stepEl = document.getElementById('clStep');
+        const fill = document.getElementById('clBarFill');
+        let i = 0;
+        stepEl.classList.remove('swap');
+        stepEl.textContent = _CL_STEPS[0];
+        fill.style.width = '0';
+        loader.classList.add('show');
+        loader.setAttribute('aria-hidden', 'false');
+        requestAnimationFrame(() => { fill.style.width = '100%'; });
+        const cycle = setInterval(() => {
+            i++;
+            if (i >= _CL_STEPS.length) return;
+            stepEl.classList.add('swap');
+            setTimeout(() => {
+                stepEl.textContent = _CL_STEPS[i];
+                stepEl.classList.remove('swap');
+            }, 220);
+        }, 500);
+        setTimeout(() => {
+            clearInterval(cycle);
+            loader.classList.remove('show');
+            loader.setAttribute('aria-hidden', 'true');
+            done();
+        }, 2000);
+    }
+
+    function _revealApp() {
         _body.className = 'phase-app';
         _restoreZones();
         compute();
@@ -3971,6 +4078,14 @@
             document.getElementById('leadGate').classList.add('show');
         }, 600);
     }
+
+    function _enterApp() {
+        _runComputeLoader(_revealApp);
+    }
+
+    // Bouton skip : accès direct aux résultats (valeurs par défaut), sans loader.
+    const _wizSkip = document.getElementById('wizSkip');
+    if (_wizSkip) _wizSkip.addEventListener('click', _revealApp);
 
     document.getElementById('wizNext').addEventListener('click', () => {
         const bad = _validateStep(_wizStep);
@@ -4018,19 +4133,24 @@
         },
         pilotage: {
             t: 'Le pilotage heures pleines / heures creuses',
-            p: 'Avec un contrat Heures Pleines / Heures Creuses, la batterie se recharge automatiquement sur le réseau pendant les heures creuses (électricité moins chère) pour être déchargée en heures pleines. Cet arbitrage sur le tarif réduit votre facture.'
+            p: 'Avec un contrat Heures Pleines / Heures Creuses, la batterie se recharge automatiquement sur le réseau pendant les heures creuses (électricité moins chère) pour être déchargée en heures pleines. Cet écart de prix réduit votre facture.'
         },
         autoconso: {
-            t: 'Le taux d\'autoconsommation',
-            p: 'Part de votre production solaire que vous consommez chez vous (directement ou via la batterie), plutôt que de l\'injecter sur le réseau. Plus ce taux est élevé, mieux vous valorisez chaque kWh produit. Une batterie le fait grimper en stockant le surplus du jour pour la soirée.'
+            t: 'C\'est quoi, l\'autoconsommation ?',
+            p: 'C\'est la part de votre électricité solaire que vous consommez directement chez vous, au lieu de la renvoyer au réseau. Plus ce taux est élevé, plus votre toit vous fait économiser. Une batterie le booste : elle met de côté le soleil du midi pour vous le rendre le soir, quand vous en avez besoin.'
         },
         autoprod: {
-            t: 'Le taux d\'autoproduction',
-            p: 'Part de votre consommation électrique couverte par votre production solaire, plutôt que par le réseau. Plus ce taux est élevé, moins vous dépendez du fournisseur. Il dépend de la taille de l\'installation, de votre profil de consommation, et de la batterie qui décale le solaire vers les heures sans soleil.'
+            t: 'C\'est quoi, l\'autoproduction ?',
+            p: 'C\'est la part de votre consommation que couvre votre propre solaire, le reste venant du réseau. Plus ce taux est élevé, moins vous dépendez de votre fournisseur et de ses hausses de prix. Il grimpe avec la taille de l\'installation et avec une batterie, qui vous fournit du solaire même la nuit.'
+        },
+        chauffeeau: {
+            t: 'Résistance ou thermodynamique ?',
+            p: 'Pour les distinguer, observez votre ballon. Un chauffe-eau thermodynamique est surmonté d\'un bloc rond (une pompe à chaleur) et émet un bruit de ventilation lorsqu\'il chauffe ; il s\'agit généralement d\'un modèle récent. Un chauffe-eau à résistance se présente comme un simple cylindre, silencieux, et reste le plus répandu. En cas de doute, sélectionnez « Résistance ».'
         }
     };
     document.querySelectorAll('.info-i').forEach(el => {
-        el.addEventListener('click', () => {
+        el.addEventListener('click', (e) => {
+            e.stopPropagation();
             const info = _INFO_TEXTS[el.dataset.info];
             if (!info) return;
             document.getElementById('infoModalTitle').textContent = info.t;
